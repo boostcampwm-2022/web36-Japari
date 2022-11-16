@@ -1,3 +1,4 @@
+-- SQLBook: Code
 -- CreateTable
 CREATE TABLE `user` (
     `user_id` INTEGER NOT NULL AUTO_INCREMENT,
