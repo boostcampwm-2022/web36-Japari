@@ -1,0 +1,38 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model user {
+  user_id    Int     @default(autoincrement()) @id
+  email String
+  nickname  String? 
+  score Int @default(0)
+  profile_image String  @default("/public/profile/default.jpg")
+
+  // https://github.com/prisma/prisma/discussions/13214
+  from_users friend[] @relation("from_user")
+  to_users friend[] @relation("to_user")
+}
+
+model game {
+  game_id Int @default(autoincrement()) @id
+  name String
+  minimum_people Int
+}
+
+model friend {
+  from_user     user @relation(name: "from_user", fields: [from_user_id], references: [user_id])
+  from_user_id  Int
+  to_user       user @relation(name: "to_user", fields: [to_user_id], references: [user_id])
+  to_user_id    Int
+
+  @@id([from_user_id, to_user_id])
+}
