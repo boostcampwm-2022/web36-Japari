@@ -16,6 +16,7 @@ jobs:
           REDIS_HOST: ${{ secrets.REDIS_HOST }}
           REDIS_PORT: ${{ secrets.REDIS_PORT }}
           REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD }}
+        run: echo 환경변수 주입
 
       - name: 체크아웃
         uses: actions/checkout@v3
