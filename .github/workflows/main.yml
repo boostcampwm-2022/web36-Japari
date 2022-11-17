@@ -4,6 +4,12 @@ on:
   push:
     branches: [main]
 
+env:
+  DATABASE_URL: ${{ secrets.DATABASE_URL }}
+  REDIS_HOST: ${{ secrets.REDIS_HOST }}
+  REDIS_PORT: ${{ secrets.REDIS_PORT }}
+  REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD }}
+
 jobs:
   deploy:
     runs-on: self-hosted
@@ -30,11 +36,6 @@ jobs:
 
       - name: server 환경변수 파일 생성
         working-directory: ./server
-        env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
-          REDIS_HOST: ${{ secrets.REDIS_HOST }}
-          REDIS_PORT: ${{ secrets.REDIS_PORT }}
-          REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD }}
         run: |
           echo DATABASE_URL=$DATABASE_URL > .env
           echo REDIS_HOST=$REDIS_HOST >> .env
