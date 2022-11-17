@@ -1,0 +1,42 @@
+name: 배포
+
+on:
+    push:
+        branches: [main]
+
+jobs:
+   deploy:
+        runs-on: self-hostedelf-hosted
+        # https://docs.github.com/en/actions/hosting-your-own-runners/adding-self-hosted-runners
+
+        steps:
+      - run: echo "안녕" 
+      # - name: "context"
+      #   env:
+      #     COMMIT_ID: ${{ github.sha }}
+      #   run: echo "Commit ID = $COMMIT_ID"
+
+      #       - name: checkout
+           #    uses: actions/checkout@v3
+      #   with:
+      #     path: 어쩌구 # 경로 지정
+      #     fetch-depth: 0 # fetch all histories of all branches ?
+
+            # - name: install modules
+            #   run: |
+            #       cd client
+            #       npm install
+            #       cd ../server
+            #       npm install
+            #       cd ..
+
+            # - name: build project
+            #   run: |
+            #       cd client
+            #       npm run build
+            #       cd ../server
+            #       npm run build
+            #       cd ..
+
+           #  - name: Step 2 - 어쩌구를 한다
+           #    run: ls -al 같은 코드
