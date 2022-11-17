@@ -16,7 +16,8 @@ jobs:
           REDIS_HOST: ${{ secrets.REDIS_HOST }}
           REDIS_PORT: ${{ secrets.REDIS_PORT }}
           REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD }}
-        run: echo 환경변수 주입
+        run: |
+          echo
 
       - name: 체크아웃
         uses: actions/checkout@v3
@@ -39,10 +40,10 @@ jobs:
       - name: server 환경변수 파일 생성
         working-directory: ./server
         run: |
-          echo DATABASE_URL=$DATABASE_URL > .env
-          echo REDIS_HOST=$REDIS_HOST >> .env
-          echo REDIS_PORT=$REDIS_PORT >> .env
-          echo REDIS_PASSWORD=$REDIS_PASSWORD >> .env
+          echo DATABASE_URL=${{ env.DATABASE_URL }} > .env
+          echo REDIS_HOST=${{ env.REDIS_HOST }} >> .env
+          echo REDIS_PORT=${{ env.REDIS_PORT }} >> .env
+          echo REDIS_PASSWORD=${{ env.REDIS_PASSWORD }} >> .env
 
       - name: 배포
         working-directory: ./server
