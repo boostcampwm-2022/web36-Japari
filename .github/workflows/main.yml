@@ -6,7 +6,7 @@ on:
 
 jobs:
    deploy:
-        runs-on: self-hostedelf-hosted
+        runs-on: self-hosted
         # https://docs.github.com/en/actions/hosting-your-own-runners/adding-self-hosted-runners
 
         steps:
