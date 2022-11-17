@@ -10,34 +10,41 @@ jobs:
     # https://docs.github.com/en/actions/hosting-your-own-runners/adding-self-hosted-runners
 
     steps:
-      - uses: actions/checkout@v3
-      - run: echo "안녕"
-    # - name: "context"
-    #   env:
-    #     COMMIT_ID: ${{ github.sha }}
-    #   run: echo "Commit ID = $COMMIT_ID"
+      - name: 환경변수 주입
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          REDIS_HOST: ${{ secrets.REDIS_HOST }}
+          REDIS_PORT: ${{ secrets.REDIS_PORT }}
+          REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD }}
 
-    #       - name: checkout
-    #    uses: actions/checkout@v3
-    #   with:
-    #     path: 어쩌구 # 경로 지정
-    #     fetch-depth: 0 # fetch all histories of all branches ?
+      - name: 체크아웃
+        uses: actions/checkout@v3
+        run: echo "안녕"
 
-    # - name: install modules
-    #   run: |
-    #       cd client
-    #       npm install
-    #       cd ../server
-    #       npm install
-    #       cd ..
+      - name: client 모듈 설치
+        working-directory: ./client
+        run: npm install
 
-    # - name: build project
-    #   run: |
-    #       cd client
-    #       npm run build
-    #       cd ../server
-    #       npm run build
-    #       cd ..
+      - name: client 빌드
+        working-directory: ./client
+        run: |
+          npm run build
+          rm -rf /var/www/build
+          cp -rf ./build /var/www/
 
-    #  - name: Step 2 - 어쩌구를 한다
-    #    run: ls -al 같은 코드
+      - name: server 모듈 설치
+        working-directory: ./server
+        run: npm install
+
+      - name: server 환경변수 파일 생성
+        working-directory: ./server
+        run: |
+          echo DATABASE_URL=$DATABASE_URL > .env
+          echo REDIS_HOST=$REDIS_HOST >> .env
+          echo REDIS_PORT=$REDIS_PORT >> .env
+          echo REDIS_PASSWORD=$REDIS_PASSWORD >> .env
+
+      - name: 배포
+        working-directory: ./server
+        run: |
+          echo 배포 시작
