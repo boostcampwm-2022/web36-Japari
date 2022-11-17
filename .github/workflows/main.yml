@@ -12,9 +12,9 @@ env:
 
 jobs:
   deploy:
-    runs-on: self-hosted
-    # https://docs.github.com/en/actions/hosting-your-own-runners/adding-self-hosted-runners
-
+    runs-on:
+      self-hosted
+      # https://docs.github.com/en/actions/hosting-your-own-runners/adding-self-hosted-runners
     steps:
       - name: 체크아웃
         uses: actions/checkout@v3
@@ -42,7 +42,6 @@ jobs:
           echo REDIS_PORT=$REDIS_PORT >> .env
           echo REDIS_PASSWORD=$REDIS_PASSWORD >> .env
 
-      - name: 배포
+      - name: pm2 프로세스 재실행
         working-directory: ./server
-        run: |
-          echo 배포 시작
+        run: pm2 restart japari
