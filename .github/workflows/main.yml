@@ -10,6 +10,7 @@ jobs:
     # https://docs.github.com/en/actions/hosting-your-own-runners/adding-self-hosted-runners
 
     steps:
+      - uses: actions/checkout@v3
       - run: echo "안녕"
     # - name: "context"
     #   env:
