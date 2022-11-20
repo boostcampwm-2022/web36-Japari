@@ -5,6 +5,9 @@ export const landingPageBodyStyle = css`
   display: flex;
   flex-direction: column;
   align-items: center;
+  gap: 30px;
+  padding: 30px;
+  box-sizing: border-box;
 `;
 
 export const jaPartyWordStyle = css`
@@ -28,4 +31,18 @@ export const descriptionStyle = css`
 export const firstRowStyle = css`
   display: flex;
   flex-direction: row;
+`;
+
+export const landingImageStyle = css`
+  width: 100%;
+`;
+
+export const logoContainerStyle = css`
+  display: flex;
+  gap: 20px;
+`;
+
+export const logoStyle = css`
+  height: 60px;
+  width: 60px;
 `;

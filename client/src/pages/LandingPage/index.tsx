@@ -1,6 +1,14 @@
 /** @jsxImportSource @emotion/react */
 import React from "react";
-import { landingPageBodyStyle, jaPartyWordStyle, descriptionStyle, firstRowStyle } from "./style";
+import {
+  landingPageBodyStyle,
+  jaPartyWordStyle,
+  descriptionStyle,
+  firstRowStyle,
+  logoStyle,
+  logoContainerStyle,
+  landingImageStyle,
+} from "./style";
 import { Page } from "../../stories/Page";
 
 const LandingPage: React.FC = () => {
@@ -13,8 +21,15 @@ const LandingPage: React.FC = () => {
           <br />
           나의 표정을 읽히지 않고 상대의 표정을 읽어내 게임에서 승리하세요!
         </div>
-        <div>image</div>
-        <div>소셜 로그인</div>
+        <div>
+          <img css={landingImageStyle} src="/landing-image.png" />
+        </div>
+        <div css={logoContainerStyle}>
+          <img css={logoStyle} src="/logo/naver_logo.png" />
+          <img css={logoStyle} src="/logo/kakao_logo.png" />
+          <img css={logoStyle} src="/logo/google_logo.png" />
+          <img css={logoStyle} src="/logo/github_logo.png" />
+        </div>
       </div>
     </Page>
   );
