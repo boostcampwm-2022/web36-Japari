@@ -22,7 +22,7 @@ export const globalStyle = css`
     font-weight: 100;
   }
 
-  body {
+  * {
     font-family: "LINESeedKR";
     font-size: 16px;
   }
