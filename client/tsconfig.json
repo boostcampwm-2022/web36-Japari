@@ -17,5 +17,6 @@
     "jsx": "react-jsx",
     "types": ["@emotion/react/types/css-prop"]
   },
-  "include": ["src"]
+  "include": ["src"],
+  "typeRoots": ["@types"]
 }
