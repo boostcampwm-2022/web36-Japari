@@ -2,12 +2,11 @@
 import React from "react";
 import {
   landingPageBodyStyle,
-  jaPartyWordStyle,
   descriptionStyle,
-  firstRowStyle,
-  logoStyle,
-  logoContainerStyle,
+  jaPartyWordStyle,
   landingImageStyle,
+  logoContainerStyle,
+  logoStyle,
 } from "./style";
 import { Page } from "../../stories/Page";
 
