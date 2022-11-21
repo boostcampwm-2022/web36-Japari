@@ -17,7 +17,7 @@ export interface RoomRecordProps {
 const RoomRecord = ({ isPrivate, title, gameId, currentPeople, maximumPeople }: RoomRecordProps) => {
   return (
     <div css={roomRecordStyle}>
-      <img src={lockIcon} />
+      {isPrivate ? <img src={lockIcon} /> : <div></div>}
       <div css={divisionLineStyle}></div>
       <span>{title}</span>
       <div css={divisionLineStyle}></div>

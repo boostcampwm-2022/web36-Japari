@@ -8,7 +8,8 @@ export const roomRecordStyle = css`
   background: #5992ff;
   border-radius: 5px;
 
-  > img {
+  > *:first-child {
+    width: 1.25rem;
     padding-left: 1.25rem;
     padding-right: 1rem;
   }
@@ -23,7 +24,7 @@ export const roomRecordStyle = css`
     padding-right: 1rem;
 
     &:nth-child(3) {
-      width: 20rem;
+      width: 30rem;
     }
 
     &:nth-child(5) {

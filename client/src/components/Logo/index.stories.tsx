@@ -8,20 +8,8 @@ export default {
 
 const Template: Story<LogoProps> = args => <Logo {...args} />;
 
-export const Both = Template.bind({});
-Both.storyName = "이미지 & 글자";
-Both.args = {
+export const Default = Template.bind({});
+Default.storyName = "로고";
+Default.args = {
   logoType: "BOTH",
-};
-
-export const ImageOnly = Template.bind({});
-ImageOnly.storyName = "이미지";
-ImageOnly.args = {
-  logoType: "IMAGE_ONLY",
-};
-
-export const WordOnly = Template.bind({});
-WordOnly.storyName = "글자";
-WordOnly.args = {
-  logoType: "WORD_ONLY",
 };

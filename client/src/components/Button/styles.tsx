@@ -3,8 +3,11 @@ import { css } from "@emotion/react";
 export const largeButtonStyle = css`
   border-radius: 10px;
   box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
-  width: 100px;
-  height: 30px;
+  width: 6rem;
+  height: 2rem;
+
+  font-family: "LINESeedKR";
+  font-weight: bold;
 `;
 
 export const smallButtonStyle = css`
@@ -12,8 +15,12 @@ export const smallButtonStyle = css`
   border-radius: 5px;
   box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
 
-  width: 60px;
-  height: 25px;
+  width: 3.5rem;
+  height: 1.5rem;
+
+  padding-top: 3px;
+  font-family: "LINESeedKR";
+  font-weight: bold;
 `;
 
 export const gameStartButtonStyle = css`
