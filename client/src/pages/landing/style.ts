@@ -8,6 +8,7 @@ export const landingPageBodyStyle = css`
   gap: 30px;
   padding: 30px;
   box-sizing: border-box;
+  font-weight: bold;
 `;
 
 export const jaPartyWordStyle = css`
