@@ -4,17 +4,19 @@ export const camContainerStyle = css`
   display: inline-flex;
   flex-direction: column;
   align-items: center;
+  gap: 0.5rem;
 
   > span {
     font-size: 18px;
     font-weight: bold;
 
     &:nth-child(2) {
-      margin-top: 0.5rem;
+      margin-top: 0.25rem;
     }
 
     &:last-child {
       color: gray;
+      font-size: 16px;
     }
   }
 `;

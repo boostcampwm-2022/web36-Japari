@@ -15,7 +15,7 @@ export const containerStyle = css`
 export const roomListHeaderStyle = css`
   display: inline-block;
   margin-top: 1rem;
-  margin-bottom: 0.5rem;
+  margin-bottom: 1rem;
 
   > label {
     line-height: 20px;
