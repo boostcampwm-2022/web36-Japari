@@ -32,7 +32,7 @@ const RoomSetting = () => {
             <Select SelectType="게임 생성" />
           </li>
           <li>
-            <Input placeholder="" />
+            <Input placeholder="방 이름을 입력해 주세요." />
           </li>
           <li>
             <Select SelectType="공개방 설정" />

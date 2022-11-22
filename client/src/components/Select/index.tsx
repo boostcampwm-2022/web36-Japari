@@ -43,10 +43,8 @@ const Select = ({ SelectType }: SelectProps) => {
     case "공개방 설정":
       return (
         <div css={style.selectWrapper}>
-          <select css={style.selectBox}>
-            <option value="public" selected>
-              공개방
-            </option>
+          <select css={style.selectBox} defaultValue="public">
+            <option value="public">공개방</option>
             <option value="private">비공개방</option>
           </select>
         </div>

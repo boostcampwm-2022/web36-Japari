@@ -3,12 +3,17 @@ import * as style from "./styles";
 
 import NickNameSetting from "./Contents/NickNameSetting";
 import RoomSetting from "./Contents/RoomSetting";
+import FriendRequest from "./Contents/FriendRequest";
 
 export interface ModalProps {
   ModalType: "닉네임 설정" | "방 설정" | "비밀번호 입력" | "친구 요청" | "게임 초대";
+  nickname?: string;
+  email?: string;
+  score?: number;
+  rank?: number;
 }
 
-const Modal = ({ ModalType }: ModalProps) => {
+const Modal = ({ ModalType, nickname, email, score, rank }: ModalProps) => {
   let content = null;
 
   switch (ModalType) {
@@ -20,10 +25,11 @@ const Modal = ({ ModalType }: ModalProps) => {
       break;
     case "비밀번호 입력":
       break;
-    // case "친구 요청":
-    //   content = <RequestFrie />;
-    //   break;
+    case "친구 요청":
+      content = <FriendRequest nickname={nickname!} email={email!} score={score!} rank={rank!} />;
+      break;
     case "게임 초대":
+      // content = <GameInvitation />
       break;
   }
 

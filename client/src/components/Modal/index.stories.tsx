@@ -23,4 +23,8 @@ export const Default = Template.bind({});
 Default.storyName = "모달";
 Default.args = {
   ModalType: "닉네임 설정",
+  nickname: "아임더베스트",
+  email: "mathlife12345@gmail.com",
+  score: 1443,
+  rank: 893,
 };

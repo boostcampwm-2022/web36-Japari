@@ -7,6 +7,7 @@ export interface InputProps {
 
 const Input = ({ placeholder }: InputProps) => {
   let styled = null;
+  let textType = "text";
   switch (placeholder) {
     case "":
       styled = [style.inputStyle, style.smallInputStyle];
@@ -19,9 +20,10 @@ const Input = ({ placeholder }: InputProps) => {
       break;
     case "비밀번호를 입력해 주세요.":
       styled = [style.inputStyle, style.largeInputStyle];
+      textType = "password";
       break;
   }
-  return <input css={styled} type="text" placeholder={placeholder} />;
+  return <input css={styled} type={textType} placeholder={placeholder} />;
 };
 
 export default Input;
