@@ -4,6 +4,7 @@ export const largeButtonStyle = css`
   &:hover {
     opacity: 0.6;
     cursor: pointer;
+    transition: all 0.3s;
   }
 
   border-radius: 10px;
@@ -19,6 +20,7 @@ export const smallButtonStyle = css`
   &:hover {
     opacity: 0.4;
     cursor: pointer;
+    transition: all 0.3s;
   }
 
   border: 1px solid black;

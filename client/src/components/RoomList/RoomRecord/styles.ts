@@ -4,6 +4,8 @@ export const roomRecordStyle = css`
   &:hover {
     background: blue;
     cursor: pointer;
+
+    transition: all 0.3s;
   }
 
   display: inline-flex;
