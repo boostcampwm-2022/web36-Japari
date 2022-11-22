@@ -1,29 +1,24 @@
 /** @jsxImportSource @emotion/react */
+import { css } from "@emotion/react";
 import * as style from "./styles";
 
 export interface InputProps {
-  placeholder: "" | "메세지 입력하기..." | "방 이름을 입력해 주세요." | "비밀번호를 입력해 주세요.";
+  type: "text" | "password";
+  width?: string;
+  placeholder: string;
 }
 
-const Input = ({ placeholder }: InputProps) => {
-  let styled = null;
-  let textType = "text";
-  switch (placeholder) {
-    case "":
-      styled = [style.inputStyle, style.smallInputStyle];
-      break;
-    case "메세지 입력하기...":
-      styled = [style.inputStyle, style.chatInputStyle];
-      break;
-    case "방 이름을 입력해 주세요.":
-      styled = [style.inputStyle, style.largeInputStyle];
-      break;
-    case "비밀번호를 입력해 주세요.":
-      styled = [style.inputStyle, style.largeInputStyle];
-      textType = "password";
-      break;
-  }
-  return <input css={styled} type={textType} placeholder={placeholder} />;
+const Input = ({ type, width, placeholder }: InputProps) => {
+  return (
+    <input
+      css={css`
+        ${style.inputStyle}
+        width: ${width};
+      `}
+      type={type}
+      placeholder={placeholder}
+    />
+  );
 };
 
 export default Input;

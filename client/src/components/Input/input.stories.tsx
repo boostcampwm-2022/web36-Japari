@@ -11,5 +11,6 @@ const Template: Story<InputProps> = args => <Input {...args} />;
 export const Default = Template.bind({});
 Default.storyName = "인풋";
 Default.args = {
-  placeholder: "",
+  type: "text",
+  placeholder: "이름을 입력하세요...",
 };
