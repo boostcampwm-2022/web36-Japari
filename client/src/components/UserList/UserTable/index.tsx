@@ -12,6 +12,16 @@ export interface UserTableProps {
 const UserTable = ({ users, selected }: UserTableProps) => {
   return (
     <div css={style.TableContainerStyle}>
+      <div css={style.TableRankContainerStyle}>
+        {selected === 2 &&
+          Array.from(Array(10).keys()).map((_, idx) => {
+            return (
+              <div css={style.TableRankStyle}>
+                <p css={style.TableRankNumberStyle}>{idx + 1}</p>
+              </div>
+            );
+          })}
+      </div>
       <ul css={style.TableStyle}>
         {users.map((user, key) => {
           return <UserRecord key={key} user={user} />;
