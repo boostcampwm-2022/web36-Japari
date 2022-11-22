@@ -32,7 +32,7 @@ export const camWrapperStyle = css`
   border: 1px solid green;
   overflow: hidden;
 
-  width: 12rem;
+  width: 10rem;
   aspect-ratio: 4/3;
 
   > video {
