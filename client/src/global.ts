@@ -112,7 +112,6 @@ export const globalStyle = css`
     padding: 0;
     border: 0;
     font-size: 100%;
-    font: inherit;
     vertical-align: baseline;
   }
   /* HTML5 display-role reset for older browsers */
@@ -159,7 +158,6 @@ export const globalStyle = css`
   textarea {
     color: inherit;
     font-size: inherit;
-    font-family: inherit;
   }
   a {
     text-decoration: none;
