@@ -8,7 +8,7 @@ export default {
 
 const Template: Story<ChatLogProps> = args => <ChatLog {...args} />;
 
-export const dummyLog = [
+const dummyLog = [
   {
     sender: "user1",
     message: "안녕하세요",
