@@ -1,10 +1,8 @@
 /** @jsxImportSource @emotion/react */
-
 import Input from "../../Input";
 import Button from "../../Button";
 import Select from "../../Select";
-import CheckBox from "../../CheckBox";
-import * as style from "../styles";
+import * as style from "./styles";
 
 const RoomSetting = () => {
   return (
@@ -29,23 +27,26 @@ const RoomSetting = () => {
         </ul>
         <ul>
           <li>
-            <Select SelectType="게임 생성" />
+            <Select selectType="게임 생성" width="13rem" />
           </li>
           <li>
-            <Input placeholder="방 이름을 입력해 주세요." />
+            <Input type="text" placeholder="방 이름을 입력해 주세요." width="13rem" />
           </li>
           <li>
-            <Select SelectType="공개방 설정" />
+            <Select selectType="공개방 설정" width="13rem" />
           </li>
           <li>
-            <Input placeholder="비밀번호를 입력해 주세요." />
+            <Input type="password" placeholder="비밀번호를 입력해 주세요." width="13rem" />
           </li>
           <li>
-            <Select SelectType="인원 제한" />
+            <Select selectType="인원 제한" width="13rem" />
           </li>
         </ul>
       </aside>
-      <Button buttonType="확인" handleClick={() => {}} />
+      <div css={style.footerStyle}>
+        <Button buttonType="확인" handleClick={() => {}} />
+        <Button buttonType="닫기" handleClick={() => {}} />
+      </div>
     </>
   );
 };

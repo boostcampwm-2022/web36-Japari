@@ -1,16 +1,23 @@
 /** @jsxImportSource @emotion/react */
 import * as style from "./styles";
+import { css } from "@emotion/react";
 
 export interface SelectProps {
-  SelectType: "게임 필터" | "게임 생성" | "인원 제한" | "공개방 설정";
+  selectType: "게임 필터" | "게임 생성" | "인원 제한" | "공개방 설정";
+  width?: string;
 }
 
-const Select = ({ SelectType }: SelectProps) => {
-  switch (SelectType) {
+const Select = ({ selectType, width }: SelectProps) => {
+  switch (selectType) {
     case "게임 필터":
       return (
         <div css={style.selectWrapper}>
-          <select css={style.selectBox}>
+          <select
+            css={css`
+              ${style.selectBox}
+              width: ${width};
+            `}
+          >
             <option>모든 게임</option>
             <option value="catchMind">캐치 마인드</option>
             <option value="battleShip">배틀십</option>
@@ -21,7 +28,12 @@ const Select = ({ SelectType }: SelectProps) => {
     case "게임 생성":
       return (
         <div css={style.selectWrapper}>
-          <select css={style.selectBox}>
+          <select
+            css={css`
+              ${style.selectBox}
+              width: ${width};
+            `}
+          >
             <option>게임을 선택해 주세요.</option>
             <option value="catchMind">캐치 마인드</option>
             <option value="battleShip">배틀십</option>
@@ -32,7 +44,12 @@ const Select = ({ SelectType }: SelectProps) => {
     case "인원 제한":
       return (
         <div css={style.selectWrapper}>
-          <select css={style.selectBox}>
+          <select
+            css={css`
+              ${style.selectBox}
+              width: ${width};
+            `}
+          >
             <option>인원을 선택해 주세요.</option>
             <option value="4">4명</option>
             <option value="8">8명</option>
@@ -43,7 +60,13 @@ const Select = ({ SelectType }: SelectProps) => {
     case "공개방 설정":
       return (
         <div css={style.selectWrapper}>
-          <select css={style.selectBox} defaultValue="public">
+          <select
+            css={css`
+              ${style.selectBox}
+              width: ${width};
+            `}
+            defaultValue={"public"}
+          >
             <option value="public">공개방</option>
             <option value="private">비공개방</option>
           </select>

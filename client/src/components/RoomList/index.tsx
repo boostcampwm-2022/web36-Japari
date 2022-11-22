@@ -31,7 +31,7 @@ const RoomList = ({ rooms }: RoomListProps) => {
             <CheckBox />
             <span>공개 방만 보기</span>
           </div>
-          <Select SelectType="게임 필터" />
+          <Select selectType="게임 필터" />
         </div>
         <Button buttonType="방 만들기" handleClick={() => {}} />
       </div>

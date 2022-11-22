@@ -6,7 +6,7 @@ import Button from "../../Button";
 const NickNameSetting = () => {
   return (
     <>
-      <Input placeholder="" />
+      <Input type="text" placeholder="" />
       <Button buttonType="확인" handleClick={() => {}} />
     </>
   );
