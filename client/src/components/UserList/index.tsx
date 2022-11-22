@@ -27,9 +27,9 @@ const UserList = ({ userMap }: UserListProps) => {
   return (
     <div css={style.ListContainerStyle}>
       <UserListTab selected={selected} setSelected={setSelected} />
-      {selected == 0 && <UserTable users={userMap.users} selected={selected} />}
-      {selected == 1 && <UserTable users={userMap.friends} selected={selected} />}
-      {selected == 2 && <UserTable users={userMap.rank} selected={selected} />}
+      {selected === 0 && <UserTable users={userMap.users} selected={selected} />}
+      {selected === 1 && <UserTable users={userMap.friends} selected={selected} />}
+      {selected === 2 && <UserTable users={userMap.rank} selected={selected} />}
     </div>
   );
 };

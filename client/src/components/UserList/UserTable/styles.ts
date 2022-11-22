@@ -1,13 +1,15 @@
-import { css } from "@emotion/react";
+import { css, Theme } from "@emotion/react";
 
-export const TableContainerStyle = css`
+export const TableContainerStyle = (theme: Theme) => css`
   position: relative;
-  background-color: #f0efff;
+
   border-radius: 0.75rem;
   flex-grow: 1;
   padding: 1.5rem 2rem 2rem 2rem;
   box-sizing: border-box;
   box-shadow: 0 0.25rem 0.25rem rgba(0, 0, 0, 0.2);
+
+  background-color: ${theme.colors.secondary};
 `;
 
 export const TableRankContainerStyle = css`

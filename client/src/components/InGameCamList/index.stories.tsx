@@ -1,16 +1,9 @@
 import { Story, Meta } from "@storybook/react";
 import InGameCamList, { InGameCamListProps } from ".";
-import { theme } from "../../styles/theme";
 
 export default {
   title: "공통 컴포넌트/인게임 캠 목록",
   component: InGameCamList,
-  parameters: {
-    backgrounds: {
-      default: "primary",
-      values: [{ name: "primary", value: theme.colors.primary }],
-    },
-  },
 } as Meta;
 
 const Template: Story<InGameCamListProps> = args => <InGameCamList {...args} />;

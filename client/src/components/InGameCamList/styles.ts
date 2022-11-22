@@ -1,5 +1,4 @@
-import { css } from "@emotion/react";
-import { theme } from "../../styles/theme";
+import { css, Theme } from "@emotion/react";
 
 export const inGameCamListStyle = css`
   display: grid;
@@ -22,10 +21,10 @@ export const camItemStyle = css`
   }
 `;
 
-export const camWrapperStyle = css`
-  background-color: ${theme.colors.secondary};
+export const camWrapperStyle = (theme: Theme) => css`
   padding: 0.5rem;
   padding-bottom: 0rem;
   border-radius: 10px;
-  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 0.25rem 0.25rem rgba(0, 0, 0, 0.2);
+  background-color: ${theme.colors.secondary};
 `;

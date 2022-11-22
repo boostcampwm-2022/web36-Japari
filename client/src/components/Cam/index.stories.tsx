@@ -4,12 +4,6 @@ import Cam, { CamProps } from ".";
 export default {
   title: "공통 컴포넌트/캠",
   component: Cam,
-  parameters: {
-    backgrounds: {
-      default: "secondary",
-      values: [{ name: "secondary", value: "#F0EFFF" }],
-    },
-  },
 } as Meta;
 
 const Template: Story<CamProps> = args => <Cam {...args} />;
