@@ -11,11 +11,13 @@ export interface UserTableProps {
 
 const UserTable = ({ users, selected }: UserTableProps) => {
   return (
-    <ul css={style.TableContainerStyle}>
-      {users.map((user, key) => {
-        return <UserRecord key={key} user={user} />;
-      })}
-    </ul>
+    <div css={style.TableContainerStyle}>
+      <ul css={style.TableStyle}>
+        {users.map((user, key) => {
+          return <UserRecord key={key} user={user} />;
+        })}
+      </ul>
+    </div>
   );
 };
 

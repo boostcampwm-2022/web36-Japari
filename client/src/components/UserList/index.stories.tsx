@@ -1,4 +1,3 @@
-import React from "react";
 import { Meta, Story } from "@storybook/react";
 import UserList, { UserListProps } from "./index";
 
@@ -17,7 +16,8 @@ const dummyUser1 = {
   email: "japari@gmail.com",
   nickname: "japari",
   score: 2000,
-  profileImage: "public/profile/1.jpg",
+  profileImage: "",
+  connected: true,
 };
 
 const dummyUser2 = {
@@ -25,13 +25,14 @@ const dummyUser2 = {
   email: "first@gmail.com",
   nickname: "first",
   score: 3000,
-  profileImage: "public/profile/1.jpg",
+  profileImage: "",
+  connected: false,
 };
 
 Default.args = {
   userMap: {
-    users: [dummyUser1],
+    users: Array(13).fill(dummyUser1),
     friends: [dummyUser1, dummyUser2],
-    rank: [dummyUser2, dummyUser1],
+    rank: Array(10).fill(dummyUser2),
   },
 };

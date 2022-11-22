@@ -10,6 +10,7 @@ export type User = {
   nickname: string;
   score: number;
   profileImage: string;
+  connected: boolean;
 };
 
 export interface UserListProps {
