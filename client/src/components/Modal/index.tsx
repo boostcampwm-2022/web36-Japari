@@ -18,6 +18,13 @@ const Modal = ({ ModalType }: ModalProps) => {
     case "방 설정":
       content = <RoomSetting />;
       break;
+    case "비밀번호 입력":
+      break;
+    // case "친구 요청":
+    //   content = <RequestFrie />;
+    //   break;
+    case "게임 초대":
+      break;
   }
 
   return (

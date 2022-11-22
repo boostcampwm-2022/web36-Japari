@@ -2,7 +2,7 @@
 import * as style from "./styles";
 
 export interface SelectProps {
-  SelectType: "게임 필터" | "게임 생성" | "인원 제한";
+  SelectType: "게임 필터" | "게임 생성" | "인원 제한" | "공개방 설정";
 }
 
 const Select = ({ SelectType }: SelectProps) => {
@@ -36,6 +36,18 @@ const Select = ({ SelectType }: SelectProps) => {
             <option>인원을 선택해 주세요.</option>
             <option value="4">4명</option>
             <option value="8">8명</option>
+          </select>
+        </div>
+      );
+
+    case "공개방 설정":
+      return (
+        <div css={style.selectWrapper}>
+          <select css={style.selectBox}>
+            <option value="public" selected>
+              공개방
+            </option>
+            <option value="private">비공개방</option>
           </select>
         </div>
       );

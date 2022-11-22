@@ -4,7 +4,7 @@ export const modalWrapper = css`
   border-radius: 0.75rem;
   // border: 0.01rem solid black;
   background-color: white;
-  width: 25rem;
+  width: 30rem;
   padding: 2.5rem 1rem;
 `;
 
@@ -40,7 +40,7 @@ export const modalContents = css`
       align-items: flex-start;
       input[type="text"],
       select {
-        width: 11rem;
+        width: 16rem;
       }
     }
   }

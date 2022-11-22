@@ -2,7 +2,7 @@
 import * as style from "./styles";
 
 export interface InputProps {
-  placeholder: "" | "메세지 입력하기..." | "방 이름을 입력해주세요." | "비밀번호를 입력해주세요.";
+  placeholder: "" | "메세지 입력하기..." | "방 이름을 입력해 주세요." | "비밀번호를 입력해 주세요.";
 }
 
 const Input = ({ placeholder }: InputProps) => {
@@ -14,10 +14,10 @@ const Input = ({ placeholder }: InputProps) => {
     case "메세지 입력하기...":
       styled = [style.inputStyle, style.chatInputStyle];
       break;
-    case "방 이름을 입력해주세요.":
+    case "방 이름을 입력해 주세요.":
       styled = [style.inputStyle, style.largeInputStyle];
       break;
-    case "비밀번호를 입력해주세요.":
+    case "비밀번호를 입력해 주세요.":
       styled = [style.inputStyle, style.largeInputStyle];
       break;
   }
