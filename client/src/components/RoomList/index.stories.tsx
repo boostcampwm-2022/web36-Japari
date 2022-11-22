@@ -4,12 +4,6 @@ import RoomList, { RoomListProps } from ".";
 export default {
   title: "공통 컴포넌트/방 목록",
   component: RoomList,
-  parameters: {
-    backgrounds: {
-      default: "pink",
-      values: [{ name: "pink", value: "#FDE1E3" }],
-    },
-  },
 } as Meta;
 
 const Template: Story<RoomListProps> = args => <RoomList {...args} />;

@@ -1,15 +1,5 @@
 /** @jsxImportSource @emotion/react */
-import {
-  largeButtonStyle,
-  smallButtonStyle,
-  gameStartButtonStyle,
-  createRoomButtonStyle,
-  exitRoomButtonStyle,
-  acceptButtonStyle,
-  declineButtonStyle,
-  OKButtonStyle,
-  closeButtonStyle,
-} from "./styles";
+import * as style from "./styles";
 
 export interface ButtonProps {
   buttonType: "방 만들기" | "방 나가기" | "게임 시작" | "확인" | "수락" | "닫기" | "거절";
@@ -17,34 +7,34 @@ export interface ButtonProps {
 }
 
 const Button = ({ buttonType, handleClick }: ButtonProps) => {
-  let style = null;
+  let buttonStyle = null;
 
   switch (buttonType) {
     case "게임 시작":
-      style = [largeButtonStyle, gameStartButtonStyle];
+      buttonStyle = [style.largeButtonStyle, style.gameStartButtonStyle];
       break;
     case "방 만들기":
-      style = [largeButtonStyle, createRoomButtonStyle];
+      buttonStyle = [style.largeButtonStyle, style.createRoomButtonStyle];
       break;
     case "방 나가기":
-      style = [largeButtonStyle, exitRoomButtonStyle];
+      buttonStyle = [style.largeButtonStyle, style.exitRoomButtonStyle];
       break;
     case "수락":
-      style = [smallButtonStyle, acceptButtonStyle];
+      buttonStyle = [style.smallButtonStyle, style.acceptButtonStyle];
       break;
     case "거절":
-      style = [smallButtonStyle, declineButtonStyle];
+      buttonStyle = [style.smallButtonStyle, style.declineButtonStyle];
       break;
     case "확인":
-      style = [smallButtonStyle, OKButtonStyle];
+      buttonStyle = [style.smallButtonStyle, style.OKButtonStyle];
       break;
     case "닫기":
-      style = [smallButtonStyle, closeButtonStyle];
+      buttonStyle = [style.smallButtonStyle, style.closeButtonStyle];
       break;
   }
 
   return (
-    <button type="button" css={style} onClick={handleClick}>
+    <button type="button" css={buttonStyle} onClick={handleClick}>
       {buttonType}
     </button>
   );
