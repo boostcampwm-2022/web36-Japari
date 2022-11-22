@@ -37,8 +37,8 @@ const RoomList = ({ rooms }: RoomListProps) => {
       </div>
 
       <div css={style.roomListStyle}>
-        {rooms.map(room => (
-          <RoomRecord {...room} />
+        {rooms.map((room, index) => (
+          <RoomRecord key={index} {...room} />
         ))}
       </div>
     </div>
