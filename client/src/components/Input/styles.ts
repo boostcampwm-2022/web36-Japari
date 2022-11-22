@@ -2,7 +2,7 @@ import { css } from "@emotion/react";
 
 export const inputStyle = css`
   border-radius: 0.3rem;
-  border: 1px solid grey;
+  border: 0.08rem solid grey;
 `;
 
 export const smallInputStyle = css`
