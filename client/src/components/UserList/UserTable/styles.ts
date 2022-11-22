@@ -19,7 +19,7 @@ export const TableRankContainerStyle = css`
 `;
 
 export const TableStyle = css`
-  overflow: scroll;
+  overflow-y: scroll;
   height: 100%;
 `;
 
