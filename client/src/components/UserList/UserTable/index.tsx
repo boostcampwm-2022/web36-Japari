@@ -16,7 +16,7 @@ const UserTable = ({ users, selected }: UserTableProps) => {
         {selected === 2 &&
           Array.from(Array(10).keys()).map((_, idx) => {
             return (
-              <div css={style.TableRankStyle}>
+              <div key={idx} css={style.TableRankStyle}>
                 <p css={style.TableRankNumberStyle}>{idx + 1}</p>
               </div>
             );
