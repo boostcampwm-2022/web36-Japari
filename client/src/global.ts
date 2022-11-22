@@ -22,8 +22,23 @@ export const globalStyle = css`
     font-weight: 100;
   }
 
+  /*
+  기본 드래그 불가 설정
+  .draggable 클래스 등록시 드래그 허용
+   */
   * {
     font-family: "LINESeedKR";
     font-size: 16px;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+
+  .draggable {
+    -webkit-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
+    user-select: text;
   }
 `;
