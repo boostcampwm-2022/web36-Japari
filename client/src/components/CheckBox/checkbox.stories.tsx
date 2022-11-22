@@ -9,4 +9,4 @@ export default {
 const Template: Story = args => <CheckBox {...args} />;
 
 export const Default = Template.bind({});
-Default.storyName = "인풋";
+Default.storyName = "체크박스";
