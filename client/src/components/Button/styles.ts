@@ -8,7 +8,7 @@ export const largeButtonStyle = css`
   }
 
   border-radius: 10px;
-  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 0.25rem 0.25rem rgba(0, 0, 0, 0.2);
   width: 8rem;
   height: 2.5rem;
 
@@ -25,7 +25,7 @@ export const smallButtonStyle = css`
 
   border: 1px solid black;
   border-radius: 5px;
-  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 0.25rem 0.25rem rgba(0, 0, 0, 0.2);
 
   width: 3.5rem;
   height: 1.5rem;
