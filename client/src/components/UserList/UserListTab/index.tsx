@@ -1,16 +1,32 @@
 /** @jsxImportSource @emotion/react */
+import { css } from "@emotion/react";
+import * as style from "./style";
 
 export interface UserListTabProps {
   selected: number;
   setSelected: (value: number) => void;
 }
 
-const UserListTab = ({ selected }: UserListTabProps) => {
+const tabs = ["유저", "친구", "랭킹"];
+
+const UserListTab = ({ selected, setSelected }: UserListTabProps) => {
   return (
-    <ul>
-      <li>유저</li>
-      <li>친구</li>
-      <li>랭킹</li>
+    <ul css={style.TabContainerStyle}>
+      {tabs.map((tabs, idx) => {
+        return (
+          <li
+            key={idx}
+            css={css`
+              ${style.TabStyle}
+              ${selected === idx ? style.SelectedTabStyle : style.UnSelectedTabStyle}
+              ${style.TabStyle[idx]}
+            `}
+            onClick={() => setSelected(idx)}
+          >
+            <p>{tabs}</p>
+          </li>
+        );
+      })}
     </ul>
   );
 };

@@ -11,8 +11,8 @@ export interface UserTableProps {
 const UserTable = ({ users, selected }: UserTableProps) => {
   return (
     <ul>
-      {users.map(user => {
-        return <UserRecord user={user} />;
+      {users.map((user, key) => {
+        return <UserRecord key={key} user={user} />;
       })}
     </ul>
   );
