@@ -4,26 +4,31 @@ export const containerStyle = css`
   position: relative;
   display: inline-flex;
   flex-direction: column;
-
-  > button {
-    position: absolute;
-    top: 0rem;
-    right: 0rem;
-  }
 `;
 
-export const roomListHeaderStyle = css`
-  display: inline-block;
-  margin-top: 1rem;
+export const headerStyle = css`
+  display: inline-flex;
+  justify-content: space-between;
+  align-items: flex-end;
+
+  margin: 0 1rem;
   margin-bottom: 1rem;
+`;
 
-  > label {
-    line-height: 20px;
-  }
+export const filterStyle = css`
+  display: inline-flex;
+  gap: 1rem;
+  align-items: center;
+`;
 
-  > select {
-    margin-left: 1rem;
-  }
+export const checkBoxStyle = css`
+  display: flex;
+  gap: 0.25rem;
+  align-items: center;
+
+  /* > span {
+    padding-top: 0.2rem;
+  } */
 `;
 
 export const roomListStyle = css`

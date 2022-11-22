@@ -29,7 +29,7 @@ export const camListContainerStyle = css`
 
   grid-template-columns: 1fr 1fr 1fr 1fr;
   grid-template-rows: 1fr 1fr;
-  column-gap: 2rem;
+  column-gap: 3rem;
   row-gap: 3rem;
 `;
 
