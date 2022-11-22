@@ -1,6 +1,11 @@
 import { css } from "@emotion/react";
 
 export const largeButtonStyle = css`
+  &:hover {
+    opacity: 0.6;
+    cursor: pointer;
+  }
+
   border-radius: 10px;
   box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
   width: 6rem;
@@ -11,6 +16,11 @@ export const largeButtonStyle = css`
 `;
 
 export const smallButtonStyle = css`
+  &:hover {
+    opacity: 0.4;
+    cursor: pointer;
+  }
+
   border: 1px solid black;
   border-radius: 5px;
   box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);

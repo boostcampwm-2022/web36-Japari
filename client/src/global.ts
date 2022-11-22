@@ -26,4 +26,13 @@ export const globalStyle = css`
     font-family: "LINESeedKR";
     font-size: 16px;
   }
+
+  body,
+  p,
+  div,
+  button,
+  span {
+    margin: 0;
+    padding: 0;
+  }
 `;

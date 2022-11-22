@@ -1,6 +1,11 @@
 import { css } from "@emotion/react";
 
 export const roomRecordStyle = css`
+  &:hover {
+    background: blue;
+    cursor: pointer;
+  }
+
   display: inline-flex;
 
   padding: 0.75rem 0rem;
