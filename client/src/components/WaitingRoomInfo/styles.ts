@@ -1,5 +1,4 @@
-import { css } from "@emotion/react";
-import { theme } from "../../styles/theme";
+import { css, Theme } from "@emotion/react";
 
 export const waitingRoomInfoStyle = css``;
 
@@ -12,16 +11,15 @@ export const headerStyle = css`
   }
 `;
 
-export const mainWrapperStyle = css`
+export const mainWrapperStyle = (theme: Theme) => css`
   display: inline-flex;
   flex-direction: column;
   align-items: flex-end;
   gap: 2rem;
-
-  background-color: ${theme.colors.secondary};
   padding: 3rem;
-
   border-radius: 10px;
+  box-shadow: 0 0.25rem 0.25rem rgba(0, 0, 0, 0.2);
+  background-color: ${theme.colors.secondary};
 `;
 
 export const camListContainerStyle = css`

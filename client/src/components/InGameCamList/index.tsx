@@ -1,6 +1,7 @@
 /** @jsxImportSource @emotion/react */
 import Cam, { CamProps } from "../Cam";
 import * as style from "./styles";
+import { css } from "@emotion/react";
 
 export interface InGameCamListProps {
   camList: CamProps[];

@@ -1,4 +1,4 @@
-import { css } from "@emotion/react";
+import { css, Theme } from "@emotion/react";
 
 export const containerStyle = css`
   position: relative;
@@ -25,21 +25,19 @@ export const checkBoxStyle = css`
   display: flex;
   gap: 0.25rem;
   align-items: center;
-
-  /* > span {
-    padding-top: 0.2rem;
-  } */
 `;
 
-export const roomListStyle = css`
+export const roomListStyle = (theme: Theme) => css`
   display: inline-flex;
   flex-direction: column;
   align-items: center;
   gap: 1rem;
 
-  background-color: #f0efff;
   height: 35rem;
   padding: 1.5rem;
   border-radius: 10px;
   overflow-y: scroll;
+
+  box-shadow: 0 0.25rem 0.25rem rgba(0, 0, 0, 0.2);
+  background-color: ${theme.colors.secondary};
 `;
