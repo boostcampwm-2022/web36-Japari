@@ -1,5 +1,21 @@
 import { css } from "@emotion/react";
 
+export const camContainerStyle = css`
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+
+  > span {
+    font-size: 18px;
+    font-weight: bold;
+
+    &:last-child {
+      color: gray;
+    }
+  }
+`;
+
 export const camWrapperStyle = css`
   display: flex;
   justify-content: center;

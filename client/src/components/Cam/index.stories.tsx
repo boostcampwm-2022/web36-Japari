@@ -20,4 +20,15 @@ Default.args = {
   isVideoOn: false,
   isAudioOn: false,
   profile: "https://avatars.githubusercontent.com/u/102232291?v=4",
+  nickname: "아임더베스트",
+};
+
+export const WithScoreRank = Template.bind({});
+WithScoreRank.storyName = "캠 (점수/등수 포함)";
+WithScoreRank.args = {
+  isVideoOn: false,
+  isAudioOn: false,
+  profile: "https://avatars.githubusercontent.com/u/102232291?v=4",
+  nickname: "아임더베스트",
+  scoreRank: "2412 (456위)",
 };

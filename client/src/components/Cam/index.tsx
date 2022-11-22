@@ -1,21 +1,27 @@
 /** @jsxImportSource @emotion/react */
-import { camWrapperStyle, profileStyle } from "./styles";
+import { camContainerStyle, camWrapperStyle, profileStyle } from "./styles";
 
 export interface VideoRecordProps {
   isVideoOn: boolean;
   isAudioOn: boolean;
   profile: string;
+  nickname?: string;
+  scoreRank?: string;
 }
 
 export interface ProfileProps {
   profile: string;
 }
 
-const Cam = ({ isVideoOn, isAudioOn, profile }: VideoRecordProps) => {
+const Cam = ({ isVideoOn, isAudioOn, profile, nickname, scoreRank }: VideoRecordProps) => {
   return (
-    <div css={camWrapperStyle}>
-      <video autoPlay playsInline></video>
-      {!isVideoOn && <Profile profile={profile} />}
+    <div css={camContainerStyle}>
+      <div css={camWrapperStyle}>
+        <video autoPlay playsInline></video>
+        {!isVideoOn && <Profile profile={profile} />}
+      </div>
+      <span>{nickname}</span>
+      <span>{scoreRank}</span>
     </div>
   );
 };
