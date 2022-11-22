@@ -1,8 +1,8 @@
 /** @jsxImportSource @emotion/react */
-
 import { useState } from "react";
 import UserListTab from "./UserListTab";
 import UserTable from "./UserTable";
+import * as style from "./styles";
 
 export type User = {
   userId: number;
@@ -24,7 +24,7 @@ const UserList = ({ userMap }: UserListProps) => {
   const [selected, setSelected] = useState<number>(0);
 
   return (
-    <div>
+    <div css={style.ListContainerStyle}>
       <UserListTab selected={selected} setSelected={setSelected} />
       {selected == 0 && <UserTable users={userMap.users} selected={selected} />}
       {selected == 1 && <UserTable users={userMap.friends} selected={selected} />}

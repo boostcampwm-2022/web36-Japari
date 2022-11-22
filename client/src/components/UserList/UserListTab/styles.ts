@@ -4,6 +4,7 @@ export const TabContainerStyle = css`
   display: flex;
   flex-direction: row;
   align-items: flex-end;
+  margin-left: 0.75rem;
 `;
 
 export const TabStyle = css`

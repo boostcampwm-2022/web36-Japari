@@ -1,6 +1,6 @@
 /** @jsxImportSource @emotion/react */
 import { css } from "@emotion/react";
-import * as style from "./style";
+import * as style from "./styles";
 
 export interface UserListTabProps {
   selected: number;

@@ -1,6 +1,7 @@
 /** @jsxImportSource @emotion/react */
 
 import { User } from "..";
+import * as style from "./styles";
 import UserRecord from "./UserRecord";
 
 export interface UserTableProps {
@@ -10,7 +11,7 @@ export interface UserTableProps {
 
 const UserTable = ({ users, selected }: UserTableProps) => {
   return (
-    <ul>
+    <ul css={style.TableContainerStyle}>
       {users.map((user, key) => {
         return <UserRecord key={key} user={user} />;
       })}
