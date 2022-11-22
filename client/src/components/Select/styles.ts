@@ -8,7 +8,7 @@ export const selectWrapper = css`
 `;
 
 export const selectBox = css`
-  padding: 0.25rem;
+  padding: 0.1rem;
   border: 0rem;
   outline: none;
 `;
