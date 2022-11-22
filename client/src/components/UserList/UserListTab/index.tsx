@@ -19,7 +19,7 @@ const UserListTab = ({ selected, setSelected }: UserListTabProps) => {
             css={css`
               ${style.TabStyle}
               ${selected === idx ? style.SelectedTabStyle : style.UnSelectedTabStyle}
-              ${style.TabStyle[idx]}
+              ${style.TabBackgroundColorStyle[idx]}
             `}
             onClick={() => setSelected(idx)}
           >
