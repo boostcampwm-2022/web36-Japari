@@ -1,8 +1,10 @@
 /** @jsxImportSource @emotion/react */
-import React, { useState } from "react";
+import React from "react";
 import Button from "../Button";
+import CheckBox from "../CheckBox";
+import Select from "../Select";
 import RoomRecord from "./RoomRecord";
-import { containerStyle, roomListHeaderStyle, roomListStyle } from "./styles";
+import * as style from "./styles";
 
 interface Room {
   gameRoomId: string;
@@ -22,21 +24,21 @@ const RoomList = ({ rooms }: RoomListProps) => {
   // or useQuery
 
   return (
-    <div css={containerStyle}>
-      <div css={roomListHeaderStyle}>
-        <input type="checkbox" id="room-list-filter-public-only" />
-        <label htmlFor="room-list-filter-public-only">공개 방만 보기</label>
-        <select>
-          <option value="0">모든 게임</option>
-          <option value="1">Catch Mind</option>
-          <option value="2">BattleShip</option>
-        </select>
+    <div css={style.containerStyle}>
+      <div css={style.headerStyle}>
+        <div css={style.filterStyle}>
+          <div css={style.checkBoxStyle}>
+            <CheckBox />
+            <span>공개 방만 보기</span>
+          </div>
+          <Select SelectType="게임 필터" />
+        </div>
+        <Button buttonType="방 만들기" handleClick={() => {}} />
       </div>
-      <Button buttonType="방 만들기" handleClick={() => {}} />
 
-      <div css={roomListStyle}>
-        {rooms.map(room => (
-          <RoomRecord {...room} />
+      <div css={style.roomListStyle}>
+        {rooms.map((room, index) => (
+          <RoomRecord key={index} {...room} />
         ))}
       </div>
     </div>

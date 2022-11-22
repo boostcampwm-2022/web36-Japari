@@ -1,16 +1,28 @@
 import { css } from "@emotion/react";
 
 export const largeButtonStyle = css`
+  &:hover {
+    opacity: 0.6;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+
   border-radius: 10px;
   box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
-  width: 6rem;
-  height: 2rem;
+  width: 8rem;
+  height: 2.5rem;
 
   padding-top: 3px; // 글자를 가운데로 정렬하는 용도
   font-weight: bold;
 `;
 
 export const smallButtonStyle = css`
+  &:hover {
+    opacity: 0.4;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+
   border: 1px solid black;
   border-radius: 5px;
   box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);

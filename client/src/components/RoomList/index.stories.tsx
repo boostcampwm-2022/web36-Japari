@@ -1,13 +1,14 @@
 import { Story, Meta } from "@storybook/react";
 import RoomList, { RoomListProps } from ".";
+import { theme } from "../../styles/theme";
 
 export default {
   title: "공통 컴포넌트/방 목록",
   component: RoomList,
   parameters: {
     backgrounds: {
-      default: "pink",
-      values: [{ name: "pink", value: "#FDE1E3" }],
+      default: "primary",
+      values: [{ name: "primary", value: theme.colors.primary }],
     },
   },
 } as Meta;
