@@ -1,5 +1,4 @@
 /** @jsxImportSource @emotion/react */
-
 import {
   largeButtonStyle,
   smallButtonStyle,
@@ -17,7 +16,7 @@ export interface ButtonProps {
   handleClick: () => void;
 }
 
-function Button({ buttonType, handleClick }: ButtonProps) {
+const Button = ({ buttonType, handleClick }: ButtonProps) => {
   let style = null;
 
   switch (buttonType) {
@@ -49,6 +48,6 @@ function Button({ buttonType, handleClick }: ButtonProps) {
       {buttonType}
     </button>
   );
-}
+};
 
 export default Button;

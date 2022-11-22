@@ -1,4 +1,6 @@
 import { INITIAL_VIEWPORTS } from "@storybook/addon-viewport";
+import { Global } from "@emotion/react";
+import { globalStyle } from "../src/global";
 
 export const parameters = {
   actions: { argTypesRegex: "^on[A-Z].*" },
@@ -12,3 +14,12 @@ export const parameters = {
     viewports: INITIAL_VIEWPORTS,
   },
 };
+
+export const decorators = [
+  Story => (
+    <>
+      <Global styles={globalStyle} />
+      <Story />
+    </>
+  ),
+];

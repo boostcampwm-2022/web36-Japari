@@ -1,7 +1,7 @@
 /** @jsxImportSource @emotion/react */
 import React from "react";
 import * as style from "./style";
-import { Page } from "../../components/Page/Page";
+import { Page } from "../../components/Page";
 import LandingImage from "../../assets/images/landing-image.png";
 import JaPartyWord from "../../assets/logo/Ja-Party-word.png";
 import NaverLogo from "../../assets/logo/naver_logo.png";

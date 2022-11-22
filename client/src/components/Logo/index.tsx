@@ -7,7 +7,7 @@ export interface LogoProps {
   logoType: "IMAGE_ONLY" | "WORD_ONLY" | "BOTH";
 }
 
-function Logo({ logoType }: LogoProps) {
+const Logo = ({ logoType }: LogoProps) => {
   if (logoType === "IMAGE_ONLY") {
     return (
       <div css={logoStyle}>
@@ -30,6 +30,6 @@ function Logo({ logoType }: LogoProps) {
       <img src={JapariLogoWord} />
     </div>
   );
-}
+};
 
 export default Logo;
