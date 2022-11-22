@@ -4,11 +4,14 @@ export const camContainerStyle = css`
   display: inline-flex;
   flex-direction: column;
   align-items: center;
-  gap: 1rem;
 
   > span {
     font-size: 18px;
     font-weight: bold;
+
+    &:nth-child(2) {
+      margin-top: 0.5rem;
+    }
 
     &:last-child {
       color: gray;
@@ -24,10 +27,10 @@ export const camWrapperStyle = css`
   position: relative;
   background-color: black;
   border-radius: 10px;
-  border: 1px solid red;
+  border: 1px solid green;
   overflow: hidden;
 
-  width: 16rem;
+  width: 12rem;
   aspect-ratio: 4/3;
 
   > video {

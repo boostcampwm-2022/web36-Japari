@@ -1,5 +1,5 @@
 import { Story, Meta } from "@storybook/react";
-import Cam, { VideoRecordProps } from ".";
+import Cam, { CamProps } from ".";
 
 export default {
   title: "공통 컴포넌트/캠",
@@ -12,7 +12,7 @@ export default {
   },
 } as Meta;
 
-const Template: Story<VideoRecordProps> = args => <Cam {...args} />;
+const Template: Story<CamProps> = args => <Cam {...args} />;
 
 export const Default = Template.bind({});
 Default.storyName = "캠";

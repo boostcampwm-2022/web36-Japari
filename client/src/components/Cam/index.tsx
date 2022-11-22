@@ -1,7 +1,7 @@
 /** @jsxImportSource @emotion/react */
 import { camContainerStyle, camWrapperStyle, profileStyle } from "./styles";
 
-export interface VideoRecordProps {
+export interface CamProps {
   isVideoOn: boolean;
   isAudioOn: boolean;
   profile: string;
@@ -13,7 +13,7 @@ export interface ProfileProps {
   profile: string;
 }
 
-const Cam = ({ isVideoOn, isAudioOn, profile, nickname, scoreRank }: VideoRecordProps) => {
+const Cam = ({ isVideoOn, isAudioOn, profile, nickname, scoreRank }: CamProps) => {
   return (
     <div css={camContainerStyle}>
       <div css={camWrapperStyle}>
