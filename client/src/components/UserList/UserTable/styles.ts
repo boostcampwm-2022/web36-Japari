@@ -7,6 +7,7 @@ export const TableContainerStyle = css`
   flex-grow: 1;
   padding: 1.5rem 2rem 2rem 2rem;
   box-sizing: border-box;
+  box-shadow: 0 0.25rem 0.25rem rgba(0, 0, 0, 0.2);
 `;
 
 export const TableRankContainerStyle = css`
