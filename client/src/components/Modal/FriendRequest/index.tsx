@@ -1,25 +1,25 @@
 /** @jsxImportSource @emotion/react */
-
+import { User } from "@dto";
 import Button from "../../Button";
-import { footerStyle } from "./styles";
+import ProfileContent from "../../Profile/ProfileContent";
+import * as style from "./styles";
 
 interface FriendRequestProps {
-  nickname: string;
-  email: string;
-  score: number;
-  rank: number;
+  user: User;
 }
 
-const FriendRequest = ({ nickname, score, rank, email }: FriendRequestProps) => {
+const FriendRequest = ({ user }: FriendRequestProps) => {
   return (
-    <>
-      <div>Profile Content 컴포넌트</div>
+    <div css={style.cardStyle}>
+      <div>
+        <ProfileContent user={user} editable={false} />
+      </div>
 
-      <div css={footerStyle}>
+      <div css={style.footerStyle}>
         <Button buttonType="수락" handleClick={() => {}} />
         <Button buttonType="거절" handleClick={() => {}} />
       </div>
-    </>
+    </div>
   );
 };
 

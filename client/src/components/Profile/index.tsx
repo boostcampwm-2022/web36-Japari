@@ -1,14 +1,7 @@
 /** @jsxImportSource @emotion/react */
 import * as style from "./styles";
 import ProfileContent from "./ProfileContent";
-
-type User = {
-  userId: number;
-  email: string;
-  nickname: string;
-  score: number;
-  profileImage: string;
-};
+import { User } from "@dto";
 
 export interface ProfileProps {
   user: User;

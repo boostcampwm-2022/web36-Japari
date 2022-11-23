@@ -1,20 +1,34 @@
 /** @jsxImportSource @emotion/react */
 
+import { User } from "@dto";
 import Button from "../../Button";
-import { footerStyle } from "./styles";
+import ProfileContent from "../../Profile/ProfileContent";
+import * as style from "./styles";
 
 interface GameInvitationProps {
-  nickname: string;
+  user: User;
   gameId: number;
   roomName: string;
 }
 
-const GameInvitation = ({ nickname, gameId, roomName }: GameInvitationProps) => {
+const GameInvitation = ({ user, gameId, roomName }: GameInvitationProps) => {
   return (
     <>
-      <div>게임 초대 관련 정보</div>
+      {/* <ProfileContent user={user} /> */}
+      <div css={style.modalContents}>
+        <ul>
+          <li>초대한 유저</li>
+          <li>게임 종류</li>
+          <li>방 이름</li>
+        </ul>
+        <ul>
+          <li>{user.nickname}</li>
+          <li>캐치마인드</li>
+          <li>{roomName}</li>
+        </ul>
+      </div>
 
-      <div css={footerStyle}>
+      <div css={style.footerStyle}>
         <Button buttonType="수락" handleClick={() => {}} />
         <Button buttonType="거절" handleClick={() => {}} />
       </div>

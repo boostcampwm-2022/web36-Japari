@@ -19,7 +19,7 @@ export const modalWrapper = css`
   display: inline-block;
   border-radius: 0.75rem;
   background-color: white;
-  padding: 2.5rem 5rem;
+  padding: 2.5rem 4rem;
 `;
 
 export const modalCard = css`
