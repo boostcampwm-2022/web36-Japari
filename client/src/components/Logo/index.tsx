@@ -11,7 +11,7 @@ const Logo = ({ logoType }: LogoProps) => {
   if (logoType === "IMAGE_ONLY") {
     return (
       <div css={logoStyle}>
-        <img src={JapariLogoGame} />
+        <img src={JapariLogoGame} alt="JapariLogoGame" />
       </div>
     );
   }
@@ -19,15 +19,15 @@ const Logo = ({ logoType }: LogoProps) => {
   if (logoType === "WORD_ONLY") {
     return (
       <div css={logoStyle}>
-        <img src={JapariLogoWord} />
+        <img src={JapariLogoWord} alt="JapariLogoWord" />
       </div>
     );
   }
 
   return (
     <div css={logoStyle}>
-      <img src={JapariLogoGame} />
-      <img src={JapariLogoWord} />
+      <img src={JapariLogoGame} alt="JapariLogoGame" />
+      <img src={JapariLogoWord} alt="JapariLogoWord" />
     </div>
   );
 };
