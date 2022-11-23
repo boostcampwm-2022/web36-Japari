@@ -10,7 +10,7 @@ interface PageProps {
 export const Page: React.FC<PageProps> = ({ children }) => {
   return (
     <div>
-      <Header headerType="로비" />
+      <Header headerType="랜딩" />
       {children}
     </div>
   );
