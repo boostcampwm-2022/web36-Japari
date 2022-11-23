@@ -4,7 +4,7 @@ export const ProfileContentStyle = css`
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 1.5rem;
+  gap: 1.25rem;
 `;
 
 export const ImageDivStyle = css`
@@ -18,7 +18,7 @@ export const ImageDivStyle = css`
 `;
 
 export const ImageStyle = css`
-  width: 6rem;
+  width: 5.5rem;
   aspect-ratio: 1/1;
 `;
 
