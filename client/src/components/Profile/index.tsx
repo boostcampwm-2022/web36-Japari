@@ -17,7 +17,7 @@ export interface ProfileProps {
 const Profile = ({ user }: ProfileProps) => {
   return (
     <div css={style.ProfileContainerStyle}>
-      <ProfileContent user={user} />
+      <ProfileContent user={user} editable={true} />
     </div>
   );
 };
