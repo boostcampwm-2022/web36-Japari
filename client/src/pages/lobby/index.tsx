@@ -13,12 +13,12 @@ const LobbyPage: React.FC = () => {
 
   return (
     <Page>
-      <div css={style.LobbyContentContainer}>
-        <div css={style.RowContentContainer}>
+      <div css={style.LobbyContentContainerStyle}>
+        <div css={style.RowContentContainerStyle}>
           <UserList userMap={dummy.dummyUserMap} />
           <RoomList rooms={dummy.dummyRooms} />
         </div>
-        <div css={style.RowContentContainer}>
+        <div css={style.RowContentContainerStyle}>
           <Profile user={dummy.dummyUser} />
           <Chatting />
         </div>

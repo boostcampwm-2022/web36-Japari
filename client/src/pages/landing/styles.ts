@@ -5,26 +5,26 @@ export const landingPageBodyStyle = css`
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 30px;
-  padding: 30px;
+  gap: 2rem;
+  padding: 1rem 2rem 2rem 2rem;
   box-sizing: border-box;
   font-weight: bold;
 `;
 
 export const jaPartyWordStyle = css`
   position: relative;
-  top: 15px;
+  top: 1rem;
 
-  width: 150px;
-  height: 75px;
+  width: 10rem;
+  height: 5rem;
   transform: rotate(-11deg);
 `;
 
 export const descriptionStyle = css`
   text-align: right;
-  line-height: 30px;
+  line-height: 2rem;
   > p {
-    margin: 0px;
+    margin: 0;
     position: relative;
   }
 `;
@@ -40,10 +40,10 @@ export const landingImageStyle = css`
 
 export const logoContainerStyle = css`
   display: flex;
-  gap: 20px;
+  gap: 1.25rem;
 `;
 
 export const logoStyle = css`
-  height: 60px;
-  width: 60px;
+  height: 4rem;
+  width: 4rem;
 `;

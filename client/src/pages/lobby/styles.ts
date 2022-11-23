@@ -1,14 +1,14 @@
 import { css, Theme } from "@emotion/react";
 
-export const LobbyContentContainer = css`
+export const LobbyContentContainerStyle = css`
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 2rem;
-  padding: 3rem;
+  padding: 1rem 1rem 2rem 1rem;
 `;
 
-export const RowContentContainer = css`
+export const RowContentContainerStyle = css`
   display: flex;
   gap: 2rem;
 `;
