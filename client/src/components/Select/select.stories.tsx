@@ -11,5 +11,5 @@ const Template: Story<SelectProps> = args => <Select {...args} />;
 export const Default = Template.bind({});
 Default.storyName = "셀렉트";
 Default.args = {
-  SelectType: "게임 필터",
+  selectType: "게임 필터",
 };

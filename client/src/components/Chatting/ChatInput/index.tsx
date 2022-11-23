@@ -6,7 +6,7 @@ import * as style from "./styles";
 const ChatInput = () => {
   return (
     <div css={style.ChatInputContainerStyle}>
-      <Input placeholder="메세지 입력하기..." />
+      <Input type="text" placeholder="메세지 입력하기..." />
       <img src={chatInputEnter} alt="chatLogEnter" />
     </div>
   );
