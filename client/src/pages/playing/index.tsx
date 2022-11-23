@@ -8,8 +8,8 @@ import Chatting from "../../components/Chatting";
 
 const PlayingPage: React.FC = () => {
   // user 정보 로직
-  let camsLeft = camList.filter((cam, idx) => idx % 2 === 0);
-  let camsRight = camList.filter((cam, idx) => idx % 2 === 1);
+  const camsLeft = camList.filter((cam, idx) => idx % 2 === 0);
+  const camsRight = camList.filter((cam, idx) => idx % 2 === 1);
   return (
     <Page>
       <div css={style.PlayingContentContainerStyle}>
