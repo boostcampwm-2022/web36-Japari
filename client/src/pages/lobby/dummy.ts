@@ -17,6 +17,7 @@ export const dummyUser = {
   nickname: "아임더베스트게이머",
   score: 2000,
   profileImage: "",
+  rank: 230,
 };
 
 const dummyUser1 = {
