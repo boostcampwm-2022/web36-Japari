@@ -48,7 +48,7 @@ export const roomRecord = {
   isPrivate: true,
   title: "캐마 초보만",
   gameId: 1,
-  currentPeople: 6,
+  currentPeople: 7,
   maximumPeople: 8,
 };
 
@@ -93,6 +93,13 @@ export const camList = [
     isAudioOn: false,
     profile: "https://avatars.githubusercontent.com/u/102232291?v=4",
     nickname: "캐마고수",
+    scoreRank: "2155 (15위)",
+  },
+  {
+    isVideoOn: false,
+    isAudioOn: false,
+    profile: "https://avatars.githubusercontent.com/u/102232291?v=4",
+    nickname: "캐마초보",
     scoreRank: "2155 (15위)",
   },
 ];
