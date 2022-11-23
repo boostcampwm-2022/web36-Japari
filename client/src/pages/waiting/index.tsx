@@ -5,18 +5,18 @@ import { Page } from "../../components/Page";
 import Profile from "../../components/Profile";
 import UserList from "../../components/UserList";
 import Chatting from "../../components/Chatting";
-import RoomList from "../../components/RoomList";
 import * as dummy from "../dummy";
+import WaitingRoomInfo from "../../components/WaitingRoomInfo";
 
-const LobbyPage: React.FC = () => {
+const WaitingPage: React.FC = () => {
   // user 정보 로직
 
   return (
     <Page>
-      <div css={style.LobbyContentContainerStyle}>
+      <div css={style.WaitingContentContainerStyle}>
         <div css={style.RowContentContainerStyle}>
           <UserList userMap={dummy.dummyUserMap} />
-          <RoomList rooms={dummy.dummyRooms} />
+          <WaitingRoomInfo roomRecord={dummy.roomRecord} camList={dummy.camList} />
         </div>
         <div css={style.RowContentContainerStyle}>
           <Profile user={dummy.dummyUser} />
@@ -27,4 +27,4 @@ const LobbyPage: React.FC = () => {
   );
 };
 
-export default LobbyPage;
+export default WaitingPage;

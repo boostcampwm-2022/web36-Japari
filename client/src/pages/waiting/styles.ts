@@ -1,6 +1,6 @@
 import { css, Theme } from "@emotion/react";
 
-export const LobbyContentContainerStyle = css`
+export const WaitingContentContainerStyle = css`
   display: flex;
   flex-direction: column;
   align-items: center;

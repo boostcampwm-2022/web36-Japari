@@ -17,10 +17,8 @@ const InGameCamList = ({ camList }: InGameCamListProps) => {
   return (
     <div css={style.inGameCamListStyle}>
       {camList.map((cam, index) => (
-        <div key={index} css={style.camItemStyle}>
-          <div css={style.camWrapperStyle}>
-            <Cam {...cam} />
-          </div>
+        <div key={index} css={style.camWrapperStyle}>
+          <Cam {...cam} />
         </div>
       ))}
     </div>
