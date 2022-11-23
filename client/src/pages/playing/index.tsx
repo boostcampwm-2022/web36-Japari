@@ -3,8 +3,8 @@ import React from "react";
 import * as style from "./styles";
 import { Page } from "../../components/Page";
 import { camList } from "../dummy";
-import Cam from "../../components/Cam";
 import InGameCamList from "../../components/InGameCamList";
+import Chatting from "../../components/Chatting";
 
 const PlayingPage: React.FC = () => {
   // user 정보 로직
@@ -12,8 +12,12 @@ const PlayingPage: React.FC = () => {
   let camsRight = camList.filter((cam, idx) => idx % 2 === 1);
   return (
     <Page>
-      <div css={style.PlayingContentContainer}>
+      <div css={style.PlayingContentContainerStyle}>
         <InGameCamList camList={camsLeft} />
+        <div css={style.GameAndChatContainerStyle}>
+          <div css={style.GameContainerStyle}>게임</div>
+          <Chatting />
+        </div>
         <InGameCamList camList={camsRight} />
       </div>
     </Page>
