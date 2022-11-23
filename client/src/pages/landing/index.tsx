@@ -14,19 +14,19 @@ const LandingPage: React.FC = () => {
     <Page>
       <div css={style.landingPageBodyStyle}>
         <div css={style.descriptionStyle}>
-          <img src={JaPartyWord} css={style.jaPartyWordStyle} />
+          <img css={style.jaPartyWordStyle} src={JaPartyWord} alt="JaPartyWord" />
           친구들과 얼굴을 마주하며 게임을 즐길 수 있습니다!
           <br />
           나의 표정을 읽히지 않고 상대의 표정을 읽어내 게임에서 승리하세요!
         </div>
         <div>
-          <img css={style.landingImageStyle} src={LandingImage} />
+          <img css={style.landingImageStyle} src={LandingImage} alt="LandingImage" />
         </div>
         <div css={style.logoContainerStyle}>
-          <img css={style.logoStyle} src={NaverLogo} />
-          <img css={style.logoStyle} src={KakaoLogo} />
-          <img css={style.logoStyle} src={GoogleLogo} />
-          <img css={style.logoStyle} src={GithubLogo} />
+          <img css={style.logoStyle} src={NaverLogo} alt="NaverLogo" />
+          <img css={style.logoStyle} src={KakaoLogo} alt="KakaoLogo" />
+          <img css={style.logoStyle} src={GoogleLogo} alt="GoogleLogo" />
+          <img css={style.logoStyle} src={GithubLogo} alt="GithubLogo" />
         </div>
       </div>
     </Page>
