@@ -9,7 +9,7 @@ export const roomRecordStyle = css`
   }
 
   display: inline-flex;
-
+  width: 100%;
   padding: 0.75rem 0rem;
 
   background: #5992ff;
@@ -31,7 +31,7 @@ export const roomRecordStyle = css`
     padding-right: 1rem;
 
     &:nth-child(3) {
-      width: 30rem;
+      flex-grow: 1;
     }
 
     &:nth-child(5) {
@@ -40,7 +40,7 @@ export const roomRecordStyle = css`
     }
 
     &:nth-child(7) {
-      width: 3rem;
+      width: 5rem;
       text-align: center;
     }
   }
