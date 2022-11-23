@@ -13,12 +13,12 @@ const WaitingPage: React.FC = () => {
 
   return (
     <Page>
-      <div css={style.LobbyContentContainer}>
-        <div css={style.RowContentContainer}>
+      <div css={style.WaitingContentContainerStyle}>
+        <div css={style.RowContentContainerStyle}>
           <UserList userMap={dummy.dummyUserMap} />
           <WaitingRoomInfo roomRecord={dummy.roomRecord} camList={dummy.camList} />
         </div>
-        <div css={style.RowContentContainer}>
+        <div css={style.RowContentContainerStyle}>
           <Profile user={dummy.dummyUser} />
           <Chatting />
         </div>
