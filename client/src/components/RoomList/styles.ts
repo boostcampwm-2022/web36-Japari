@@ -4,15 +4,16 @@ export const containerStyle = css`
   position: relative;
   display: inline-flex;
   flex-direction: column;
+  height: 40rem;
+  width: 60rem;
 `;
 
 export const headerStyle = css`
   display: inline-flex;
   justify-content: space-between;
   align-items: flex-end;
-
-  margin: 0 1rem;
-  margin-bottom: 1rem;
+  box-sizing: border-box;
+  padding: 0 1rem 0.5rem 1rem;
 `;
 
 export const filterStyle = css`
@@ -33,7 +34,9 @@ export const roomListStyle = (theme: Theme) => css`
   align-items: center;
   gap: 1rem;
 
-  height: 35rem;
+  width: inherit;
+  flex-grow: 1;
+  box-sizing: border-box;
   padding: 1.5rem;
   border-radius: 10px;
   overflow-y: scroll;

@@ -3,6 +3,7 @@ import { css, Theme } from "@emotion/react";
 export const TableContainerStyle = (theme: Theme) => css`
   position: relative;
 
+  width: inherit;
   border-radius: 0.75rem;
   flex-grow: 1;
   padding: 1.5rem 2rem 2rem 2rem;
