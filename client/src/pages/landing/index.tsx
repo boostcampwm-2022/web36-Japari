@@ -1,6 +1,6 @@
 /** @jsxImportSource @emotion/react */
 import React from "react";
-import * as style from "./style";
+import * as style from "./styles";
 import { Page } from "../../components/Page";
 import LandingImage from "../../assets/images/landing-image.png";
 import JaPartyWord from "../../assets/logo/Ja-Party-word.png";
