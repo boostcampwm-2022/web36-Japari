@@ -14,7 +14,6 @@ export class GameService {
 
   async findAllGame() {
     let gameList = await this.prisma.game.findMany();
-    console.log(gameList);
     if (!gameList) gameList = [];
 
     return gameList;
