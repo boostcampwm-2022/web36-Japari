@@ -10,6 +10,10 @@ import GoogleLogo from "../../assets/logo/google_logo.png";
 import GithubLogo from "../../assets/logo/github_logo.png";
 
 const LandingPage: React.FC = () => {
+  const handleGithubLogin = () => {
+    window.location.href = process.env.REACT_APP_OAUTH_GITHUB_AUTH_SERVER!;
+  };
+
   return (
     <Page>
       <div css={style.landingPageBodyStyle}>
@@ -26,7 +30,7 @@ const LandingPage: React.FC = () => {
           <img css={style.logoStyle} src={NaverLogo} alt="NaverLogo" />
           <img css={style.logoStyle} src={KakaoLogo} alt="KakaoLogo" />
           <img css={style.logoStyle} src={GoogleLogo} alt="GoogleLogo" />
-          <img css={style.logoStyle} src={GithubLogo} alt="GithubLogo" />
+          <img css={style.logoStyle} src={GithubLogo} alt="GithubLogo" onClick={handleGithubLogin} />
         </div>
       </div>
     </Page>
