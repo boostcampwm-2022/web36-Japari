@@ -1,3 +1,4 @@
+import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { INITIAL_VIEWPORTS } from "@storybook/addon-viewport";
 import { Global, ThemeProvider } from "@emotion/react";
 import { globalStyle } from "../src/styles/global";
@@ -18,11 +19,11 @@ export const parameters = {
 
 export const decorators = [
   Story => (
-    <>
+    <BrowserRouter>
       <Global styles={globalStyle} />
       <ThemeProvider theme={theme}>
         <Story />
       </ThemeProvider>
-    </>
+    </BrowserRouter>
   ),
 ];
