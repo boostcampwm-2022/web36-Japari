@@ -30,7 +30,7 @@ redisClient.connect().then();
 export const redisCli = redisClient.v4;
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, { cors: true });
   app.use(cookieParser());
   await app.listen(3000);
 }
