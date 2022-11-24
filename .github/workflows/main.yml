@@ -5,6 +5,7 @@ on:
     branches: [main]
 
 env:
+  CI: false
   CLIENT_ENV: ${{ secrets.CLIENT_ENV }}
   SERVER_ENV: ${{ secrets.SERVER_ENV }}
 
