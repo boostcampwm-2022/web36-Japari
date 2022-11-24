@@ -32,7 +32,7 @@ export class AuthService {
 
     // jwt
     const { jwtAccessToken, jwtRefreshToken } = await this.createTokens(user);
-    this.saveNewJwtRefreshTokenToDB(user, jwtRefreshToken);
+    this.saveRefreshTokenToDB(user, jwtRefreshToken);
     return { jwtAccessToken, jwtRefreshToken };
   }
 
@@ -45,7 +45,7 @@ export class AuthService {
   }
 
   async logout(user: user) {
-    await this.saveNewJwtRefreshTokenToDB(user, null);
+    await this.saveRefreshTokenToDB(user, null);
     return { message: "로그아웃 성공" };
   }
 
@@ -58,7 +58,7 @@ export class AuthService {
     return { jwtAccessToken, jwtRefreshToken };
   }
 
-  async saveNewJwtRefreshTokenToDB(user: user, jwtRefreshToken) {
+  async saveRefreshTokenToDB(user: user, jwtRefreshToken) {
     await this.prisma.user.update({
       where: { user_id: user.user_id },
       data: { jwt_refresh_token: jwtRefreshToken },
