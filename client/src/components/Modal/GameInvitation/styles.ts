@@ -9,29 +9,27 @@ export const modalContents = css`
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-
-    &:first-child {
-      font-weight: bold;
-    }
-
-    &:nth-child(2) {
-      width: 10rem;
-
-      > li {
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-      }
-    }
-
     li {
       height: 2rem;
-
       display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: flex-start;
     }
+  }
+`;
+
+export const modalContentLeftStyle = css`
+  font-weight: bold;
+`;
+
+export const modalContentRightStyle = css`
+  width: 10rem;
+
+  > li {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 `;
 

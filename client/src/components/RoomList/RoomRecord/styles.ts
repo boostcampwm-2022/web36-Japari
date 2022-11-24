@@ -15,12 +15,6 @@ export const roomRecordStyle = css`
   background: #5992ff;
   border-radius: 5px;
 
-  > *:first-child {
-    width: 1.25rem;
-    padding-left: 1.25rem;
-    padding-right: 1rem;
-  }
-
   > span {
     font-size: 18px;
     font-weight: bold;
@@ -29,21 +23,27 @@ export const roomRecordStyle = css`
     padding-top: 0.25rem;
     padding-left: 1rem;
     padding-right: 1rem;
-
-    &:nth-child(3) {
-      flex-grow: 1;
-    }
-
-    &:nth-child(5) {
-      width: 10rem;
-      text-align: center;
-    }
-
-    &:nth-child(7) {
-      width: 5rem;
-      text-align: center;
-    }
   }
+`;
+
+export const roomRecordPrivateIconStyle = css`
+  width: 1.25rem;
+  padding-left: 1.25rem;
+  padding-right: 1rem;
+`;
+
+export const roomRecordTitleStyle = css`
+  flex-grow: 1;
+`;
+
+export const roomRecordGameTypeStyle = css`
+  width: 10rem;
+  text-align: center;
+`;
+
+export const roomRecordPeopleStyle = css`
+  width: 5rem;
+  text-align: center;
 `;
 
 export const divisionLineStyle = css`

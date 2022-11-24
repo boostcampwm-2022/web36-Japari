@@ -16,12 +16,12 @@ const GameInvitation = ({ user, gameId, roomName }: GameInvitationProps) => {
     <>
       {/* <ProfileContent user={user} /> */}
       <div css={style.modalContents}>
-        <ul>
+        <ul css={style.modalContentLeftStyle}>
           <li>초대한 유저</li>
           <li>게임 종류</li>
           <li>방 이름</li>
         </ul>
-        <ul>
+        <ul css={style.modalContentRightStyle}>
           <li>{user.nickname}</li>
           <li>캐치마인드</li>
           <li>{roomName}</li>

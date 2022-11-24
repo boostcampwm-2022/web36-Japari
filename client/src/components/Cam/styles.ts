@@ -9,16 +9,16 @@ export const camContainerStyle = css`
   > span {
     font-size: 18px;
     font-weight: bold;
-
-    &:nth-child(2) {
-      margin-top: 0.25rem;
-    }
-
-    &:last-child {
-      color: gray;
-      font-size: 16px;
-    }
   }
+`;
+
+export const camNickNameStyle = css`
+  margin-top: 0.25rem;
+`;
+
+export const camScoreStyle = css`
+  color: gray;
+  font-size: 16px;
 `;
 
 export const camWrapperStyle = css`
