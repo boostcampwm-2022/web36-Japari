@@ -5,16 +5,15 @@ import { PrismaService } from "src/prisma/prisma.service";
 import { AuthController } from "./auth.controller";
 import { AuthService } from "./auth.service";
 import { GithubService } from "./github.service";
-import { AccessTokenStrategy } from "./jwtAccessToken.strategy";
+import { AccessTokenStrategy } from "./jwt-access-token.strategy";
 import { HttpModule } from "@nestjs/axios";
-import { RefreshTokenStrategy } from "./jwtRefreshToken.strategy";
+import { RefreshTokenStrategy } from "./jwt-refresh-token.strategy";
 
 @Module({
   imports: [
     PassportModule,
     JwtModule.register({
       secret: process.env.JWT_SECRET_KEY,
-      signOptions: { expiresIn: 3600 },
     }),
     HttpModule,
   ],

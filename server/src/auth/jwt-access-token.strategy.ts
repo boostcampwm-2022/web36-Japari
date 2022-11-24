@@ -9,7 +9,7 @@ interface JwtPayload {
 }
 
 @Injectable()
-export class RefreshTokenStrategy extends PassportStrategy(Strategy) {
+export class AccessTokenStrategy extends PassportStrategy(Strategy, "jwt-access-token") {
   constructor(private prisma: PrismaService) {
     super({
       secretOrKey: process.env.JWT_SECRET_KEY,
