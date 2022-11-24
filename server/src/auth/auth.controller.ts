@@ -7,15 +7,6 @@ export class AuthController {
 
   @Get("/login/:site")
   async login(@Param("site") site: string, @Query("code") code: string) {
-    switch (site) {
-      case "github":
-        return this.authService.githubLogin(code);
-      case "kakao":
-        return;
-      case "naver":
-        return;
-      case "google":
-        break;
-    }
+    return this.authService.login(site, code);
   }
 }
