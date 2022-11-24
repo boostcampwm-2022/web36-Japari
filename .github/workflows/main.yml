@@ -6,8 +6,17 @@ on:
 
 env:
   CI: false
-  CLIENT_ENV: ${{ secrets.CLIENT_ENV }}
-  SERVER_ENV: ${{ secrets.SERVER_ENV }}
+  REACT_APP_OAUTH_GITHUB_AUTH_SERVER: ${{ secrets.REACT_APP_OAUTH_GITHUB_AUTH_SERVER }} 
+  DATABASE_URL: ${{ secrets.DATABASE_URL }}
+  REDIS_HOST: ${{ secrets.REDIS_HOST }}
+  REDIS_PORT: ${{ secrets.REDIS_PORT }}
+  REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD }}
+  JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
+  OAUTH_GITHUB_CLIENT_ID: ${{ secrets.OAUTH_GITHUB_CLIENT_ID }}
+  OAUTH_GITHUB_CLIENT_SECRET: ${{ secrets.OAUTH_GITHUB_CLIENT_SECRET }}
+  OAUTH_GITHUB_EMAIL_API: ${{ secrets.OAUTH_GITHUB_EMAIL_API }}
+  OAUTH_GITHUB_ACCESS_TOKEN_API: ${{ secrets.OAUTH_GITHUB_ACCESS_TOKEN_API }}
+  REDIRECT_URI: ${{ secrets.REDIRECT_URI }}
 
 jobs:
   deploy:
@@ -25,7 +34,8 @@ jobs:
         
       - name: client 환경변수 파일 생성
         working-directory: ./client
-        run: echo $CLIENT_ENV > .env
+        run: |
+          echo REACT_APP_OAUTH_GITHUB_AUTH_SERVER=$REACT_APP_OAUTH_GITHUB_AUTH_SERVER > .env
         
       - name: client 빌드
         working-directory: ./client
@@ -40,7 +50,17 @@ jobs:
 
       - name: server 환경변수 파일 생성
         working-directory: ./server
-        run: echo $SERVER_ENV > .env
+        run: |
+          echo DATABASE_URL=$DATABASE_URL > .env
+          echo REDIS_HOST=$REDIS_HOST >> .env
+          echo REDIS_PORT=$REDIS_PORT >> .env
+          echo REDIS_PASSWORD=$REDIS_PASSWORD >> .env
+          echo JWT_SECRET_KEY=$JWT_SECRET_KEY >> .env
+          echo OAUTH_GITHUB_CLIENT_ID=$OAUTH_GITHUB_CLIENT_ID >> .env
+          echo OAUTH_GITHUB_CLIENT_SECRET=$OAUTH_GITHUB_CLIENT_SECRET >> .env
+          echo OAUTH_GITHUB_EMAIL_API=$OAUTH_GITHUB_EMAIL_API >> .env
+          echo OAUTH_GITHUB_ACCESS_TOKEN_API=$OAUTH_GITHUB_ACCESS_TOKEN_API >> .env
+          echo REDIRECT_URI=$REDIRECT_URI >> .env
 
       - name: pm2 프로세스 재실행
         working-directory: ./server
