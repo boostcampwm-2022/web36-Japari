@@ -46,4 +46,8 @@ export const logoContainerStyle = css`
 export const logoStyle = css`
   height: 4rem;
   width: 4rem;
+
+  &:hover {
+    cursor: pointer;
+  }
 `;
