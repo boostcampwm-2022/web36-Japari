@@ -5,8 +5,9 @@ import { PrismaService } from "src/prisma/prisma.service";
 import { AuthController } from "./auth.controller";
 import { AuthService } from "./auth.service";
 import { GithubService } from "./github.service";
-import { JwtStrategy } from "./jwt.strategy";
+import { AccessTokenStrategy } from "./jwtAccessToken.strategy";
 import { HttpModule } from "@nestjs/axios";
+import { RefreshTokenStrategy } from "./jwtRefreshToken.strategy";
 
 @Module({
   imports: [
@@ -18,7 +19,7 @@ import { HttpModule } from "@nestjs/axios";
     HttpModule,
   ],
   controllers: [AuthController],
-  providers: [AuthService, PrismaService, JwtStrategy, GithubService],
-  exports: [JwtStrategy, PassportModule],
+  providers: [AuthService, PrismaService, GithubService, AccessTokenStrategy, RefreshTokenStrategy],
+  exports: [AccessTokenStrategy, PassportModule],
 })
 export class AuthModule {}

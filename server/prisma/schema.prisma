@@ -16,6 +16,7 @@ model user {
   nickname  String? 
   score Int @default(0)
   profile_image String  @default("/public/profile/default.jpg")
+  jwt_refresh_token String?
 
   // https://github.com/prisma/prisma/discussions/13214
   from_users friend[] @relation("from_user")
