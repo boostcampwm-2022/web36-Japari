@@ -5,9 +5,10 @@ import { css } from "@emotion/react";
 export interface SelectProps {
   selectType: "게임 필터" | "게임 생성" | "인원 제한" | "공개방 설정";
   width?: string;
+  setValue: (value: any) => void;
 }
 
-const Select = ({ selectType, width }: SelectProps) => {
+const Select = ({ selectType, width, setValue }: SelectProps) => {
   switch (selectType) {
     case "게임 필터":
       return (
@@ -17,6 +18,7 @@ const Select = ({ selectType, width }: SelectProps) => {
               ${style.selectBox}
               width: ${width};
             `}
+            onChange={setValue ? e => setValue(e.target.value) : () => {}}
           >
             <option>모든 게임</option>
             <option value="catchMind">캐치 마인드</option>
