@@ -19,10 +19,6 @@ jobs:
       - name: 체크아웃
         uses: actions/checkout@v3
 
-      - name: client 모듈 설치
-        working-directory: ./client
-        run: npm install
-
       - name: client 빌드
         working-directory: ./client
         run: |
