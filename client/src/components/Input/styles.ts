@@ -4,6 +4,10 @@ export const inputStyle = css`
   border-radius: 0.3rem;
   border: 0.08rem solid grey;
   padding: 0.1rem 0.25rem;
+
+  :disabled {
+    background-color: #dddddd;
+  }
 `;
 
 export const smallInputStyle = css`

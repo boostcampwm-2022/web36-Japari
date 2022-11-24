@@ -13,4 +13,5 @@ Default.storyName = "인풋";
 Default.args = {
   type: "text",
   placeholder: "이름을 입력하세요...",
+  setValue: () => {},
 };

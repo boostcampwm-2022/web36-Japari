@@ -6,9 +6,11 @@ export interface InputProps {
   type: "text" | "password";
   width?: string;
   placeholder: string;
+  disabled?: boolean;
+  setValue: (value: string) => void;
 }
 
-const Input = ({ type, width, placeholder }: InputProps) => {
+const Input = ({ type, width, placeholder, disabled, setValue }: InputProps) => {
   return (
     <input
       css={css`
@@ -17,6 +19,8 @@ const Input = ({ type, width, placeholder }: InputProps) => {
       `}
       type={type}
       placeholder={placeholder}
+      disabled={disabled ?? false}
+      onChange={e => setValue(e.target.value)}
     />
   );
 };
