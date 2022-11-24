@@ -19,12 +19,9 @@ jobs:
       - name: 체크아웃
         uses: actions/checkout@v3
 
-      - name: client 빌드
+      - name: client 모듈 설치
         working-directory: ./client
-        run: |
-          npm run build
-          rm -rf /var/www/build
-          cp -rf ./build /var/www/
+        run: npm install
 
       - name: server 모듈 설치
         working-directory: ./server
