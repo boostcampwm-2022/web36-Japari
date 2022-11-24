@@ -1,7 +1,7 @@
-import { Controller, Get, Param, Post, Query, UseGuards } from "@nestjs/common";
+import { Controller, Get, Param, Post, Query, Redirect, Req, Res, UseGuards } from "@nestjs/common";
 import { user } from "@prisma/client";
+import { Request, Response } from "express";
 import { AuthService } from "./auth.service";
-import { GetRefreshToken, GetUser } from "./get-from-request.decorator";
 import { AccessTokenGuard } from "./jwt-access-token.guard";
 import { RefreshTokenGuard } from "./jwt-refresh-token.guard";
 
@@ -9,20 +9,24 @@ import { RefreshTokenGuard } from "./jwt-refresh-token.guard";
 export class AuthController {
   constructor(private authService: AuthService) {}
 
+  @Redirect("http://localhost:3001/lobby")
   @Get("/login/:site")
-  async login(@Param("site") site: string, @Query("code") code: string) {
-    return this.authService.login(site, code);
+  async login(@Res() res: Response, @Param("site") site: string, @Query("code") code: string) {
+    const { jwtAccessToken, jwtRefreshToken } = await this.authService.login(site, code);
+    res.cookie("jwt-access-token", jwtAccessToken);
+    res.cookie("jwt-refresh-token", jwtRefreshToken);
   }
 
   @UseGuards(AccessTokenGuard)
   @Post("/logout")
-  async logout(@GetUser() user: user) {
-    return this.authService.logout(user);
+  async logout(@Req() req, @Res() res: Response) {
+    res.clearCookie("jwt-access-token");
+    return this.authService.logout(req.user);
   }
 
   @UseGuards(RefreshTokenGuard)
   @Get("/refresh-token")
-  async refreshToken(@GetUser() user: user, @GetRefreshToken() refreshToken: string) {
-    return this.authService.refreshJwtTokens(user, refreshToken);
+  async refreshToken(@Req() req) {
+    return this.authService.refreshJwtTokens(req.user, req.refreshToken);
   }
 }

@@ -3,6 +3,7 @@ import { PassportStrategy } from "@nestjs/passport";
 import { ExtractJwt, Strategy } from "passport-jwt";
 import { PrismaService } from "src/prisma/prisma.service";
 import { user } from "@prisma/client";
+import { Request } from "express";
 
 interface JwtPayload {
   user_id: number;
@@ -13,7 +14,11 @@ export class AccessTokenStrategy extends PassportStrategy(Strategy, "jwt-access-
   constructor(private prisma: PrismaService) {
     super({
       secretOrKey: process.env.JWT_SECRET_KEY,
-      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      jwtFromRequest: ExtractJwt.fromExtractors([
+        (req: Request) => {
+          return req.cookies["jwt-access-token"];
+        },
+      ]),
     });
   }
 
