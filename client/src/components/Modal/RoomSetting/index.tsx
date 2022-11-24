@@ -25,7 +25,7 @@ const RoomSetting = ({ closeModal }: RoomSettingProps) => {
   return (
     <>
       <aside css={style.modalContents}>
-        <ul>
+        <ul css={style.modalContentLeftStyle}>
           <li>
             <span>게임 종류</span>
           </li>

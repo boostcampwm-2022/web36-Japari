@@ -10,10 +10,6 @@ export const modalContents = css`
     flex-direction: column;
     justify-content: space-between;
 
-    &:first-child {
-      font-weight: bold;
-    }
-
     li {
       height: 4rem;
 
@@ -23,6 +19,10 @@ export const modalContents = css`
       align-items: flex-start;
     }
   }
+`;
+
+export const modalContentLeftStyle = css`
+  font-weight: bold;
 `;
 
 export const footerStyle = css`

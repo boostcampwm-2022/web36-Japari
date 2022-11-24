@@ -24,14 +24,7 @@ export const RoomSetting = Template.bind({});
 RoomSetting.storyName = "방 설정";
 RoomSetting.args = {
   ModalType: "방 설정",
-  user: {
-    userId: 1,
-    nickname: "아임더베스트",
-    email: "mathlife12345@gmail.com",
-    score: 1443,
-    rank: 893,
-    profileImage: "",
-  },
+  closeModal: () => {},
 };
 
 export const friendRequest = Template.bind({});
