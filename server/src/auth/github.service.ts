@@ -61,8 +61,8 @@ export class GithubService {
     };
 
     try {
-      const res = await this.httpService.get(OAUTH_GITHUB_USER_API, githubUserAPIConfig).toPromise();
-      const { email } = res.data;
+      const res = await this.httpService.get(OAUTH_GITHUB_EMAIL_API, githubUserAPIConfig).toPromise();
+      const { email } = res.data[0].email;
       return email;
     } catch (err) {
       throw new UnauthorizedException();
