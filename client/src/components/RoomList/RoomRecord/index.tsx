@@ -12,11 +12,12 @@ export interface RoomRecordProps {
   gameId: number;
   currentPeople: number;
   maximumPeople: number;
+  onClickRecord?: () => void;
 }
 
-const RoomRecord = ({ isPrivate, title, gameId, currentPeople, maximumPeople }: RoomRecordProps) => {
+const RoomRecord = ({ isPrivate, title, gameId, currentPeople, maximumPeople, onClickRecord }: RoomRecordProps) => {
   return (
-    <div css={roomRecordStyle}>
+    <div css={roomRecordStyle} onClick={onClickRecord}>
       {isPrivate ? <img src={lockIcon} /> : <div></div>}
       <div css={divisionLineStyle}></div>
       <span>{title}</span>

@@ -1,13 +1,15 @@
 /** @jsxImportSource @emotion/react */
-import React from "react";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Button from "../Button";
 import CheckBox from "../CheckBox";
+import Modal from "../Modal";
 import Select from "../Select";
 import RoomRecord from "./RoomRecord";
 import * as style from "./styles";
 
-interface Room {
-  gameRoomId: string;
+export interface Room {
+  gameRoomId: number;
   title: string;
   gameId: number;
   currentPeople: number;
@@ -22,6 +24,7 @@ export interface RoomListProps {
 const RoomList = ({ rooms }: RoomListProps) => {
   //   const [rooms, setRooms] = useState<Room[]>([]);
   // or useQuery
+  const navigate = useNavigate();
 
   return (
     <div css={style.containerStyle}>
@@ -38,7 +41,7 @@ const RoomList = ({ rooms }: RoomListProps) => {
 
       <div css={style.roomListStyle}>
         {rooms.map((room, index) => (
-          <RoomRecord key={index} {...room} />
+          <RoomRecord key={index} {...room} onClickRecord={() => navigate(`/waiting/${room.gameRoomId}`)} />
         ))}
       </div>
     </div>

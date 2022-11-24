@@ -12,6 +12,7 @@ export const Default = Template.bind({});
 Default.storyName = "대기실 정보";
 Default.args = {
   roomRecord: {
+    gameRoomId: 1,
     isPrivate: true,
     title: "캐마 초보만",
     gameId: 1,
