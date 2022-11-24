@@ -22,16 +22,13 @@ export class GithubService {
     private readonly httpService: HttpService
   ) {}
 
-  async githubLogin(code: string) {
-    const { accessToken } = await this.fetchGithubAccessToken(code);
-    const { email } = await this.fetchGithubUserAPI(accessToken);
+  async getGithubEmail(code: string) {
+    const accessToken = await this.fetchGithubAccessToken(code);
+    const email = await this.fetchGithubUserAPI(accessToken);
     return email;
   }
 
-  async fetchGithubAccessToken(code: string) {
-    // http://localhost:3000/auth/login/github
-    // http://123.215.../api/auth/login/github
-
+  async fetchGithubAccessToken(code: string): Promise<string> {
     const accesstokenAPIConfig = {
       headers: {
         accept: "application/json",
@@ -49,13 +46,13 @@ export class GithubService {
         .post(OAUTH_GITHUB_ACCESS_TOKEN_API, accesstokenAPIData, accesstokenAPIConfig)
         .toPromise();
       const { access_token: accessToken } = res.data;
-      return { accessToken };
+      return accessToken;
     } catch (err) {
       throw new UnauthorizedException();
     }
   }
 
-  async fetchGithubUserAPI(accessToken: string) {
+  async fetchGithubUserAPI(accessToken: string): Promise<string> {
     const githubUserAPIConfig = {
       headers: {
         Authorization: `Token ${accessToken}`,
@@ -66,9 +63,8 @@ export class GithubService {
     try {
       const res = await this.httpService.get(OAUTH_GITHUB_USER_API, githubUserAPIConfig).toPromise();
       const { email } = res.data;
-      return { email };
+      return email;
     } catch (err) {
-      // console.log(err);
       throw new UnauthorizedException();
     }
   }

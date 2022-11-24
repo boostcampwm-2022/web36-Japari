@@ -1,5 +1,6 @@
 import { Injectable, UnauthorizedException } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
+import { user } from "@prisma/client";
 import { PrismaService } from "src/prisma/prisma.service";
 import { GithubService } from "./github.service";
 
@@ -10,9 +11,11 @@ export class AuthService {
   constructor(private prisma: PrismaService, private jwtService: JwtService, private githubService: GithubService) {}
 
   async login(site: string, code: string) {
+    let email: string;
     switch (site) {
       case "github":
-        return this.githubService.githubLogin(code);
+        email = await this.githubService.getGithubEmail(code);
+        break;
       case "kakao":
         return;
       case "naver":
@@ -20,15 +23,53 @@ export class AuthService {
       case "google":
         break;
     }
+
+    let user = await this.prisma.user.findFirst({ where: { email } });
+
+    if (!user) {
+      user = await this.signup(email);
+    }
+
+    // jwt
+    const { jwtAccessToken, jwtRefreshToken } = await this.createTokens(user);
+    this.saveRefreshTokenToDB(user, jwtRefreshToken);
+    return { jwtAccessToken, jwtRefreshToken };
   }
 
-  async githubLogin(code: string) {}
+  async signup(email: string) {
+    return this.prisma.user.create({
+      data: {
+        email,
+      },
+    });
+  }
 
-  async kakaoLogin(code: string) {}
+  async logout(user: user) {
+    await this.saveRefreshTokenToDB(user, null);
+    return { message: "로그아웃 성공" };
+  }
 
-  async naverLogin(code: string) {}
+  async createTokens(user: user) {
+    const { user_id } = user;
+    const payload = { user_id };
+    const jwtAccessToken = await this.jwtService.sign(payload, { expiresIn: "1h" });
+    const jwtRefreshToken = await this.jwtService.sign(payload, { expiresIn: "7d" });
 
-  async googleLogin(code: string) {}
+    return { jwtAccessToken, jwtRefreshToken };
+  }
 
-  async signup() {}
+  async saveRefreshTokenToDB(user: user, jwtRefreshToken) {
+    await this.prisma.user.update({
+      where: { user_id: user.user_id },
+      data: { jwt_refresh_token: jwtRefreshToken },
+    });
+  }
+
+  async refreshJwtTokens(user: user, refreshToken: string) {
+    if (!user.jwt_refresh_token) throw new UnauthorizedException();
+    if (user.jwt_refresh_token != refreshToken) throw new UnauthorizedException();
+
+    const { jwtAccessToken, jwtRefreshToken } = await this.createTokens(user);
+    return { jwtAccessToken, jwtRefreshToken };
+  }
 }
