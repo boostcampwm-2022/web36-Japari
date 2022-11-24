@@ -1,5 +1,5 @@
 /** @jsxImportSource @emotion/react */
-import React from "react";
+import React, { useEffect } from "react";
 import * as style from "./styles";
 import { Page } from "../../components/Page";
 import LandingImage from "../../assets/images/landing-image.png";
@@ -8,11 +8,20 @@ import NaverLogo from "../../assets/logo/naver_logo.png";
 import KakaoLogo from "../../assets/logo/kakao_logo.png";
 import GoogleLogo from "../../assets/logo/google_logo.png";
 import GithubLogo from "../../assets/logo/github_logo.png";
+import { isLogin } from "../../api/login";
+import { useNavigate } from "react-router-dom";
 
 const LandingPage: React.FC = () => {
   const handleGithubLogin = () => {
     window.location.href = process.env.REACT_APP_OAUTH_GITHUB_AUTH_SERVER!;
   };
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    isLogin().then(isLogin => {
+      if (isLogin) navigate("/lobby");
+    });
+  }, []);
 
   return (
     <Page>

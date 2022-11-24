@@ -19,7 +19,7 @@ const RoomSetting = ({ closeModal }: RoomSettingProps) => {
     // room 생성 혹은 설정 로직
     const data = { gameId, title, private: isPrivate, maximumPeople, password };
     // socket.emit('create_game', data)
-    console.log(data);
+    // console.log(data);
     closeModal();
   };
 

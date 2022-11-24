@@ -5,13 +5,13 @@ import { AuthService } from "./auth.service";
 import { AccessTokenGuard } from "./jwt-access-token.guard";
 import { RefreshTokenGuard } from "./jwt-refresh-token.guard";
 
-const { LOBBY_PAGE_URI } = process.env;
+const { REDIRECT_URI } = process.env;
 
 @Controller("auth")
 export class AuthController {
   constructor(private authService: AuthService) {}
 
-  @Redirect(LOBBY_PAGE_URI)
+  @Redirect(REDIRECT_URI)
   @Get("/login/:site")
   async login(@Res() res: Response, @Param("site") site: string, @Query("code") code: string) {
     const { jwtAccessToken, jwtRefreshToken } = await this.authService.login(site, code);
@@ -24,6 +24,12 @@ export class AuthController {
   async logout(@Req() req, @Res() res: Response) {
     res.clearCookie("jwt-access-token");
     return this.authService.logout(req.user);
+  }
+
+  @UseGuards(AccessTokenGuard)
+  @Get("/is-login")
+  async isLogin() {
+    return { isLogin: true };
   }
 
   @UseGuards(RefreshTokenGuard)
