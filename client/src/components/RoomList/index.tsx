@@ -25,6 +25,10 @@ const RoomList = ({ rooms }: RoomListProps) => {
   //   const [rooms, setRooms] = useState<Room[]>([]);
   // or useQuery
   const navigate = useNavigate();
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
 
   return (
     <div css={style.containerStyle}>
@@ -36,7 +40,8 @@ const RoomList = ({ rooms }: RoomListProps) => {
           </div>
           <Select selectType="게임 필터" />
         </div>
-        <Button buttonType="방 만들기" handleClick={() => {}} />
+        <Button buttonType="방 만들기" handleClick={() => setIsModalOpen(true)} />
+        {isModalOpen && <Modal ModalType="방 설정" closeModal={closeModal} />}
       </div>
 
       <div css={style.roomListStyle}>

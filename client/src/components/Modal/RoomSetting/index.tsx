@@ -4,7 +4,16 @@ import Button from "../../Button";
 import Select from "../../Select";
 import * as style from "./styles";
 
-const RoomSetting = () => {
+interface RoomSettingProps {
+  closeModal: () => void;
+}
+
+const RoomSetting = ({ closeModal }: RoomSettingProps) => {
+  const createRoom = () => {
+    // room 생성 혹은 설정 로직
+    closeModal();
+  };
+
   return (
     <>
       <aside css={style.modalContents}>
@@ -44,8 +53,8 @@ const RoomSetting = () => {
         </ul>
       </aside>
       <div css={style.footerStyle}>
-        <Button buttonType="확인" handleClick={() => {}} />
-        <Button buttonType="닫기" handleClick={() => {}} />
+        <Button buttonType="확인" handleClick={createRoom} />
+        <Button buttonType="닫기" handleClick={closeModal} />
       </div>
     </>
   );
