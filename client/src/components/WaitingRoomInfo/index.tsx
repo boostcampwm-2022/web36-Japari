@@ -23,6 +23,13 @@ const WaitingRoomInfo = ({ roomRecord, camList }: WaitingRoomInfoProps) => {
     navigate("/lobby");
   };
 
+  const handleGameStartButton = () => {
+    // socket.emit('start_game', {gameRoomId: roomRecord.gameRoomId})
+
+    navigate(`/playing/${roomRecord.gameRoomId}`);
+    // socket.on('start_game') 시 naviagte가 되도록 변경될 여지 있음
+  };
+
   return (
     <div css={style.waitingRoomInfoStyle}>
       <div css={style.headerStyle}>
@@ -36,7 +43,7 @@ const WaitingRoomInfo = ({ roomRecord, camList }: WaitingRoomInfoProps) => {
         </div>
         <div css={style.footerStyle}>
           <Button buttonType="방 나가기" handleClick={handleRootOutButton} />
-          <Button buttonType="게임 시작" handleClick={() => {}} />
+          <Button buttonType="게임 시작" handleClick={handleGameStartButton} />
         </div>
       </div>
     </div>
