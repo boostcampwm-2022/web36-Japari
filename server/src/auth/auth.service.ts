@@ -43,20 +43,19 @@ export class AuthService {
   }
 
   async logout(user: User) {
-    await this.saveRefreshTokenToDB(user, null);
-    return { message: "로그아웃 성공" };
+    return this.saveRefreshTokenToDB(user, null);
   }
 
   async createTokens(user: User) {
     const { userId } = user;
     const payload = { userId };
-    const jwtAccessToken = await this.jwtService.sign(payload, { expiresIn: "1h" });
-    const jwtRefreshToken = await this.jwtService.sign(payload, { expiresIn: "7d" });
+    const jwtAccessToken = this.jwtService.sign(payload, { expiresIn: "1h" });
+    const jwtRefreshToken = this.jwtService.sign(payload, { expiresIn: "7d" });
 
     return { jwtAccessToken, jwtRefreshToken };
   }
 
-  async saveRefreshTokenToDB(user: User, jwtRefreshToken) {
+  async saveRefreshTokenToDB(user: User, jwtRefreshToken: string) {
     await this.prisma.user.update({
       where: { userId: user.userId },
       data: { jwtRefreshToken },

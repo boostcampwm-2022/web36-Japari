@@ -29,11 +29,11 @@ export class RefreshTokenStrategy extends PassportStrategy(Strategy, "jwt-refres
 
     if (!user) throw new UnauthorizedException();
 
-    const refreshToken = req.get("Authorization").replace("Bearer", "").trim();
+    const oldRefreshToken = req.get("Authorization").replace("Bearer", "").trim();
 
     return {
       user,
-      refreshToken,
+      oldRefreshToken,
     };
   }
 }
