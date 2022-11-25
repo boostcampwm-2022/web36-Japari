@@ -1,6 +1,5 @@
 import { Controller, Get, Param, Post, Query, Redirect, Req, Res, UseGuards } from "@nestjs/common";
-import { user } from "@prisma/client";
-import { Request, Response } from "express";
+import { Response } from "express";
 import { AuthService } from "./auth.service";
 import { AccessTokenGuard } from "./jwt-access-token.guard";
 import { RefreshTokenGuard } from "./jwt-refresh-token.guard";

@@ -1,10 +1,8 @@
 import { Injectable, UnauthorizedException } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
-import { user } from "@prisma/client";
+import { User } from "@prisma/client";
 import { PrismaService } from "src/prisma/prisma.service";
 import { GithubService } from "./github.service";
-
-const { OAUTH_GITHUB_CLIENT_ID, OAUTH_GITHUB_CLIENT_SECRET } = process.env;
 
 @Injectable()
 export class AuthService {
@@ -44,32 +42,32 @@ export class AuthService {
     });
   }
 
-  async logout(user: user) {
+  async logout(user: User) {
     await this.saveRefreshTokenToDB(user, null);
     return { message: "로그아웃 성공" };
   }
 
-  async createTokens(user: user) {
-    const { user_id } = user;
-    const payload = { user_id };
+  async createTokens(user: User) {
+    const { userId } = user;
+    const payload = { userId };
     const jwtAccessToken = await this.jwtService.sign(payload, { expiresIn: "1h" });
     const jwtRefreshToken = await this.jwtService.sign(payload, { expiresIn: "7d" });
 
     return { jwtAccessToken, jwtRefreshToken };
   }
 
-  async saveRefreshTokenToDB(user: user, jwtRefreshToken) {
+  async saveRefreshTokenToDB(user: User, jwtRefreshToken) {
     await this.prisma.user.update({
-      where: { user_id: user.user_id },
-      data: { jwt_refresh_token: jwtRefreshToken },
+      where: { userId: user.userId },
+      data: { jwtRefreshToken },
     });
   }
 
-  async refreshJwtTokens(user: user, refreshToken: string) {
-    if (!user.jwt_refresh_token) throw new UnauthorizedException();
-    if (user.jwt_refresh_token != refreshToken) throw new UnauthorizedException();
+  async refreshJwtTokens(user: User, jwtRefreshToken: string) {
+    if (!user.jwtRefreshToken) throw new UnauthorizedException();
+    if (user.jwtRefreshToken != jwtRefreshToken) throw new UnauthorizedException();
 
-    const { jwtAccessToken, jwtRefreshToken } = await this.createTokens(user);
-    return { jwtAccessToken, jwtRefreshToken };
+    const { jwtAccessToken, jwtRefreshToken: newJwtRefreshToken } = await this.createTokens(user);
+    return { jwtAccessToken, jwtRefreshToken: newJwtRefreshToken };
   }
 }

@@ -1,26 +1,12 @@
 import { Injectable, UnauthorizedException } from "@nestjs/common";
-import { JwtService } from "@nestjs/jwt";
-import { PrismaService } from "src/prisma/prisma.service";
-// import axios from "axios";
 import { HttpService } from "@nestjs/axios";
-import axios from "axios";
-import { map } from "rxjs";
 
-const {
-  OAUTH_GITHUB_CLIENT_ID,
-  OAUTH_GITHUB_CLIENT_SECRET,
-  OAUTH_GITHUB_ACCESS_TOKEN_API,
-  OAUTH_GITHUB_USER_API,
-  OAUTH_GITHUB_EMAIL_API,
-} = process.env;
+const { OAUTH_GITHUB_CLIENT_ID, OAUTH_GITHUB_CLIENT_SECRET, OAUTH_GITHUB_ACCESS_TOKEN_API, OAUTH_GITHUB_EMAIL_API } =
+  process.env;
 
 @Injectable()
 export class GithubService {
-  constructor(
-    private prisma: PrismaService,
-    private jwtService: JwtService,
-    private readonly httpService: HttpService
-  ) {}
+  constructor(private readonly httpService: HttpService) {}
 
   async getGithubEmail(code: string) {
     const accessToken = await this.fetchGithubAccessToken(code);

@@ -6,8 +6,8 @@ export class GameService {
   constructor(private prisma: PrismaService) {}
 
   async findGame(id: number) {
-    let gameInfo = await this.prisma.game.findUnique({ where: { game_id: id } });
-    if (!gameInfo) gameInfo = { game_id: 0, name: "", minimum_people: 0 };
+    let gameInfo = await this.prisma.game.findUnique({ where: { gameId: id } });
+    if (!gameInfo) gameInfo = { gameId: 0, name: "", minimumPeople: 0 };
 
     return gameInfo;
   }

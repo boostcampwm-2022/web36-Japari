@@ -19,7 +19,7 @@ const redisClient = redis.createClient({
 redisClient.on("connect", () => {
   console.info("Redis connected!");
 
-  testFunction(1, "아임더베스트 테스트");
+  // testFunction(1, "redis 데이터");
 });
 
 redisClient.on("error", err => {
