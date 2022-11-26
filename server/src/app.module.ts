@@ -1,16 +1,14 @@
 import { Module } from "@nestjs/common";
-
+import { AuthModule } from "./modules/auth/auth.module";
+import { GameModule } from "./modules/game/game.module";
+import { PrismaModule } from "./modules/prisma/prisma.module";
+import { ChatModule } from "./modules/chat/chat.module";
+import { ConfigModule } from "@nestjs/config";
 import { AppController } from "./app.controller";
-
 import { AppService } from "./app.service";
 
-import { AuthModule } from "./auth/auth.module";
-import { GameModule } from "./game/game.module";
-import { PrismaModule } from "./prisma/prisma.module";
-import { ChatModule } from "./chat/chat.module";
-
 @Module({
-  imports: [AuthModule, GameModule, PrismaModule, ChatModule],
+  imports: [ConfigModule.forRoot({ isGlobal: true }), AuthModule, GameModule, PrismaModule, ChatModule],
 
   controllers: [AppController],
 

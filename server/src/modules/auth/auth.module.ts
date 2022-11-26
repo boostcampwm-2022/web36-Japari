@@ -4,20 +4,16 @@ import { PassportModule } from "@nestjs/passport";
 import { AuthController } from "./auth.controller";
 import { AuthService } from "./auth.service";
 import { GithubService } from "./github.service";
-import { AccessTokenStrategy } from "./jwt-access-token.strategy";
+import { AccessTokenStrategy } from "./jwt/jwt-access-token.strategy";
 import { HttpModule } from "@nestjs/axios";
-import { RefreshTokenStrategy } from "./jwt-refresh-token.strategy";
-import { PrismaModule } from "src/prisma/prisma.module";
+import { RefreshTokenStrategy } from "./jwt/jwt-refresh-token.strategy";
+import { PrismaModule } from "src/modules/prisma/prisma.module";
+import { ConfigService } from "@nestjs/config";
+import { jwtConfig } from "src/config/jwt.config";
 
 @Module({
-  imports: [
-    PassportModule,
-    JwtModule.register({
-      secret: process.env.JWT_SECRET_KEY,
-    }),
-    HttpModule,
-    PrismaModule,
-  ],
+  // dynamic module: https://docs.nestjs.com/fundamentals/dynamic-modules
+  imports: [PassportModule, JwtModule.registerAsync(jwtConfig), HttpModule, PrismaModule],
   controllers: [AuthController],
   providers: [AuthService, GithubService, AccessTokenStrategy, RefreshTokenStrategy],
   exports: [AccessTokenStrategy, PassportModule],
