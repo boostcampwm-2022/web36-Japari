@@ -20,14 +20,14 @@ class RedisModuleWithoutConfig {
     const redisProvider = {
       provide: "RedisProvider",
       useFactory: async (...args) => {
-        const logger = new Logger("RedisModule");
+        const logger = new Logger("Redis Module");
 
         const { connectionOptions } = await useFactory(...args);
 
         const client = new IORedis(connectionOptions);
 
         client.on("connect", () => {
-          logger.log("redis connected");
+          logger.verbose("redis connected");
         });
 
         client.on("error", err => {
