@@ -1,8 +1,8 @@
 import { ConfigService } from "@nestjs/config";
 
-export const jwtConfig = {
-  useFactory: async (configService: ConfigService) => ({
-    secret: configService.get<string>("JWT_SECRET_KEY"),
+export default {
+  useFactory: async (config: ConfigService) => ({
+    secret: config.get<string>("JWT_SECRET_KEY"),
   }),
   inject: [ConfigService],
 };

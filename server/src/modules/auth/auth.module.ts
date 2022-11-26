@@ -8,8 +8,7 @@ import { AccessTokenStrategy } from "./jwt/jwt-access-token.strategy";
 import { HttpModule } from "@nestjs/axios";
 import { RefreshTokenStrategy } from "./jwt/jwt-refresh-token.strategy";
 import { PrismaModule } from "src/modules/prisma/prisma.module";
-import { ConfigService } from "@nestjs/config";
-import { jwtConfig } from "src/config/jwt.config";
+import jwtConfig from "src/config/jwt.config";
 
 @Module({
   // dynamic module: https://docs.nestjs.com/fundamentals/dynamic-modules
