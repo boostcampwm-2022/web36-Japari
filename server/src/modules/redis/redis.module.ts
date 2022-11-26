@@ -1,6 +1,7 @@
 // https://www.youtube.com/watch?v=vGkInLFL0kg&list=PLnrGn4P6C4P5J2rSSyiAyxZegws4SS8ey&index=4&ab_channel=JacoboCode
 
 import { DynamicModule, FactoryProvider, Logger, Module, ModuleMetadata } from "@nestjs/common";
+import { ConfigModule, ConfigService } from "@nestjs/config";
 
 import IORedis, { RedisOptions } from "ioredis";
 
@@ -14,7 +15,7 @@ type RedisRegisterAsyncParam = {
   Pick<FactoryProvider, "inject">;
 
 @Module({})
-export class RedisModule {
+class RedisModuleWithoutConfig {
   static async registerAsync({ imports, useFactory, inject }: RedisRegisterAsyncParam): Promise<DynamicModule> {
     const redisProvider = {
       provide: "RedisProvider",
@@ -39,10 +40,24 @@ export class RedisModule {
     };
 
     return {
-      module: RedisModule,
+      module: RedisModuleWithoutConfig,
       imports,
       providers: [redisProvider],
       exports: [redisProvider],
     };
   }
 }
+
+export const RedisModule = RedisModuleWithoutConfig.registerAsync({
+  imports: [ConfigModule],
+  useFactory: async (config: ConfigService) => {
+    return {
+      connectionOptions: {
+        host: config.get("REDIS_HOST"),
+        port: config.get("REDIS_PORT"),
+        password: config.get("REDIS_PASSWORD"),
+      },
+    };
+  },
+  inject: [ConfigService],
+});

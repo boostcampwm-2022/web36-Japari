@@ -1,8 +1,8 @@
 import { Controller, Get, Param, Post, Query, Redirect, Req, Res, UseGuards } from "@nestjs/common";
 import { RequestWithAccessToken, RequestWithRefreshToken, Response } from "express";
 import { AuthService } from "./auth.service";
-import { AccessTokenGuard } from "./jwt/jwt-access-token.guard";
-import { RefreshTokenGuard } from "./jwt/jwt-refresh-token.guard";
+import { AccessTokenGuard } from "../jwt/jwt-access-token.guard";
+import { RefreshTokenGuard } from "../jwt/jwt-refresh-token.guard";
 
 const { REDIRECT_URI } = process.env;
 
