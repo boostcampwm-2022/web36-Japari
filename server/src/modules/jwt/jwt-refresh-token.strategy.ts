@@ -1,19 +1,19 @@
 import { Injectable, UnauthorizedException } from "@nestjs/common";
 import { PassportStrategy } from "@nestjs/passport";
 import { ExtractJwt, Strategy } from "passport-jwt";
-import { PrismaService } from "src/prisma/prisma.service";
-import { user } from "@prisma/client";
+import { PrismaService } from "src/modules/prisma/prisma.service";
 import { Request } from "express";
+import { ConfigService } from "@nestjs/config";
 
 interface JwtPayload {
-  user_id: number;
+  userId: number;
 }
 
 @Injectable()
 export class RefreshTokenStrategy extends PassportStrategy(Strategy, "jwt-refresh-token") {
-  constructor(private prisma: PrismaService) {
+  constructor(private config: ConfigService, private prisma: PrismaService) {
     super({
-      secretOrKey: process.env.JWT_SECRET_KEY,
+      secretOrKey: config.get<string>("JWT_SECRET_KEY"),
       jwtFromRequest: ExtractJwt.fromExtractors([
         (req: Request) => {
           return req.cookies["jwt-refresh-token"];
@@ -23,18 +23,18 @@ export class RefreshTokenStrategy extends PassportStrategy(Strategy, "jwt-refres
   }
 
   async validate(req: Request, payload: JwtPayload) {
-    const { user_id } = payload;
+    const { userId } = payload;
     const user = await this.prisma.user.findUnique({
-      where: { user_id },
+      where: { userId },
     });
 
     if (!user) throw new UnauthorizedException();
 
-    const refreshToken = req.get("Authorization").replace("Bearer", "").trim();
+    const oldRefreshToken = req.get("Authorization").replace("Bearer", "").trim();
 
     return {
       user,
-      refreshToken,
+      oldRefreshToken,
     };
   }
 }

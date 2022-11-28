@@ -9,3 +9,12 @@ if (!REACT_APP_OAUTH_GITHUB_AUTH_SERVER) {
 export const githubLogin = () => {
   axios.get(REACT_APP_OAUTH_GITHUB_AUTH_SERVER);
 };
+
+export const isLogin = async () => {
+  try {
+    const res = await axios.get("/auth/is-login");
+    return res.data.isLogin;
+  } catch {
+    return false;
+  }
+};

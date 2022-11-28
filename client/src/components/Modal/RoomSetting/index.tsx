@@ -19,6 +19,7 @@ const RoomSetting = ({ closeModal }: RoomSettingProps) => {
     // room 생성 혹은 설정 로직
     const data = { gameId, title, private: isPrivate, maximumPeople, password };
     // socket.emit('create_game', data)
+    // console.log(data);
     closeModal();
   };
 
@@ -47,13 +48,19 @@ const RoomSetting = ({ closeModal }: RoomSettingProps) => {
             <Select selectType="게임 생성" width="13rem" setValue={setGameId} />
           </li>
           <li>
-            <Input type="text" placeholder="방 이름을 입력해 주세요." width="13rem" />
+            <Input type="text" placeholder="방 이름을 입력해 주세요." width="13rem" setValue={setTitle} />
           </li>
           <li>
             <Select selectType="공개방 설정" width="13rem" setValue={setIsPrivate} />
           </li>
           <li>
-            <Input type="password" placeholder="비밀번호를 입력해 주세요." width="13rem" />
+            <Input
+              type="password"
+              placeholder="비밀번호를 입력해 주세요."
+              width="13rem"
+              disabled={!isPrivate}
+              setValue={setPassword}
+            />
           </li>
           <li>
             <Select selectType="인원 제한" width="13rem" setValue={setMaximumPeople} />
