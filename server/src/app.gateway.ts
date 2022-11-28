@@ -17,8 +17,7 @@ import { PrismaService } from "./modules/prisma/prisma.service";
 @WebSocketGateway(4001, { transports: ["websocket"], namespace: "/" })
 export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer() public server: Server;
-  private logger = new Logger("Chat Gateway");
-  private socketIdToUserEmail = new Map<string, string>(); // 모킹을 위해 이름 대신 email 저장
+  private logger = new Logger("App Gateway");
 
   constructor(
     private jwt: JwtService,
