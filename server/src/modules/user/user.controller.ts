@@ -17,24 +17,27 @@ import { UserService } from "./user.service";
 export class UserController {
   constructor(private userService: UserService) {}
 
+  @UseGuards(AccessTokenGuard)
+  @Get("/")
+  async getLoggedInUser(@Req() req: RequestWithAccessToken) {
+    return this.userService.findUser(req.user.userId);
+  }
+
+  @UseGuards(AccessTokenGuard)
   @Get("/list")
   async getUserList() {
     return this.userService.findAllUser();
   }
 
+  @UseGuards(AccessTokenGuard)
   @Get("/:userId")
   async getUser(@Param("userId", ParseIntPipe) userId: number) {
     return this.userService.findUser(userId);
   }
 
   @UseGuards(AccessTokenGuard)
-  @Patch("/nickname/:userId")
-  async patchNickname(
-    @Param("userId", ParseIntPipe) userId: number,
-    @Req() req: RequestWithAccessToken,
-    @Body() { nickname }: { nickname: string }
-  ) {
-    if (req.user.userId != userId) throw new UnauthorizedException();
-    return this.userService.updateUserNickname(userId, nickname);
+  @Patch("/nickname")
+  async patchNickname(@Req() req: RequestWithAccessToken, @Body() { nickname }: { nickname: string }) {
+    return this.userService.updateUserNickname(req.user.userId, nickname);
   }
 }
