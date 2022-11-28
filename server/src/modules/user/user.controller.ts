@@ -36,13 +36,9 @@ export class UserController {
   }
 
   @UseGuards(AccessTokenGuard)
-  @Patch("/nickname/:userId")
-  async patchNickname(
-    @Param("userId", ParseIntPipe) userId: number,
-    @Req() req: RequestWithAccessToken,
-    @Body() { nickname }: { nickname: string }
-  ) {
-    if (req.user.userId != userId) throw new UnauthorizedException();
-    return this.userService.updateUserNickname(userId, nickname);
+  @Patch("/nickname")
+  async patchNickname(@Req() req: RequestWithAccessToken, @Body() { nickname }: { nickname: string }) {
+    console.log(req.user, nickname);
+    return this.userService.updateUserNickname(req.user.userId, nickname);
   }
 }

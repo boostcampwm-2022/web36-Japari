@@ -3,6 +3,7 @@
 import Input from "../../Input";
 import Button from "../../Button";
 import { useState } from "react";
+import { updateNickname } from "../../../api/user";
 
 interface NickNameSettingProps {
   closeModal: () => void;
@@ -16,7 +17,12 @@ const NickNameSetting = ({ closeModal }: NickNameSettingProps) => {
       alert("닉네임을 입력하세요.");
       return;
     }
-    // 닉네임 설정 api
+
+    updateNickname(nickName).catch(err => {
+      alert("닉네임 설정에 실패하였습니다.");
+      return;
+    });
+    alert("닉네임 설정이 완료되었습니다.");
 
     closeModal();
   };

@@ -14,3 +14,12 @@ export const getLoggedInUser = async () => {
     return null;
   }
 };
+
+export const updateNickname = async (nickname: string) => {
+  try {
+    const res = await axios.patch("/user/nickname", { nickname });
+    return res.data;
+  } catch {
+    throw new Error("닉네임 설정 오류");
+  }
+};
