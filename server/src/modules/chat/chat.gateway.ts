@@ -22,11 +22,24 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   constructor(private jwt: JwtService, private prisma: PrismaService, @Inject("RedisProvider") private redis: Redis) {}
 
   @SubscribeMessage("chat/lobby")
-  async handleMessage(@ConnectedSocket() socket: Socket, @MessageBody() data) {
+  async handleLobbyChat(@ConnectedSocket() socket: Socket, @MessageBody() data) {
     const { message, sendTime } = data;
     const sender = (await this.redis.hmget("socket-id-to-user-name", socket.id))[0];
 
-    socket.broadcast.emit("chat/lobby", {
+    socket.to("lobby").emit("chat/lobby", {
+      sender,
+      message,
+      sendTime,
+    });
+  }
+
+  @SubscribeMessage("chat/room")
+  async handleRoomChat(@ConnectedSocket() socket: Socket, @MessageBody() data) {
+    const { message, sendTime } = data;
+    const sender = (await this.redis.hmget("socket-id-to-user-name", socket.id))[0];
+    const room = (await this.redis.hmget("socket-id-to-room-id"))[0];
+
+    socket.to(room).emit("chat/room", {
       sender,
       message,
       sendTime,
