@@ -17,11 +17,20 @@ import { UserService } from "./user.service";
 export class UserController {
   constructor(private userService: UserService) {}
 
+  @UseGuards(AccessTokenGuard)
+  @Get("/")
+  async getLoggedInUser(@Req() req: RequestWithAccessToken) {
+    console.log("LoggedIn:", req.user);
+    return this.userService.findUser(req.user.userId);
+  }
+
+  @UseGuards(AccessTokenGuard)
   @Get("/list")
   async getUserList() {
     return this.userService.findAllUser();
   }
 
+  @UseGuards(AccessTokenGuard)
   @Get("/:userId")
   async getUser(@Param("userId", ParseIntPipe) userId: number) {
     return this.userService.findUser(userId);
