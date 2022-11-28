@@ -22,8 +22,12 @@ const Modal = ({ ModalType, user, gameId, roomName, closeModal }: ModalProps) =>
 
   switch (ModalType) {
     case "닉네임 설정":
-      modalTitle = "닉네임 설정";
-      content = <NickNameSetting />;
+      if (!closeModal) {
+        console.error("no props");
+      } else {
+        modalTitle = "닉네임 설정";
+        content = <NickNameSetting closeModal={closeModal} />;
+      }
       break;
     case "방 설정":
       if (!closeModal) {
