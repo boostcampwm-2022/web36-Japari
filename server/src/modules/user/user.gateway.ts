@@ -1,17 +1,17 @@
-import { Inject, Logger, UseGuards } from "@nestjs/common";
+import { Inject, Logger } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import {
   ConnectedSocket,
-  MessageBody,
   OnGatewayConnection,
   OnGatewayDisconnect,
   OnGatewayInit,
-  SubscribeMessage,
   WebSocketGateway,
   WebSocketServer,
 } from "@nestjs/websockets";
 import Redis from "ioredis";
 import { Server, Socket } from "socket.io";
+import { RedisTableName } from "src/constants/redis-table-name";
+import { redisRecordToObject } from "util/convert";
 import { PrismaService } from "../prisma/prisma.service";
 
 @WebSocketGateway(4001, { transports: ["websocket"], namespace: "/" })
@@ -22,13 +22,11 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   constructor(private jwt: JwtService, private prisma: PrismaService, @Inject("RedisProvider") private redis: Redis) {}
 
   afterInit(server: Server) {
+    // 매 초마다 모든 유저들에게 접속 중인 유저 정보 전송
     setInterval(async () => {
-      const records = await this.redis.hgetall("online-users");
+      const records = await this.redis.hgetall(RedisTableName.ONLINE_USERS);
 
-      const users = {};
-      Object.entries(records).forEach(([userId, userPublicInfo]) => {
-        users[userId] = JSON.parse(userPublicInfo);
-      });
+      const users = redisRecordToObject(records);
 
       server.emit("user/online", users);
     }, 1000);

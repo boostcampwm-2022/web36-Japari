@@ -1,5 +1,4 @@
-import { Inject, Injectable, NotFoundException } from "@nestjs/common";
-import Redis from "ioredis";
+import { Injectable, NotFoundException } from "@nestjs/common";
 import { PrismaService } from "src/modules/prisma/prisma.service";
 
 const getUserOption = {

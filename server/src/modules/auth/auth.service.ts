@@ -49,7 +49,7 @@ export class AuthService {
   async createTokens(user: User) {
     const { userId } = user;
     const payload = { userId };
-    const jwtAccessToken = this.jwtService.sign(payload, { expiresIn: "1h" });
+    const jwtAccessToken = this.jwtService.sign(payload, { expiresIn: "3h" });
     const jwtRefreshToken = this.jwtService.sign(payload, { expiresIn: "7d" });
 
     return { jwtAccessToken, jwtRefreshToken };
