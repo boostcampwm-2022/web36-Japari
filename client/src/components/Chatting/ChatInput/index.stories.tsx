@@ -6,7 +6,7 @@ export default {
   component: ChatInput,
 } as Meta;
 
-const Template: Story = () => <ChatInput />;
+const Template: Story = () => <ChatInput addLogs={() => {}} />;
 
 export const Default = Template.bind({});
 Default.storyName = "채팅 인풋";

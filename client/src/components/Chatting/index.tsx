@@ -46,11 +46,15 @@ export type Chat = {
 const Chatting = () => {
   const [logs, setLogs] = useState<Chat[]>(dummyLog);
 
+  const addLogs = (newLog: Chat) => {
+    setLogs((current: Chat[]) => [...current, newLog]);
+  };
+
   return (
     <div css={style.ChattingContainerStyle}>
       <ChatLog logs={logs} />
       <hr css={style.ChattingHRStyle} />
-      <ChatInput />
+      <ChatInput addLogs={addLogs} />
     </div>
   );
 };
