@@ -38,7 +38,6 @@ export class UserController {
   @UseGuards(AccessTokenGuard)
   @Patch("/nickname")
   async patchNickname(@Req() req: RequestWithAccessToken, @Body() { nickname }: { nickname: string }) {
-    console.log(req.user, nickname);
     return this.userService.updateUserNickname(req.user.userId, nickname);
   }
 }
