@@ -40,15 +40,17 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
         where: { userId },
       });
 
-      console.log({ [socket.id]: user.email });
-
       this.redis.hmset("socket-id-to-user-name", { [socket.id]: user.email });
+      this.redis.hmset("socket-id-to-room-id", { [socket.id]: "lobby" });
+      socket.join("lobby");
     } catch (e) {
       socket.disconnect();
     }
   }
 
-  handleDisconnect(@ConnectedSocket() socket: Socket) {
+  async handleDisconnect(@ConnectedSocket() socket: Socket) {
     this.redis.hdel("socket-id-to-user-name", socket.id);
+    const room = (await this.redis.hmget("socket-id-to-room-id", socket.id))[0];
+    socket.leave(room);
   }
 }
