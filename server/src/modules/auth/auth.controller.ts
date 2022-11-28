@@ -3,19 +3,18 @@ import { RequestWithAccessToken, RequestWithRefreshToken, Response } from "expre
 import { AuthService } from "./auth.service";
 import { AccessTokenGuard } from "../jwt/jwt-access-token.guard";
 import { RefreshTokenGuard } from "../jwt/jwt-refresh-token.guard";
-
-const { REDIRECT_URI } = process.env;
+import { ConfigService } from "@nestjs/config";
 
 @Controller("auth")
 export class AuthController {
-  constructor(private authService: AuthService) {}
+  constructor(private authService: AuthService, private config: ConfigService) {}
 
-  @Redirect(REDIRECT_URI)
   @Get("/login/:site")
   async login(@Param("site") site: string, @Query("code") code: string, @Res() res: Response) {
     const { jwtAccessToken, jwtRefreshToken } = await this.authService.login(site, code);
     res.cookie("jwt-access-token", jwtAccessToken, { httpOnly: true });
     res.cookie("jwt-refresh-token", jwtRefreshToken, { httpOnly: true });
+    res.redirect(this.config.get<string>("REDIRECT_URI"));
   }
 
   @UseGuards(AccessTokenGuard)

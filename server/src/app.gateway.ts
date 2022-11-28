@@ -32,11 +32,13 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
   async handleConnection(@ConnectedSocket() socket: Socket) {
     const user = { email: "test" };
 
-    console.log({ [socket.id]: user.email });
+    this.logger.verbose({ [socket.id]: user.email });
     this.redis.hmset("socket-id-to-user-name", { [socket.id]: user.email });
   }
 
-  handleDisconnect(@ConnectedSocket() socket: Socket) {
+  async handleDisconnect(@ConnectedSocket() socket: Socket) {
     this.redis.hdel("socket-id-to-user-name", socket.id);
+    const room = (await this.redis.hmget("socket-id-to-room-id", socket.id))[0];
+    socket.leave(room);
   }
 }

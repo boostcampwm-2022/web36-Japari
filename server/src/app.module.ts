@@ -9,6 +9,7 @@ import { AppService } from "./app.service";
 import { RedisModule } from "./modules/redis/redis.module";
 import { AppGateway } from "./app.gateway";
 import { JwtModule } from "./modules/jwt/jwt.module";
+import { UserModule } from "./modules/user/user.module";
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { JwtModule } from "./modules/jwt/jwt.module";
     JwtModule,
     RedisModule,
     ChatModule,
+    UserModule,
   ],
 
   controllers: [AppController],

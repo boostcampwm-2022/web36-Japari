@@ -21,7 +21,7 @@ const Input = ({ type, width, placeholder, disabled, value, setValue, handleKeyP
         width: ${width};
       `}
       type={type}
-      value={value ?? ""}
+      value={value}
       placeholder={placeholder}
       disabled={disabled ?? false}
       onChange={e => setValue(e.target.value)}
