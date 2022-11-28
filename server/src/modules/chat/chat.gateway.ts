@@ -14,7 +14,7 @@ import Redis from "ioredis";
 import { Server, Socket } from "socket.io";
 import { PrismaService } from "../prisma/prisma.service";
 
-@WebSocketGateway(2999, { transports: ["websocket"], namespace: "/" })
+@WebSocketGateway(4001, { transports: ["websocket"], namespace: "/" })
 export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer() public server: Server;
   private logger = new Logger("Chat Gateway");
