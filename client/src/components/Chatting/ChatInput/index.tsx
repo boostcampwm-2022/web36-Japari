@@ -19,7 +19,7 @@ const ChatInput = ({ addLogs }: ChatInputProps) => {
     }
     const newLog: Chat = {
       sender: "me",
-      message: message,
+      message,
       sendTime: new Date(),
     };
 
