@@ -27,6 +27,9 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 
   afterInit(server: Server) {
     this.logger.verbose("app gateway initiated");
+    this.redis.del("socket-id-to-user-name");
+    this.redis.del("socket-id-to-room-id");
+    this.redis.del("online-users");
   }
 
   async handleConnection(@ConnectedSocket() socket: Socket) {
@@ -39,9 +42,18 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
       const user = await this.prisma.user.findUnique({
         where: { userId },
       });
+      const userPublicInfo = {
+        email: user.email,
+        nickname: user.nickname,
+        socketId: socket.id,
+        profileImage: user.profileImage,
+        score: user.score,
+      };
 
-      this.redis.hmset("socket-id-to-user-name", { [socket.id]: user.email });
+      this.redis.hmset("socket-id-to-user-id", { [socket.id]: user.userId }); // user name needed
+      this.redis.hmset("socket-id-to-user-name", { [socket.id]: user.email }); // user name needed
       this.redis.hmset("socket-id-to-room-id", { [socket.id]: "lobby" });
+      this.redis.hmset("online-users", { [userId]: JSON.stringify(userPublicInfo) });
       socket.join("lobby");
     } catch (e) {
       socket.disconnect();
@@ -49,8 +61,12 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
   }
 
   async handleDisconnect(@ConnectedSocket() socket: Socket) {
+    const userId = (await this.redis.hmget("socket-id-to-user-id", socket.id))[0];
+    this.redis.hdel("socket-id-to-user-id", socket.id);
     this.redis.hdel("socket-id-to-user-name", socket.id);
+    this.redis.hdel("online-users", userId);
     const room = (await this.redis.hmget("socket-id-to-room-id", socket.id))[0];
+    this.redis.hdel("socket-id-to-room-id", socket.id);
     socket.leave(room);
   }
 }
