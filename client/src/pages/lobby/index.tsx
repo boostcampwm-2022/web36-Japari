@@ -1,5 +1,5 @@
 /** @jsxImportSource @emotion/react */
-import React from "react";
+import React, { useEffect } from "react";
 import * as style from "./styles";
 import { Page } from "../../components/Page";
 import Profile from "../../components/Profile";
@@ -7,9 +7,17 @@ import UserList from "../../components/UserList";
 import Chatting from "../../components/Chatting";
 import RoomList from "../../components/RoomList";
 import * as dummy from "../dummy";
+import { useRecoilState } from "recoil";
+import { userState } from "../../recoil/user";
+import { getLoggedInUser } from "../../api/user";
 
 const LobbyPage: React.FC = () => {
-  // user 정보 로직
+  const [user, setUser] = useRecoilState(userState);
+
+  useEffect(() => {
+    // getuser
+    getLoggedInUser();
+  }, []);
 
   return (
     <Page>
