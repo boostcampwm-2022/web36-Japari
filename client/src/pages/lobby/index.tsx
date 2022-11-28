@@ -15,8 +15,9 @@ const LobbyPage: React.FC = () => {
   const [user, setUser] = useRecoilState(userState);
 
   useEffect(() => {
-    // getuser
-    getLoggedInUser();
+    getLoggedInUser().then(res => {
+      setUser(res);
+    });
   }, []);
 
   return (

@@ -20,7 +20,6 @@ export class UserController {
   @UseGuards(AccessTokenGuard)
   @Get("/")
   async getLoggedInUser(@Req() req: RequestWithAccessToken) {
-    console.log("LoggedIn:", req.user);
     return this.userService.findUser(req.user.userId);
   }
 

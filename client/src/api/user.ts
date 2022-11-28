@@ -9,9 +9,8 @@ if (!REACT_APP_OAUTH_GITHUB_AUTH_SERVER) {
 export const getLoggedInUser = async () => {
   try {
     const res = await axios.get("/user/");
-    console.log(res.data);
-    // return res.data.isLogin;
+    return res.data;
   } catch {
-    return false;
+    return null;
   }
 };
