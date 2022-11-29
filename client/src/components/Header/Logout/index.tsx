@@ -12,9 +12,9 @@ const RoomRecord = () => {
   const [user, setUser] = useRecoilState(userState);
 
   const handleLogout = () => {
-    setUser(null);
-    socket.disconnect();
     logout().then(() => {
+      setUser(null);
+      socket.disconnect();
       navigate("/");
     });
   };
