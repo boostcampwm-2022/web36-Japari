@@ -7,7 +7,6 @@ import UserList from "../../components/UserList";
 import Chatting from "../../components/Chatting";
 import RoomList from "../../components/RoomList";
 import * as dummy from "../dummy";
-import io from "socket.io-client";
 import { useRecoilState } from "recoil";
 import { userState } from "../../recoil/user";
 import { getLoggedInUser } from "../../api/user";
@@ -16,11 +15,6 @@ import Modal from "../../components/Modal";
 const LobbyPage: React.FC = () => {
   const [user, setUser] = useRecoilState(userState);
   const [nicknameModalOpen, setNicknameModalOpen] = useState<boolean>(false);
-  const socket = io(`${process.env.REACT_APP_SOCKET_SERVER_URL}`, {
-    // websocket으로 먼저 연결 시도 후 실패 시 polling으로 연결
-    transports: ["websocket", "polling"],
-    autoConnect: false,
-  });
 
   const closeModal = () => {
     setNicknameModalOpen(false);
@@ -36,12 +30,6 @@ const LobbyPage: React.FC = () => {
     if (!user) return;
     if (!user.nickname) setNicknameModalOpen(true);
   }, [user]);
-
-  useEffect(() => {
-    socket.connect();
-    console.log(socket);
-    socket.emit("chat/lobby", { message: "hi" });
-  }, []);
 
   return (
     <Page>

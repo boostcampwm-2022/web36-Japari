@@ -25,7 +25,8 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   async handleLobbyChat(@ConnectedSocket() socket: Socket, @MessageBody() data) {
     const { message, sendTime } = data;
     // receive 확인
-    this.logger.verbose(message, data);
+    this.logger.verbose(data);
+    console.dir(message);
     const sender = (await this.redis.hmget("socket-id-to-user-name", socket.id))[0];
 
     socket.to("lobby").emit("chat/lobby", {
