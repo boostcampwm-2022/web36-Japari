@@ -5,7 +5,7 @@ import { socketState } from "../../../store/socket";
 import { logout } from "../../../api/auth";
 import * as style from "./styles";
 import { useNavigate } from "react-router-dom";
-import { userState } from "../../../recoil/user";
+import { userState } from "../../../store/user";
 const RoomRecord = () => {
   const navigate = useNavigate();
   const socket = useRecoilValue(socketState);
