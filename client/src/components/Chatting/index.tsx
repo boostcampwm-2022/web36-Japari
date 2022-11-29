@@ -12,7 +12,6 @@ export type Chat = {
 };
 
 const socket = io(`${process.env.REACT_APP_SOCKET_SERVER_URL}`, {
-  // websocket으로 먼저 연결 시도 후 실패 시 polling으로 연결
   transports: ["websocket", "polling"],
   autoConnect: false,
   query: {
@@ -25,6 +24,7 @@ const Chatting = () => {
 
   const addLogs = (newLog: Chat) => {
     setLogs((current: Chat[]) => [...current, newLog]);
+    console.log(logs);
   };
 
   useEffect(() => {
