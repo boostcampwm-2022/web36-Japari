@@ -32,7 +32,7 @@ const ChatLog = ({ logs }: ChatLogProps) => {
       {logs.map((log, idx) => {
         return (
           <div css={style.ChatLogStyle} key={idx}>
-            <p>&#91;{log.sendTime.toTimeString().split(" ")[0]}&#93;</p>
+            <p>&#91;{log.sendTime}&#93;</p>
             <p>
               {log.sender} : {log.message}
             </p>
