@@ -45,7 +45,7 @@ export const dummyUserMap = {
 };
 
 export const roomRecord = {
-  roomId: 1,
+  roomId: "1",
   isPrivate: true,
   title: "캐마 초보만",
   gameId: 1,

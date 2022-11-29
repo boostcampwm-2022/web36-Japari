@@ -11,7 +11,7 @@ import RoomRecord from "./RoomRecord";
 import * as style from "./styles";
 
 export interface Room {
-  roomId: number;
+  roomId: string;
   title: string;
   gameId: number;
   currentPeople: number;
@@ -32,6 +32,11 @@ const RoomList = ({ rooms }: RoomListProps) => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const closeModal = () => {
     setIsModalOpen(false);
+  };
+
+  const onClickRecord = (roomId: string) => {
+    socket.emit("game-room/join", { roomId });
+    navigate(`/waiting/${roomId}`);
   };
 
   useEffect(() => {
@@ -60,7 +65,7 @@ const RoomList = ({ rooms }: RoomListProps) => {
 
       <div css={style.roomListStyle}>
         {rooms.map((room, index) => (
-          <RoomRecord key={index} {...room} onClickRecord={() => navigate(`/waiting/${room.roomId}`)} />
+          <RoomRecord key={index} {...room} onClickRecord={() => onClickRecord(room.roomId)} />
         ))}
       </div>
     </div>

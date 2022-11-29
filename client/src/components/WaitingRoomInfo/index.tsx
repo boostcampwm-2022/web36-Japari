@@ -1,5 +1,7 @@
 /** @jsxImportSource @emotion/react */
 import { useNavigate } from "react-router-dom";
+import { useRecoilValue } from "recoil";
+import { socketState } from "../../store/socket";
 import Button from "../Button";
 import Cam, { CamProps } from "../Cam";
 import { Room } from "../RoomList";
@@ -16,10 +18,12 @@ export interface ProfileProps {
 }
 
 const WaitingRoomInfo = ({ roomRecord, camList }: WaitingRoomInfoProps) => {
+  const socket = useRecoilValue(socketState);
   // [camList, setCamList] = useState<Cam[]>([]);
   const navigate = useNavigate();
 
   const handleRootOutButton = () => {
+    socket.emit("game-room/exit");
     navigate("/lobby");
   };
 
