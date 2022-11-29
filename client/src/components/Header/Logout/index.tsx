@@ -11,12 +11,11 @@ const RoomRecord = () => {
   const socket = useRecoilValue(socketState);
   const [user, setUser] = useRecoilState(userState);
 
-  const handleLogout = () => {
-    logout().then(() => {
-      setUser(null);
-      socket.disconnect();
-      navigate("/");
-    });
+  const handleLogout = async () => {
+    await logout();
+    setUser(null);
+    socket.disconnect();
+    navigate("/");
   };
 
   return (
