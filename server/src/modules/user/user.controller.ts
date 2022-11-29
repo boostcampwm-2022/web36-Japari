@@ -6,6 +6,7 @@ import {
   ParseIntPipe,
   Patch,
   Req,
+  UseFilters,
   UseGuards,
   UsePipes,
   ValidationPipe,
@@ -43,7 +44,7 @@ export class UserController {
     return this.userService.updateUserProfileImage(req.user.userId, profileImage);
   }
 
-  @Get(":id")
+  @Get("/:id")
   async getUser(@Param("id", ParseIntPipe) userId: number) {
     return this.userService.findUser(userId);
   }

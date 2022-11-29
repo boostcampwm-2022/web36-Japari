@@ -1,4 +1,4 @@
-import { Inject, Logger, UsePipes, ValidationPipe } from "@nestjs/common";
+import { Inject, Logger, UseFilters, UsePipes, ValidationPipe } from "@nestjs/common";
 import {
   ConnectedSocket,
   MessageBody,
@@ -8,6 +8,7 @@ import {
   SubscribeMessage,
   WebSocketGateway,
   WebSocketServer,
+  WsException,
 } from "@nestjs/websockets";
 import Redis from "ioredis";
 import { Server, Socket } from "socket.io";
@@ -18,7 +19,11 @@ import { v4 as uuid } from "uuid";
 import { getRoomId } from "util/socket";
 import { RoomSettingDto } from "./dto/room-setting.dto";
 import { RoomCredentialDto } from "./dto/room-credential.dto";
+import { WebsocketBadRequestFilter, WebsocketExceptionFilter } from "src/exception-filters/websocket.filter";
+import { WebsocketException } from "src/constants/exception";
 
+@UseFilters(new WebsocketBadRequestFilter("game-room/error"))
+@UseFilters(new WebsocketExceptionFilter("game-room/error"))
 @WebSocketGateway(4001, { transports: ["websocket"], namespace: "/" })
 export class GameRoomGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer() public server: Server;
@@ -84,26 +89,17 @@ export class GameRoomGateway implements OnGatewayInit, OnGatewayConnection, OnGa
     const room = JSON.parse(await this.redis.hget(RedisTableName.GAME_ROOMS, roomId));
 
     if (!room) {
-      socket.emit("game-room/error", {
-        message: "the room does not exist",
-      });
-      return;
+      throw new WebsocketException("해당 번호의 방이 존재하지 않습니다.");
     }
 
     // 잘못된 비밀번호 입력
     if (room.isPrivate && room.password !== password) {
-      socket.emit("game-room/error", {
-        message: "wrong password",
-      });
-      return;
+      throw new WebsocketException("잘못된 비밀번호입니다.");
     }
 
     // 방 정원 초과
     if (room.participants.length + 1 > room.maximumPeople) {
-      socket.emit("game-room/error", {
-        message: "the room is full",
-      });
-      return;
+      throw new WebsocketException("방 정원이 초과되었습니다.");
     }
 
     // 유저를 방에 추가
