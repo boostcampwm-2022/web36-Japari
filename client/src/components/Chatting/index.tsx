@@ -1,39 +1,15 @@
 /** @jsxImportSource @emotion/react */
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import ChatLog from "./ChatLog";
 import ChatInput from "./ChatInput";
 import * as style from "./styles";
-import io from "socket.io-client";
+import { useRecoilValue } from "recoil";
+import { socketState } from "../../store/socket";
 
 const dummyLog = [
   {
     sender: "user1",
     message: "안녕하세요",
-    sendTime: new Date(),
-  },
-  {
-    sender: "user2",
-    message: "안녕하세요",
-    sendTime: new Date(),
-  },
-  {
-    sender: "user3",
-    message: "안녕하세요",
-    sendTime: new Date(),
-  },
-  {
-    sender: "user4",
-    message: "안",
-    sendTime: new Date(),
-  },
-  {
-    sender: "user5",
-    message: "안녕하세요5555555",
-    sendTime: new Date(),
-  },
-  {
-    sender: "user6",
-    message: "안녕하세요666666666666666666666666",
     sendTime: new Date(),
   },
 ];
@@ -44,15 +20,18 @@ export type Chat = {
   sendTime: Date;
 };
 
-const socket = io(`${process.env.REACT_APP_SOCKET_SERVER_URL}`, {
-  // websocket으로 먼저 연결 시도 후 실패 시 polling으로 연결
-  transports: ["websocket", "polling"],
-  autoConnect: false,
-});
+// const socket = io(`${process.env.REACT_APP_SOCKET_SERVER_URL}`, {
+//   // websocket으로 먼저 연결 시도 후 실패 시 polling으로 연결
+//   transports: ["websocket", "polling"],
+//   autoConnect: false,
+// });
 
 const Chatting = () => {
   const [logs, setLogs] = useState<Chat[]>(dummyLog);
   const [message, setMessage] = useState<string>("");
+  const socket = useRecoilValue(socketState);
+
+  console.log("socket", socket);
 
   const sendMessage = () => {
     if (message === "") {
@@ -79,10 +58,6 @@ const Chatting = () => {
     setLogs((current: Chat[]) => [...current, newLog]);
     console.log(logs);
   };
-
-  useEffect(() => {
-    socket.connect();
-  }, []);
 
   return (
     <div css={style.ChattingContainerStyle}>
