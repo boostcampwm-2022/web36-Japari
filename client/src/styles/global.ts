@@ -173,4 +173,20 @@ export const globalStyle = css`
     font-family: "LINESeedKR";
     font-size: 16px;
   }
+
+  body {
+    overflow-y: overlay;
+  }
+
+  ::-webkit-scrollbar {
+    width: 1rem;
+  }
+
+  /* scrollbar itself */
+  ::-webkit-scrollbar-thumb {
+    background-color: #babac0;
+    background-clip: padding-box;
+    border-radius: 1rem;
+    border: 0.25rem solid transparent;
+  }
 `;

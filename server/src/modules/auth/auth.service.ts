@@ -49,7 +49,7 @@ export class AuthService {
   async createTokens(user: User) {
     const { userId } = user;
     const payload = { userId };
-    const jwtAccessToken = this.jwtService.sign(payload, { expiresIn: "1h" });
+    const jwtAccessToken = this.jwtService.sign(payload, { expiresIn: "3h" });
     const jwtRefreshToken = this.jwtService.sign(payload, { expiresIn: "7d" });
 
     return { jwtAccessToken, jwtRefreshToken };
@@ -61,7 +61,7 @@ export class AuthService {
       data: { jwtRefreshToken },
     });
   }
-
+ 
   async refreshJwtTokens(user: User, jwtRefreshToken: string) {
     if (!user.jwtRefreshToken) throw new UnauthorizedException();
     if (user.jwtRefreshToken != jwtRefreshToken) throw new UnauthorizedException();

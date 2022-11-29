@@ -1,17 +1,18 @@
-import { Inject, Logger, UseGuards } from "@nestjs/common";
+import { Inject, Logger } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import {
   ConnectedSocket,
-  MessageBody,
   OnGatewayConnection,
   OnGatewayDisconnect,
   OnGatewayInit,
-  SubscribeMessage,
   WebSocketGateway,
   WebSocketServer,
 } from "@nestjs/websockets";
 import Redis from "ioredis";
 import { Server, Socket } from "socket.io";
+import { getRoomId } from "util/socket";
+import { RedisTableName } from "./constants/redis-table-name";
+import { GameRoomGateway } from "./modules/game-room/game-room.gateway";
 import { PrismaService } from "./modules/prisma/prisma.service";
 
 @WebSocketGateway(4001, { transports: ["websocket"], namespace: "/" })
@@ -22,35 +23,53 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
   constructor(
     private jwt: JwtService,
     private prisma: PrismaService,
-    @Inject("RedisProvider") private readonly redis: Redis
+    @Inject("RedisProvider") private readonly redis: Redis,
+    private gameRoomGateway: GameRoomGateway
   ) {}
 
   afterInit(server: Server) {
     this.logger.verbose("app gateway initiated");
+    this.redis.del(RedisTableName.SOCKET_ID_TO_USER_INFO);
+    this.redis.del(RedisTableName.ONLINE_USERS);
+    this.redis.del(RedisTableName.GAME_ROOMS);
   }
 
   async handleConnection(@ConnectedSocket() socket: Socket) {
-    const jwtAccessToken = socket.handshake.query["jwt-access-token"] as string;
+    const userId = Number(socket.handshake.query["user-id"]);
 
-    try {
-      const payload = this.jwt.verify(jwtAccessToken);
-      const { userId } = payload;
+    const user = await this.prisma.user.findUnique({
+      where: { userId },
+    });
 
-      const user = await this.prisma.user.findUnique({
-        where: { userId },
-      });
+    if (!user) socket.disconnect();
 
-      this.redis.hmset("socket-id-to-user-name", { [socket.id]: user.email });
-      this.redis.hmset("socket-id-to-room-id", { [socket.id]: "lobby" });
-      socket.join("lobby");
-    } catch (e) {
-      socket.disconnect();
-    }
+    socket.join("lobby");
+
+    const userPublicInfo = {
+      email: user.email,
+      nickname: user.nickname,
+      profileImage: user.profileImage,
+      score: user.score,
+    };
+
+    this.redis.hset(RedisTableName.SOCKET_ID_TO_USER_INFO, socket.id, JSON.stringify(userPublicInfo));
+    this.redis.hset(RedisTableName.ONLINE_USERS, userId, JSON.stringify(userPublicInfo));
   }
 
   async handleDisconnect(@ConnectedSocket() socket: Socket) {
-    this.redis.hdel("socket-id-to-user-name", socket.id);
-    const room = (await this.redis.hmget("socket-id-to-room-id", socket.id))[0];
-    socket.leave(room);
+    const userId = JSON.parse(await this.redis.hget(RedisTableName.SOCKET_ID_TO_USER_INFO, socket.id));
+    this.redis.hdel(RedisTableName.SOCKET_ID_TO_USER_INFO, socket.id);
+    this.redis.hdel(RedisTableName.ONLINE_USERS, userId);
+
+    if (!getRoomId(socket)) {
+      return;
+    }
+
+    if (getRoomId(socket) === "lobby") {
+      socket.leave("lobby");
+      return;
+    }
+
+    this.gameRoomGateway.exit(socket);
   }
 }
