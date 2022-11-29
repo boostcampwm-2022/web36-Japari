@@ -7,35 +7,13 @@ import { Chat } from "..";
 
 interface ChatInputProps {
   addLogs: (value: Chat) => void;
+  pressEnter: (e: KeyboardEvent<HTMLInputElement>) => void;
+  message: string;
+  setMessage: (value: string) => void;
+  sendMessage: React.MouseEventHandler<HTMLImageElement>;
 }
 
-const ChatInput = ({ addLogs }: ChatInputProps) => {
-  const [message, setMessage] = useState<string>("");
-
-  const sendMessage = () => {
-    if (message === "") {
-      alert("메세지를 입력하세요");
-      return;
-    }
-    const newLog: Chat = {
-      sender: "me",
-      message,
-      sendTime: new Date(),
-    };
-
-    addLogs(newLog);
-
-    // socket.emit('send_message', newLog)
-
-    setMessage("");
-  };
-
-  const pressEnter = (e: KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
-      sendMessage();
-    }
-  };
-
+const ChatInput = ({ addLogs, pressEnter, message, setMessage, sendMessage }: ChatInputProps) => {
   return (
     <div css={style.ChatInputContainerStyle}>
       <Input

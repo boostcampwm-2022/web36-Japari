@@ -1,5 +1,4 @@
-import { Inject, Logger, UseGuards } from "@nestjs/common";
-import { JwtService } from "@nestjs/jwt";
+import { Inject, Logger } from "@nestjs/common";
 import {
   ConnectedSocket,
   MessageBody,

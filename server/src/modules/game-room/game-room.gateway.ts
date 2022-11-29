@@ -18,7 +18,7 @@ import { v4 as uuid } from "uuid";
 import { getRoomId } from "util/socket";
 
 @WebSocketGateway(4001, { transports: ["websocket"], namespace: "/" })
-export class GameroomGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
+export class GameRoomGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer() public server: Server;
   private logger = new Logger("Chat Gateway");
 

@@ -3,36 +3,12 @@ import { useState } from "react";
 import ChatLog from "./ChatLog";
 import ChatInput from "./ChatInput";
 import * as style from "./styles";
+import { Sender } from "../../hooks/useSocket";
 
 const dummyLog = [
   {
     sender: "user1",
     message: "안녕하세요",
-    sendTime: new Date(),
-  },
-  {
-    sender: "user2",
-    message: "안녕하세요",
-    sendTime: new Date(),
-  },
-  {
-    sender: "user3",
-    message: "안녕하세요",
-    sendTime: new Date(),
-  },
-  {
-    sender: "user4",
-    message: "안",
-    sendTime: new Date(),
-  },
-  {
-    sender: "user5",
-    message: "안녕하세요5555555",
-    sendTime: new Date(),
-  },
-  {
-    sender: "user6",
-    message: "안녕하세요666666666666666666666666",
     sendTime: new Date(),
   },
 ];
@@ -45,16 +21,46 @@ export type Chat = {
 
 const Chatting = () => {
   const [logs, setLogs] = useState<Chat[]>(dummyLog);
+  const [message, setMessage] = useState<string>("");
+  const chatLobbySender = Sender("chat/lobby");
+
+  const sendMessage = () => {
+    if (message === "") {
+      alert("메세지를 입력하세요");
+      return;
+    }
+    const newLog: Chat = {
+      sender: "me",
+      message,
+      sendTime: new Date(),
+    };
+
+    chatLobbySender(newLog);
+    setMessage("");
+  };
+
+  const pressEnter = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      sendMessage();
+    }
+  };
 
   const addLogs = (newLog: Chat) => {
     setLogs((current: Chat[]) => [...current, newLog]);
+    console.log(logs);
   };
 
   return (
     <div css={style.ChattingContainerStyle}>
       <ChatLog logs={logs} />
       <hr css={style.ChattingHRStyle} />
-      <ChatInput addLogs={addLogs} />
+      <ChatInput
+        addLogs={addLogs}
+        sendMessage={sendMessage}
+        pressEnter={pressEnter}
+        message={message}
+        setMessage={setMessage}
+      />
     </div>
   );
 };

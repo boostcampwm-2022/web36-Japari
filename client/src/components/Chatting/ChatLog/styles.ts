@@ -8,7 +8,7 @@ export const ChatLogContainerStyle = css`
   padding: 0.75rem;
   box-sizing: border-box;
   box-shadow: 0 0.25rem 0.25rem rgba(0, 0, 0, 0.2);
-  overflow-y: scroll;
+  overflow-y: overlay;
   display: flex;
   flex-direction: column;
   gap: 0.25rem;

@@ -39,7 +39,7 @@ export const roomListStyle = (theme: Theme) => css`
   box-sizing: border-box;
   padding: 1.5rem;
   border-radius: 10px;
-  overflow-y: scroll;
+  overflow-y: overlay;
 
   box-shadow: 0 0.25rem 0.25rem rgba(0, 0, 0, 0.2);
   background-color: ${theme.colors.secondary};
