@@ -4,6 +4,9 @@ import ChatLog from "./ChatLog";
 import ChatInput from "./ChatInput";
 import * as style from "./styles";
 import io from "socket.io-client";
+import { socketState } from "../../store/socket";
+
+import { useRecoilValue } from "recoil";
 
 export type Chat = {
   sender: string;
@@ -11,30 +14,18 @@ export type Chat = {
   sendTime: string;
 };
 
-const socket = io(`${process.env.REACT_APP_SOCKET_SERVER_URL}`, {
-  transports: ["websocket", "polling"],
-  autoConnect: false,
-  query: {
-    "user-id": 3,
-  },
-});
-
 const Chatting = () => {
   const [logs, setLogs] = useState<Chat[]>([]);
-
+  const socket = useRecoilValue(socketState);
   const addLogs = (newLog: Chat) => {
     setLogs((current: Chat[]) => [...current, newLog]);
-    console.log(logs);
   };
 
   useEffect(() => {
-    socket.connect();
-  }, []);
-
-  useEffect(() => {
-    socket.on("chat/lobby", (data: Chat) => {
-      addLogs(data);
-    });
+    socket.on("chat/lobby", addLogs);
+    return () => {
+      socket.off("chat/lobby", addLogs);
+    };
   }, []);
 
   return (

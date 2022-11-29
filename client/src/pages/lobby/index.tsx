@@ -22,23 +22,13 @@ const LobbyPage: React.FC = () => {
     setNicknameModalOpen(false);
   };
 
-  // useEffect(() => {
-  //   socket.connect();
-  // }, []);
-
-  // useEffect(() => {
-  //   getLoggedInUser().then(res => {
-  //     setUser(res);
-  //   });
-  // }, [setUser]);
-
-  // useEffect(() => {
-  //   if (!user) return;
-  //   socket.io.opts.query = {
-  //     "user-id": user.userId,
-  //   };
-  //   socket.connect();
-  // }, [user]);
+  useEffect(() => {
+    if (!user) return;
+    socket.io.opts.query = {
+      "user-id": user.userId,
+    };
+    socket.connect();
+  }, [user]);
 
   useEffect(() => {
     if (!user) {
@@ -47,7 +37,6 @@ const LobbyPage: React.FC = () => {
       });
       return;
     }
-
     if (!user.nickname) setNicknameModalOpen(true);
   }, [user]);
 
