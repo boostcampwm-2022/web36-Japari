@@ -20,18 +20,10 @@ export type Chat = {
   sendTime: Date;
 };
 
-// const socket = io(`${process.env.REACT_APP_SOCKET_SERVER_URL}`, {
-//   // websocket으로 먼저 연결 시도 후 실패 시 polling으로 연결
-//   transports: ["websocket", "polling"],
-//   autoConnect: false,
-// });
-
 const Chatting = () => {
   const [logs, setLogs] = useState<Chat[]>(dummyLog);
   const [message, setMessage] = useState<string>("");
   const socket = useRecoilValue(socketState);
-
-  console.log("socket", socket);
 
   const sendMessage = () => {
     if (message === "") {
