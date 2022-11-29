@@ -21,13 +21,12 @@ const LobbyPage: React.FC = () => {
   };
 
   useEffect(() => {
-    getLoggedInUser().then(res => {
-      setUser(res);
-    });
-  }, []);
-
-  useEffect(() => {
-    if (!user) return;
+    if (!user) {
+      getLoggedInUser().then(res => {
+        setUser(res);
+      });
+      return;
+    }
 
     if (!user.nickname) setNicknameModalOpen(true);
   }, [user]);
@@ -40,7 +39,7 @@ const LobbyPage: React.FC = () => {
           <RoomList rooms={dummy.dummyRooms} />
         </div>
         <div css={style.RowContentContainerStyle}>
-          <Profile user={dummy.dummyUser} />
+          <Profile user={user} />
           <Chatting />
         </div>
       </div>
