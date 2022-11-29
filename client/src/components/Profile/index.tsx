@@ -3,6 +3,7 @@ import * as style from "./styles";
 import ProfileContent from "./ProfileContent";
 import { Oval } from "react-loader-spinner";
 import { User } from "@dto";
+import Spinner from "../Loader/Spinner";
 
 export interface ProfileProps {
   user: User | null;
@@ -11,19 +12,7 @@ export interface ProfileProps {
 const Profile = ({ user }: ProfileProps) => {
   return (
     <div css={style.ProfileContainerStyle}>
-      {user ? (
-        <ProfileContent user={user} editable={true} />
-      ) : (
-        <Oval
-          height={80}
-          width={80}
-          color="#bbbbbb"
-          ariaLabel="oval-loading"
-          secondaryColor="transparent"
-          strokeWidth={4}
-          strokeWidthSecondary={4}
-        />
-      )}
+      {user ? <ProfileContent user={user} editable={true} /> : <Spinner color="#bbbbbb" trackColor="transparent" />}
     </div>
   );
 };
