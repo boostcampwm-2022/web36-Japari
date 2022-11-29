@@ -26,7 +26,7 @@ const WaitingRoomInfo = ({ roomRecord, camList }: WaitingRoomInfoProps) => {
   const handleGameStartButton = () => {
     // socket.emit('start_game', {gameRoomId: roomRecord.gameRoomId})
 
-    navigate(`/playing/${roomRecord.gameRoomId}`);
+    navigate(`/playing/${roomRecord.roomId}`);
     // socket.on('start_game') 시 naviagte가 되도록 변경될 여지 있음
   };
 
@@ -37,8 +37,8 @@ const WaitingRoomInfo = ({ roomRecord, camList }: WaitingRoomInfoProps) => {
       </div>
       <div css={style.mainWrapperStyle}>
         <div css={style.camListContainerStyle}>
-          {camList.map(cam => (
-            <Cam {...cam} />
+          {camList.map((cam, idx) => (
+            <Cam key={idx} {...cam} />
           ))}
         </div>
         <div css={style.footerStyle}>

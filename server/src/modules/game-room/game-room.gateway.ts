@@ -43,15 +43,16 @@ export class GameRoomGateway implements OnGatewayInit, OnGatewayConnection, OnGa
 
     // 입력으로 들어오지 않은 방 정보 추가
     const roomId = uuid();
-    const { minimumPeople } = await this.prisma.game.findUnique({ where: { gameId } });
+    const { minimumPeople } = await this.prisma.game.findUnique({ where: { gameId: Number(gameId) } });
 
     // 새로운 방을 redis에 저장
     this.redis.hset(
       RedisTableName.GAME_ROOMS,
       roomId,
-      JSON.stringify({ title, gameId, maximumPeople, isPrivate, password, minimumPeople, participants: [] })
+      JSON.stringify({ roomId, title, gameId, maximumPeople, isPrivate, password, minimumPeople, participants: [] })
     );
 
+    socket.emit("game-room/create-success", { roomId });
     // 방 생성자 방에 입장
     this.join(socket, { roomId, password });
   }

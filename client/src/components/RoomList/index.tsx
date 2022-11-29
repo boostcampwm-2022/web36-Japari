@@ -1,6 +1,8 @@
 /** @jsxImportSource @emotion/react */
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useRecoilValue } from "recoil";
+import { socketState } from "../../store/socket";
 import Button from "../Button";
 import CheckBox from "../CheckBox";
 import Modal from "../Modal";
@@ -9,7 +11,7 @@ import RoomRecord from "./RoomRecord";
 import * as style from "./styles";
 
 export interface Room {
-  gameRoomId: number;
+  roomId: number;
   title: string;
   gameId: number;
   currentPeople: number;
@@ -22,6 +24,7 @@ export interface RoomListProps {
 }
 
 const RoomList = ({ rooms }: RoomListProps) => {
+  const socket = useRecoilValue(socketState);
   //   const [rooms, setRooms] = useState<Room[]>([]);
   // or useQuery
   const navigate = useNavigate();
@@ -30,6 +33,16 @@ const RoomList = ({ rooms }: RoomListProps) => {
   const closeModal = () => {
     setIsModalOpen(false);
   };
+
+  useEffect(() => {
+    socket.on("game-room/create-success", data => {
+      navigate(`/waiting/${data.roomId}`);
+    });
+
+    return () => {
+      socket.off("game-room/create-success");
+    };
+  }, []);
 
   return (
     <div css={style.containerStyle}>
@@ -47,7 +60,7 @@ const RoomList = ({ rooms }: RoomListProps) => {
 
       <div css={style.roomListStyle}>
         {rooms.map((room, index) => (
-          <RoomRecord key={index} {...room} onClickRecord={() => navigate(`/waiting/${room.gameRoomId}`)} />
+          <RoomRecord key={index} {...room} onClickRecord={() => navigate(`/waiting/${room.roomId}`)} />
         ))}
       </div>
     </div>
