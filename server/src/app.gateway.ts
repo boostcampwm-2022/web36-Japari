@@ -12,7 +12,7 @@ import Redis from "ioredis";
 import { Server, Socket } from "socket.io";
 import { getRoomId } from "util/socket";
 import { RedisTableName } from "./constants/redis-table-name";
-import { GameroomGateway } from "./modules/game-room/game-room.gateway";
+import { GameRoomGateway } from "./modules/game-room/game-room.gateway";
 import { PrismaService } from "./modules/prisma/prisma.service";
 
 @WebSocketGateway(4001, { transports: ["websocket"], namespace: "/" })
@@ -24,7 +24,7 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
     private jwt: JwtService,
     private prisma: PrismaService,
     @Inject("RedisProvider") private readonly redis: Redis,
-    private gameRoomGateway: GameroomGateway
+    private gameRoomGateway: GameRoomGateway
   ) {}
 
   afterInit(server: Server) {
