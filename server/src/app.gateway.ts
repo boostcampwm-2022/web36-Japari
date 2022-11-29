@@ -34,14 +34,15 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
   }
 
   async handleConnection(@ConnectedSocket() socket: Socket) {
-    const jwtAccessToken = socket.handshake.query["jwt-access-token"] as string;
-    socket.join("lobby");
-
     const userId = Number(socket.handshake.query["user-id"]);
 
     const user = await this.prisma.user.findUnique({
       where: { userId },
     });
+
+    if (!user) socket.disconnect();
+
+    socket.join("lobby");
 
     const userPublicInfo = {
       email: user.email,
