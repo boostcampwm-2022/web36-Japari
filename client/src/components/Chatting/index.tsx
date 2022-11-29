@@ -3,8 +3,7 @@ import { useState } from "react";
 import ChatLog from "./ChatLog";
 import ChatInput from "./ChatInput";
 import * as style from "./styles";
-import { useRecoilValue } from "recoil";
-import { socketState } from "../../store/socket";
+import { Sender } from "../../hooks/useSocket";
 
 const dummyLog = [
   {
@@ -23,7 +22,7 @@ export type Chat = {
 const Chatting = () => {
   const [logs, setLogs] = useState<Chat[]>(dummyLog);
   const [message, setMessage] = useState<string>("");
-  const socket = useRecoilValue(socketState);
+  const chatLobbySender = Sender("chat/lobby");
 
   const sendMessage = () => {
     if (message === "") {
@@ -36,7 +35,7 @@ const Chatting = () => {
       sendTime: new Date(),
     };
 
-    socket.emit("chat/lobby", newLog);
+    chatLobbySender(newLog);
     setMessage("");
   };
 
