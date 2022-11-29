@@ -1,6 +1,19 @@
-import { Body, Controller, Get, Param, ParseIntPipe, Patch, Req, UseGuards } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  ParseIntPipe,
+  Patch,
+  Req,
+  UseGuards,
+  UsePipes,
+  ValidationPipe,
+} from "@nestjs/common";
 import { RequestWithUser } from "express";
 import { AccessTokenGuard } from "../jwt/jwt-access-token.guard";
+import { NewNickName } from "./dto/new-nickname.dto";
+import { NewProfileImage } from "./dto/new-profile-image.dto";
 import { UserService } from "./user.service";
 
 @UseGuards(AccessTokenGuard)
@@ -18,13 +31,15 @@ export class UserController {
     return this.userService.findAllUser();
   }
 
+  @UsePipes(ValidationPipe)
   @Patch("/nickname")
-  async patchNickname(@Req() req: RequestWithUser, @Body("nickname") nickname: string) {
+  async patchNickname(@Req() req: RequestWithUser, @Body() { nickname }: NewNickName) {
     return this.userService.updateUserNickname(req.user.userId, nickname);
   }
 
+  @UsePipes(ValidationPipe)
   @Patch("/profile-image")
-  async patchProfile(@Req() req: RequestWithUser, @Body("profile-image") profileImage: string) {
+  async patchProfile(@Req() req: RequestWithUser, @Body() { profileImage }: NewProfileImage) {
     return this.userService.updateUserProfileImage(req.user.userId, profileImage);
   }
 

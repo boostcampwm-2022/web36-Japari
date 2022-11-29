@@ -1,4 +1,4 @@
-import { Inject, Logger } from "@nestjs/common";
+import { Inject, Logger, UsePipes, ValidationPipe } from "@nestjs/common";
 import {
   ConnectedSocket,
   MessageBody,
@@ -16,6 +16,8 @@ import { redisRecordToObject } from "util/convert";
 import { PrismaService } from "../prisma/prisma.service";
 import { v4 as uuid } from "uuid";
 import { getRoomId } from "util/socket";
+import { RoomSettingDto } from "./dto/room-setting.dto";
+import { RoomCredentialDto } from "./dto/room-credential.dto";
 
 @WebSocketGateway(4001, { transports: ["websocket"], namespace: "/" })
 export class GameroomGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
@@ -37,8 +39,9 @@ export class GameroomGateway implements OnGatewayInit, OnGatewayConnection, OnGa
     this.logger.verbose("game room gateway initiated");
   }
 
+  @UsePipes(ValidationPipe)
   @SubscribeMessage("game-room/create")
-  async create(@ConnectedSocket() socket: Socket, @MessageBody() data) {
+  async create(@ConnectedSocket() socket: Socket, @MessageBody() data: RoomSettingDto) {
     const { title, gameId, maximumPeople, isPrivate, password } = data;
 
     // 입력으로 들어오지 않은 방 정보 추가
@@ -56,8 +59,9 @@ export class GameroomGateway implements OnGatewayInit, OnGatewayConnection, OnGa
     this.join(socket, { roomId, password });
   }
 
+  @UsePipes(ValidationPipe)
   @SubscribeMessage("game-room/modify")
-  async modify(@ConnectedSocket() socket: Socket, @MessageBody() data) {
+  async modify(@ConnectedSocket() socket: Socket, @MessageBody() data: RoomSettingDto) {
     const roomId = getRoomId(socket);
     const room = JSON.parse(await this.redis.hget(RedisTableName.GAME_ROOMS, roomId));
     const newRoom = { ...room, ...data };
@@ -72,8 +76,9 @@ export class GameroomGateway implements OnGatewayInit, OnGatewayConnection, OnGa
     });
   }
 
+  @UsePipes(ValidationPipe)
   @SubscribeMessage("game-room/join")
-  async join(@ConnectedSocket() socket, @MessageBody() data) {
+  async join(@ConnectedSocket() socket, @MessageBody() data: RoomCredentialDto) {
     const { roomId, password } = data;
 
     const room = JSON.parse(await this.redis.hget(RedisTableName.GAME_ROOMS, roomId));
@@ -106,7 +111,7 @@ export class GameroomGateway implements OnGatewayInit, OnGatewayConnection, OnGa
     room.participants.push(user);
     socket.join(roomId);
     socket.leave("lobby");
-    this.redis.hset(RedisTableName.GAME_ROOMS, roomId, JSON.stringify(room));
+    await this.redis.hset(RedisTableName.GAME_ROOMS, roomId, JSON.stringify(room));
 
     // 유저가 들어왔다는 소식을 참여한 유저와 기존에 방에 있던 모든 유저에게 전달
     this.server.to(roomId).emit("game-room/info", {

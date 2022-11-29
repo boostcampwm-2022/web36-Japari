@@ -1,4 +1,4 @@
-import { Inject, Logger, UseGuards } from "@nestjs/common";
+import { Inject, Logger, UseGuards, UsePipes, ValidationPipe } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import {
   ConnectedSocket,
@@ -13,6 +13,7 @@ import {
 import Redis from "ioredis";
 import { Server, Socket } from "socket.io";
 import { RedisTableName } from "src/constants/redis-table-name";
+import { ChatDto } from "./chat.dto";
 
 @WebSocketGateway(4001, { transports: ["websocket"], namespace: "/" })
 export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
@@ -25,8 +26,9 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     this.logger.verbose("chat gateway initiated");
   }
 
+  @UsePipes(ValidationPipe)
   @SubscribeMessage("chat/lobby")
-  async handleLobbyChat(@ConnectedSocket() socket: Socket, @MessageBody() data) {
+  async handleLobbyChat(@ConnectedSocket() socket: Socket, @MessageBody() data: ChatDto) {
     const { message, sendTime } = data;
     const userInfo = JSON.parse(await this.redis.hget(RedisTableName.SOCKET_ID_TO_USER_INFO, socket.id));
 
@@ -39,8 +41,9 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     });
   }
 
+  @UsePipes(ValidationPipe)
   @SubscribeMessage("chat/room")
-  async handleRoomChat(@ConnectedSocket() socket: Socket, @MessageBody() data) {
+  async handleRoomChat(@ConnectedSocket() socket: Socket, @MessageBody() data: ChatDto) {
     const { message, sendTime } = data;
     const userInfo = JSON.parse(await this.redis.hget(RedisTableName.SOCKET_ID_TO_USER_INFO, socket.id));
 
