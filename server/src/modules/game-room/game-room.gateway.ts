@@ -118,6 +118,8 @@ export class GameroomGateway implements OnGatewayInit, OnGatewayConnection, OnGa
   @SubscribeMessage("game-room/exit")
   async exit(@ConnectedSocket() socket: Socket) {
     const roomId = getRoomId(socket);
+
+    if (roomId === "lobby") return;
     const room = JSON.parse(await this.redis.hget(RedisTableName.GAME_ROOMS, roomId));
 
     // 유저를 방에서 제거
