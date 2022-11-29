@@ -43,7 +43,6 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 
     if (!user) socket.disconnect();
 
-    console.log("here");
     socket.join("lobby");
 
     const userPublicInfo = {
