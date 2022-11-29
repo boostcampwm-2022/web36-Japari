@@ -1,14 +1,4 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Param,
-  ParseIntPipe,
-  Patch,
-  Req,
-  UnauthorizedException,
-  UseGuards,
-} from "@nestjs/common";
+import { Body, Controller, Get, Param, ParseIntPipe, Patch, Req, UseGuards } from "@nestjs/common";
 import { RequestWithAccessToken } from "express";
 import { AccessTokenGuard } from "../jwt/jwt-access-token.guard";
 import { UserService } from "./user.service";
