@@ -25,7 +25,7 @@ const LobbyPage: React.FC = () => {
   useEffect(() => {
     if (!user) return;
     socket.io.opts.query = {
-      "user-id": user?.userId,
+      "user-id": user.userId,
     };
     socket.connect();
   }, [user]);
