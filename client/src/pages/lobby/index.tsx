@@ -8,7 +8,7 @@ import Chatting from "../../components/Chatting";
 import RoomList from "../../components/RoomList";
 import * as dummy from "../dummy";
 import { useRecoilState, useRecoilValue } from "recoil";
-import { userState } from "../../recoil/user";
+import { userState } from "../../store/user";
 import { getLoggedInUser } from "../../api/user";
 import Modal from "../../components/Modal";
 import { socketState } from "../../store/socket";
@@ -23,17 +23,21 @@ const LobbyPage: React.FC = () => {
   };
 
   useEffect(() => {
-    socket.connect();
-  }, []);
-
-  useEffect(() => {
-    getLoggedInUser().then(res => {
-      setUser(res);
-    });
-  }, [setUser]);
-
-  useEffect(() => {
     if (!user) return;
+    socket.io.opts.query = {
+      "user-id": user.userId,
+    };
+    socket.connect();
+  }, [user]);
+
+  useEffect(() => {
+    if (!user) {
+      getLoggedInUser().then(res => {
+        setUser(res);
+      });
+      return;
+    }
+
     if (!user.nickname) setNicknameModalOpen(true);
   }, [user]);
 
@@ -45,7 +49,7 @@ const LobbyPage: React.FC = () => {
           <RoomList rooms={dummy.dummyRooms} />
         </div>
         <div css={style.RowContentContainerStyle}>
-          <Profile user={dummy.dummyUser} />
+          <Profile user={user} />
           <Chatting />
         </div>
       </div>
