@@ -22,9 +22,9 @@ const LobbyPage: React.FC = () => {
     setNicknameModalOpen(false);
   };
 
-  useEffect(() => {
-    socket.connect();
-  }, []);
+  // useEffect(() => {
+  //   socket.connect();
+  // }, []);
 
   useEffect(() => {
     getLoggedInUser().then(res => {
