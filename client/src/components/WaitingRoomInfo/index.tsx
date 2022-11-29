@@ -23,7 +23,6 @@ const WaitingRoomInfo = ({ roomRecord, camList }: WaitingRoomInfoProps) => {
   const navigate = useNavigate();
 
   const handleRootOutButton = () => {
-    socket.emit("game-room/exit");
     navigate("/lobby");
   };
 

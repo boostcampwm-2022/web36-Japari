@@ -44,7 +44,6 @@ const LobbyPage: React.FC = () => {
 
   useEffect(() => {
     socket.on("game-room/list", data => {
-      console.log(data);
       setGameRooms(data);
     });
     return () => {

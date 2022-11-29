@@ -62,7 +62,7 @@ export class GameRoomGateway implements OnGatewayInit, OnGatewayConnection, OnGa
     this.redis.hset(
       RedisTableName.GAME_ROOMS,
       roomId,
-      JSON.stringify({ roomId, title, gameId, maximumPeople, isPrivate, password, minimumPeople, participants: [] })
+      JSON.stringify({ title, gameId, maximumPeople, isPrivate, password, minimumPeople, participants: [] })
     );
 
     socket.emit("game-room/create-success", { roomId });
