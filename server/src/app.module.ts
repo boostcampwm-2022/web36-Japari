@@ -10,6 +10,7 @@ import { RedisModule } from "./modules/redis/redis.module";
 import { AppGateway } from "./app.gateway";
 import { JwtModule } from "./modules/jwt/jwt.module";
 import { UserModule } from "./modules/user/user.module";
+import { GameRoomModule } from "./modules/game-room/game-room.module";
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { UserModule } from "./modules/user/user.module";
     RedisModule,
     ChatModule,
     UserModule,
+    GameRoomModule,
   ],
 
   controllers: [AppController],
