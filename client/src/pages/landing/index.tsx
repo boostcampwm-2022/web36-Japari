@@ -8,7 +8,7 @@ import NaverLogo from "../../assets/logo/naver_logo.png";
 import KakaoLogo from "../../assets/logo/kakao_logo.png";
 import GoogleLogo from "../../assets/logo/google_logo.png";
 import GithubLogo from "../../assets/logo/github_logo.png";
-import { isLogin } from "../../api/login";
+import { isLogin } from "../../api/auth";
 import { useNavigate } from "react-router-dom";
 
 const LandingPage: React.FC = () => {

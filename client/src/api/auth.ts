@@ -18,3 +18,12 @@ export const isLogin = async () => {
     return false;
   }
 };
+
+export const logout = async () => {
+  try {
+    const res = await axios.post("/auth/logout");
+    return res.data;
+  } catch {
+    return false;
+  }
+};
