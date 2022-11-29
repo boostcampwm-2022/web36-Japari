@@ -8,7 +8,7 @@ import Chatting from "../../components/Chatting";
 import * as dummy from "../dummy";
 import WaitingRoomInfo from "../../components/WaitingRoomInfo";
 import { useRecoilState } from "recoil";
-import { userState } from "../../recoil/user";
+import { userState } from "../../store/user";
 import { getLoggedInUser } from "../../api/user";
 
 const WaitingPage: React.FC = () => {

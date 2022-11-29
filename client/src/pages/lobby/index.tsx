@@ -8,7 +8,7 @@ import Chatting from "../../components/Chatting";
 import RoomList from "../../components/RoomList";
 import * as dummy from "../dummy";
 import { useRecoilState, useRecoilValue } from "recoil";
-import { userState } from "../../recoil/user";
+import { userState } from "../../store/user";
 import { getLoggedInUser } from "../../api/user";
 import Modal from "../../components/Modal";
 import { socketState } from "../../store/socket";
