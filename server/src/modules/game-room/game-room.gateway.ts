@@ -20,7 +20,7 @@ import { RoomSettingDto } from "./dto/room-setting.dto";
 import { RoomCredentialDto } from "./dto/room-credential.dto";
 
 @WebSocketGateway(4001, { transports: ["websocket"], namespace: "/" })
-export class GameroomGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
+export class GameRoomGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer() public server: Server;
   private logger = new Logger("Chat Gateway");
 
