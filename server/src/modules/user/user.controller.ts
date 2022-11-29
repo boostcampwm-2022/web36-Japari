@@ -33,7 +33,7 @@ export class UserController {
 
   @UseGuards(AccessTokenGuard)
   @Patch("/profile-image")
-  async patchProfile(@Req() req: RequestWithAccessToken, @Body("profileImage") profileImage: string) {
+  async patchProfile(@Req() req: RequestWithAccessToken, @Body("profile-image") profileImage: string) {
     return this.userService.updateUserProfileImage(req.user.userId, profileImage);
   }
 }
