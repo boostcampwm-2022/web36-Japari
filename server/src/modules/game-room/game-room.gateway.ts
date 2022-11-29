@@ -30,8 +30,21 @@ export class GameRoomGateway implements OnGatewayInit, OnGatewayConnection, OnGa
       const records = await this.redis.hgetall(RedisTableName.GAME_ROOMS);
 
       const gameRooms = redisRecordToObject(records);
+      let data = [];
+      for (let roomId in gameRooms) {
+        const { title, gameId, participants, maximumPeople, isPrivate } = gameRooms[roomId];
 
-      server.to("lobby").emit("game-room/list", gameRooms);
+        data.push({
+          roomId,
+          title,
+          gameId: Number(gameId),
+          currentPeople: participants.length,
+          maximumPeople,
+          isPrivate,
+        });
+      }
+
+      server.to("lobby").emit("game-room/list", data);
     }, 1000);
 
     this.logger.verbose("game room gateway initiated");

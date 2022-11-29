@@ -3,10 +3,9 @@ import Input from "../../Input";
 import Button from "../../Button";
 import Select from "../../Select";
 import * as style from "./styles";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useRecoilValue } from "recoil";
 import { socketState } from "../../../store/socket";
-import { Sender } from "../../../hooks/useSocket";
 
 interface RoomSettingProps {
   closeModal: () => void;
@@ -23,7 +22,7 @@ const RoomSetting = ({ closeModal }: RoomSettingProps) => {
 
   const createRoom = () => {
     // room 생성 혹은 설정 로직
-    const data = { gameId, title, private: isPrivate, maximumPeople, password };
+    const data = { gameId, title, isPrivate: isPrivate, maximumPeople, password };
 
     socket.emit("game-room/create", data);
     closeModal();
