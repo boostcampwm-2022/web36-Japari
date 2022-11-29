@@ -1,15 +1,18 @@
 /** @jsxImportSource @emotion/react */
 import logoutIcon from "../../../assets/icons/logout-icon.svg";
-import { useRecoilValue } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 import { socketState } from "../../../store/socket";
 import { logout } from "../../../api/auth";
 import * as style from "./styles";
 import { useNavigate } from "react-router-dom";
+import { userState } from "../../../recoil/user";
 const RoomRecord = () => {
   const navigate = useNavigate();
   const socket = useRecoilValue(socketState);
+  const [user, setUser] = useRecoilState(userState);
 
   const handleLogout = () => {
+    setUser(null);
     socket.disconnect();
     logout().then(() => {
       navigate("/");
