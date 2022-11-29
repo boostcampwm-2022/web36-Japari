@@ -10,6 +10,7 @@ import {
 } from "@nestjs/websockets";
 import Redis from "ioredis";
 import { Server, Socket } from "socket.io";
+import { getRoomId } from "util/socket";
 import { RedisTableName } from "./constants/redis-table-name";
 import { GameroomGateway } from "./modules/game-room/game-room.gateway";
 import { PrismaService } from "./modules/prisma/prisma.service";
@@ -34,31 +35,25 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
   }
 
   async handleConnection(@ConnectedSocket() socket: Socket) {
-    const jwtAccessToken = socket.handshake.query["jwt-access-token"] as string;
+    const userId = Number(socket.handshake.query["user-id"]);
 
-    try {
-      const payload = this.jwt.verify(jwtAccessToken);
+    const user = await this.prisma.user.findUnique({
+      where: { userId },
+    });
 
-      socket.join("lobby");
+    if (!user) socket.disconnect();
 
-      const { userId } = payload;
+    socket.join("lobby");
 
-      const user = await this.prisma.user.findUnique({
-        where: { userId },
-      });
+    const userPublicInfo = {
+      email: user.email,
+      nickname: user.nickname,
+      profileImage: user.profileImage,
+      score: user.score,
+    };
 
-      const userPublicInfo = {
-        email: user.email,
-        nickname: user.nickname,
-        profileImage: user.profileImage,
-        score: user.score,
-      };
-
-      this.redis.hset(RedisTableName.SOCKET_ID_TO_USER_INFO, socket.id, JSON.stringify(userPublicInfo));
-      this.redis.hset(RedisTableName.ONLINE_USERS, userId, JSON.stringify(userPublicInfo));
-    } catch (e) {
-      socket.disconnect();
-    }
+    this.redis.hset(RedisTableName.SOCKET_ID_TO_USER_INFO, socket.id, JSON.stringify(userPublicInfo));
+    this.redis.hset(RedisTableName.ONLINE_USERS, userId, JSON.stringify(userPublicInfo));
   }
 
   async handleDisconnect(@ConnectedSocket() socket: Socket) {
@@ -66,7 +61,15 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
     this.redis.hdel(RedisTableName.SOCKET_ID_TO_USER_INFO, socket.id);
     this.redis.hdel(RedisTableName.ONLINE_USERS, userId);
 
-    socket.leave("lobby");
+    if (!getRoomId(socket)) {
+      return;
+    }
+
+    if (getRoomId(socket) === "lobby") {
+      socket.leave("lobby");
+      return;
+    }
+
     this.gameRoomGateway.exit(socket);
   }
 }

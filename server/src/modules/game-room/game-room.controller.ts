@@ -1,7 +1,7 @@
-import { Controller, ForbiddenException, Get, Param, ParseIntPipe } from "@nestjs/common";
+import { Controller } from "@nestjs/common";
 import { GameRoomService } from "./game-room.service";
 
-@Controller("game")
+@Controller("game-room")
 export class GameRoomController {
   constructor(private gameService: GameRoomService) {}
 }

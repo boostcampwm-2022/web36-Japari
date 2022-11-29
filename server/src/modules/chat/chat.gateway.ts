@@ -30,8 +30,10 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     const { message, sendTime } = data;
     const userInfo = JSON.parse(await this.redis.hget(RedisTableName.SOCKET_ID_TO_USER_INFO, socket.id));
 
+    console.log(userInfo);
+
     socket.to("lobby").emit("chat/lobby", {
-      sender: userInfo.name,
+      sender: userInfo.nickname,
       message,
       sendTime,
     });
@@ -43,7 +45,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     const userInfo = JSON.parse(await this.redis.hget(RedisTableName.SOCKET_ID_TO_USER_INFO, socket.id));
 
     socket.to(userInfo.roomId).emit("chat/room", {
-      sender: userInfo.name,
+      sender: userInfo.nickname,
       message,
       sendTime,
     });

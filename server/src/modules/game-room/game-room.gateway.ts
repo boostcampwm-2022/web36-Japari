@@ -79,7 +79,7 @@ export class GameroomGateway implements OnGatewayInit, OnGatewayConnection, OnGa
     const room = JSON.parse(await this.redis.hget(RedisTableName.GAME_ROOMS, roomId));
 
     if (!room) {
-      socket.emit("game-room/join-failed", {
+      socket.emit("game-room/error", {
         message: "the room does not exist",
       });
       return;
@@ -87,7 +87,7 @@ export class GameroomGateway implements OnGatewayInit, OnGatewayConnection, OnGa
 
     // 잘못된 비밀번호 입력
     if (room.isPrivate && room.password !== password) {
-      socket.emit("game-room/join-failed", {
+      socket.emit("game-room/error", {
         message: "wrong password",
       });
       return;
@@ -95,7 +95,7 @@ export class GameroomGateway implements OnGatewayInit, OnGatewayConnection, OnGa
 
     // 방 정원 초과
     if (room.participants.length + 1 > room.maximumPeople) {
-      socket.emit("game-room/join-failed", {
+      socket.emit("game-room/error", {
         message: "the room is full",
       });
       return;
@@ -118,7 +118,6 @@ export class GameroomGateway implements OnGatewayInit, OnGatewayConnection, OnGa
   @SubscribeMessage("game-room/exit")
   async exit(@ConnectedSocket() socket: Socket) {
     const roomId = getRoomId(socket);
-    if (roomId === "lobby") return;
     const room = JSON.parse(await this.redis.hget(RedisTableName.GAME_ROOMS, roomId));
 
     // 유저를 방에서 제거
