@@ -26,14 +26,17 @@ export class UserService {
     return this.prisma.user.findMany({ select: getUserOption });
   }
 
-  async updateUserNickname(id: number, nickname: string) {
+  async updateUserNickname(userId: number, nickname: string) {
     return this.prisma.user.update({
-      where: {
-        userId: id,
-      },
-      data: {
-        nickname,
-      },
+      where: { userId },
+      data: { nickname },
+    });
+  }
+
+  async updateUserProfileImage(userId: number, profileImage: string) {
+    return this.prisma.user.update({
+      where: { userId },
+      data: { profileImage },
     });
   }
 }

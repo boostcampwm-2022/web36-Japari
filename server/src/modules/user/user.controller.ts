@@ -20,14 +20,20 @@ export class UserController {
   }
 
   @UseGuards(AccessTokenGuard)
-  @Get("/:userId")
-  async getUser(@Param("userId", ParseIntPipe) userId: number) {
+  @Get("/:user-id")
+  async getUser(@Param("user-id", ParseIntPipe) userId: number) {
     return this.userService.findUser(userId);
   }
 
   @UseGuards(AccessTokenGuard)
   @Patch("/nickname")
-  async patchNickname(@Req() req: RequestWithAccessToken, @Body() { nickname }: { nickname: string }) {
+  async patchNickname(@Req() req: RequestWithAccessToken, @Body("nickname") nickname: string) {
     return this.userService.updateUserNickname(req.user.userId, nickname);
+  }
+
+  @UseGuards(AccessTokenGuard)
+  @Patch("/profile-image")
+  async patchProfile(@Req() req: RequestWithAccessToken, @Body("profileImage") profileImage: string) {
+    return this.userService.updateUserProfileImage(req.user.userId, profileImage);
   }
 }

@@ -35,30 +35,23 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 
   async handleConnection(@ConnectedSocket() socket: Socket) {
     const jwtAccessToken = socket.handshake.query["jwt-access-token"] as string;
+    socket.join("lobby");
 
-    try {
-      const payload = this.jwt.verify(jwtAccessToken);
+    const userId = Number(socket.handshake.query["user-id"]);
 
-      socket.join("lobby");
+    const user = await this.prisma.user.findUnique({
+      where: { userId },
+    });
 
-      const { userId } = payload;
+    const userPublicInfo = {
+      email: user.email,
+      nickname: user.nickname,
+      profileImage: user.profileImage,
+      score: user.score,
+    };
 
-      const user = await this.prisma.user.findUnique({
-        where: { userId },
-      });
-
-      const userPublicInfo = {
-        email: user.email,
-        nickname: user.nickname,
-        profileImage: user.profileImage,
-        score: user.score,
-      };
-
-      this.redis.hset(RedisTableName.SOCKET_ID_TO_USER_INFO, socket.id, JSON.stringify(userPublicInfo));
-      this.redis.hset(RedisTableName.ONLINE_USERS, userId, JSON.stringify(userPublicInfo));
-    } catch (e) {
-      socket.disconnect();
-    }
+    this.redis.hset(RedisTableName.SOCKET_ID_TO_USER_INFO, socket.id, JSON.stringify(userPublicInfo));
+    this.redis.hset(RedisTableName.ONLINE_USERS, userId, JSON.stringify(userPublicInfo));
   }
 
   async handleDisconnect(@ConnectedSocket() socket: Socket) {

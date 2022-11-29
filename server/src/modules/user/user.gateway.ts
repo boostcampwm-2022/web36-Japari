@@ -12,14 +12,13 @@ import Redis from "ioredis";
 import { Server, Socket } from "socket.io";
 import { RedisTableName } from "src/constants/redis-table-name";
 import { redisRecordToObject } from "util/convert";
-import { PrismaService } from "../prisma/prisma.service";
 
 @WebSocketGateway(4001, { transports: ["websocket"], namespace: "/" })
 export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer() public server: Server;
   private logger = new Logger("Chat Gateway");
 
-  constructor(private jwt: JwtService, private prisma: PrismaService, @Inject("RedisProvider") private redis: Redis) {}
+  constructor(@Inject("RedisProvider") private redis: Redis) {}
 
   afterInit(server: Server) {
     // 매 초마다 모든 유저들에게 접속 중인 유저 정보 전송
