@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from "@nestjs/common";
+import { BadRequestException, Injectable, UnauthorizedException } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import { User } from "@prisma/client";
 import { PrismaService } from "src/modules/prisma/prisma.service";
@@ -20,6 +20,8 @@ export class AuthService {
         return;
       case "google":
         break;
+      default:
+        throw new BadRequestException(`${site} 로그인 기능은 제공하지 않습니다.`);
     }
 
     let user = await this.prisma.user.findFirst({ where: { email } });

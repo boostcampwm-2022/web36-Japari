@@ -1,5 +1,5 @@
 import { Controller, Get, Param, Post, Query, Redirect, Req, Res, UseGuards } from "@nestjs/common";
-import { RequestWithAccessToken, RequestWithRefreshToken, Response } from "express";
+import { RequestWithUser, RequestWithUserAndRefreshToken, Response } from "express";
 import { AuthService } from "./auth.service";
 import { AccessTokenGuard } from "../jwt/jwt-access-token.guard";
 import { RefreshTokenGuard } from "../jwt/jwt-refresh-token.guard";
@@ -19,7 +19,7 @@ export class AuthController {
 
   @UseGuards(AccessTokenGuard)
   @Post("/logout")
-  async logout(@Req() req: RequestWithAccessToken, @Res() res: Response) {
+  async logout(@Req() req: RequestWithUser, @Res() res: Response) {
     await this.authService.logout(req.user);
     res.clearCookie("jwt-access-token");
     res.clearCookie("jwt-refresh-token");
@@ -34,7 +34,7 @@ export class AuthController {
 
   @UseGuards(RefreshTokenGuard)
   @Get("/refresh-token")
-  async refreshToken(@Req() req: RequestWithRefreshToken) {
+  async refreshToken(@Req() req: RequestWithUserAndRefreshToken) {
     return this.authService.refreshJwtTokens(req.user, req.oldRefreshToken);
   }
 }
