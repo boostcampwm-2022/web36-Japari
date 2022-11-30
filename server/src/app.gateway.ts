@@ -46,6 +46,7 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
       nickname: user.nickname,
       profileImage: user.profileImage,
       score: user.score,
+      connected: true,
     };
 
     socket.join("lobby");

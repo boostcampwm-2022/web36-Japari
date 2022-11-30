@@ -28,6 +28,7 @@ const WaitingPage: React.FC = () => {
   const socket = useRecoilValue(socketState);
   const [user, setUser] = useRecoilState(userState);
   const [room, setRoom] = useState<GameRoom | null>(null);
+
   const location = useLocation();
   const roomId = location.pathname.split("/").slice(-1)[0];
 
@@ -38,7 +39,7 @@ const WaitingPage: React.FC = () => {
       });
       return;
     }
-  }, [user]);
+  }, [user, setUser]);
 
   useEffect(() => {
     getGameRoomInfo(roomId).then(res => {
@@ -47,13 +48,13 @@ const WaitingPage: React.FC = () => {
     return () => {
       socket.emit("game-room/exit");
     };
-  }, []);
+  }, [roomId, socket]);
 
   return (
     <Page>
       <div css={style.WaitingContentContainerStyle}>
         <div css={style.RowContentContainerStyle}>
-          <UserList userMap={dummy.dummyUserMap} />
+          <UserList />
           {room && (
             <WaitingRoomInfo
               roomRecord={{
