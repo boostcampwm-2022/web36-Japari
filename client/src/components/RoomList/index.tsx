@@ -47,7 +47,7 @@ const RoomList = ({ rooms }: RoomListProps) => {
     return () => {
       socket.off("game-room/create-success");
     };
-  }, []);
+  }, [navigate, socket]);
 
   return (
     <div css={style.containerStyle}>

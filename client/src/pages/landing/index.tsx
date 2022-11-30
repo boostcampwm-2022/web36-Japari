@@ -21,7 +21,7 @@ const LandingPage: React.FC = () => {
     isLogin().then(isLogin => {
       if (isLogin) navigate("/lobby");
     });
-  }, []);
+  }, [navigate]);
 
   return (
     <Page>
