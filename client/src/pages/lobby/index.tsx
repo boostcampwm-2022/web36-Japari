@@ -6,7 +6,7 @@ import Profile from "../../components/Profile";
 import UserList from "../../components/UserList";
 import Chatting from "../../components/Chatting";
 import RoomList, { Room } from "../../components/RoomList";
-import * as dummy from "../dummy";
+
 import { useRecoilState, useRecoilValue } from "recoil";
 import { userState } from "../../store/user";
 import { getLoggedInUser } from "../../api/user";
@@ -16,6 +16,7 @@ import { socketState } from "../../store/socket";
 const LobbyPage: React.FC = () => {
   const socket = useRecoilValue(socketState);
   const [user, setUser] = useRecoilState(userState);
+
   const [gameRooms, setGameRooms] = useState<Room[]>([]);
   const [nicknameModalOpen, setNicknameModalOpen] = useState<boolean>(false);
 
@@ -29,7 +30,7 @@ const LobbyPage: React.FC = () => {
       "user-id": user.userId,
     };
     socket.connect();
-  }, [user]);
+  }, [user, socket]);
 
   useEffect(() => {
     if (!user) {
@@ -39,7 +40,7 @@ const LobbyPage: React.FC = () => {
       return;
     }
     if (!user.nickname) setNicknameModalOpen(true);
-  }, [user]);
+  }, [user, setUser]);
 
   useEffect(() => {
     socket.on("game-room/list", data => {
@@ -48,13 +49,13 @@ const LobbyPage: React.FC = () => {
     return () => {
       socket.off("game-room/list");
     };
-  }, []);
+  }, [socket]);
 
   return (
     <Page>
       <div css={style.LobbyContentContainerStyle}>
         <div css={style.RowContentContainerStyle}>
-          <UserList userMap={dummy.dummyUserMap} />
+          <UserList />
           <RoomList rooms={gameRooms} />
         </div>
         <div css={style.RowContentContainerStyle}>

@@ -1,8 +1,11 @@
 /** @jsxImportSource @emotion/react */
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import UserListTab from "./UserListTab";
 import UserTable from "./UserTable";
+import { useRecoilValue } from "recoil";
+import { socketState } from "../../store/socket";
 import * as style from "./styles";
+import * as dummy from "../../pages/dummy";
 
 export type User = {
   userId: number;
@@ -21,8 +24,21 @@ export interface UserListProps {
   };
 }
 
-const UserList = ({ userMap }: UserListProps) => {
+const UserList = () => {
+  const socket = useRecoilValue(socketState);
   const [selected, setSelected] = useState<number>(0);
+  const [userMap, setUserMap] = useState(dummy.dummyUserMap);
+
+  useEffect(() => {
+    socket.on("user/online", data => {
+      setUserMap(current => {
+        return { ...current, users: Object.values(data) };
+      });
+    });
+    return () => {
+      socket.off("user/online");
+    };
+  }, [socket]);
 
   return (
     <div css={style.ListContainerStyle}>

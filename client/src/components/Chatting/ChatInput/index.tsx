@@ -2,7 +2,7 @@
 import Input from "../../Input";
 import chatInputEnter from "../../../assets/icons/chat-input-enter.svg";
 import * as style from "./styles";
-import { useState, KeyboardEvent, useEffect } from "react";
+import { useState } from "react";
 import { Chat } from "..";
 import { Socket } from "socket.io-client";
 

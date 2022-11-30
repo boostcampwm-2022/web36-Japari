@@ -3,7 +3,6 @@ import { useState, useEffect } from "react";
 import ChatLog from "./ChatLog";
 import ChatInput from "./ChatInput";
 import * as style from "./styles";
-import io from "socket.io-client";
 import { socketState } from "../../store/socket";
 import { useLocation } from "react-router-dom";
 import { useRecoilValue } from "recoil";
@@ -47,7 +46,7 @@ const Chatting = () => {
     return () => {
       socket.off(channel, addLogs);
     };
-  }, [channel]);
+  }, [channel, socket]);
 
   return (
     <div css={style.ChattingContainerStyle}>

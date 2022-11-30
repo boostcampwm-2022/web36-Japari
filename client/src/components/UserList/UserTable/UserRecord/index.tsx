@@ -13,7 +13,11 @@ const UserRecord = ({ user }: UserRecordProps) => {
     <li css={style.UserRecordContainerStyle}>
       <div css={style.ImageAndConnectionStyle}>
         <div css={style.ImageDivStyle}>
-          <img css={style.ImageStyle} src={user.profileImage === "" ? DefaultUserImage : user.profileImage} />
+          <img
+            css={style.ImageStyle}
+            src={user.profileImage === "" ? DefaultUserImage : user.profileImage}
+            alt="profileImage"
+          />
           <div
             css={css`
               ${style.ConnectionCircleStyle}
