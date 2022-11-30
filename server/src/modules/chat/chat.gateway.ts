@@ -28,9 +28,6 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   async handleLobbyChat(@ConnectedSocket() socket: Socket, @MessageBody() data) {
     const { message, sendTime } = data;
     const userInfo = JSON.parse(await this.redis.hget(RedisTableName.SOCKET_ID_TO_USER_INFO, socket.id));
-
-    console.log(userInfo);
-
     socket.to("lobby").emit("chat/lobby", {
       sender: userInfo.nickname,
       message,

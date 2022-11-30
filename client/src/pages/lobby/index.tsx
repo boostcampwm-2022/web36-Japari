@@ -37,7 +37,6 @@ const LobbyPage: React.FC = () => {
       });
       return;
     }
-
     if (!user.nickname) setNicknameModalOpen(true);
   }, [user]);
 

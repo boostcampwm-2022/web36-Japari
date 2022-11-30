@@ -2,18 +2,40 @@
 import Input from "../../Input";
 import chatInputEnter from "../../../assets/icons/chat-input-enter.svg";
 import * as style from "./styles";
-import { useState, KeyboardEvent } from "react";
+import { useState, KeyboardEvent, useEffect } from "react";
 import { Chat } from "..";
+import { Socket } from "socket.io-client";
 
 interface ChatInputProps {
   addLogs: (value: Chat) => void;
-  pressEnter: (e: KeyboardEvent<HTMLInputElement>) => void;
-  message: string;
-  setMessage: (value: string) => void;
-  sendMessage: React.MouseEventHandler<HTMLImageElement>;
+  socket: Socket;
 }
 
-const ChatInput = ({ addLogs, pressEnter, message, setMessage, sendMessage }: ChatInputProps) => {
+const ChatInput = ({ addLogs, socket }: ChatInputProps) => {
+  const [message, setMessage] = useState<string>("");
+
+  const sendMessage = () => {
+    if (message === "") {
+      alert("메세지를 입력하세요");
+      return;
+    }
+    const newLog: Chat = {
+      sender: "ME",
+      message,
+      sendTime: new Date().toTimeString().split(" ")[0],
+    };
+
+    socket.emit("chat/lobby", newLog);
+    addLogs(newLog);
+    setMessage("");
+  };
+
+  const pressEnter = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      sendMessage();
+    }
+  };
+
   return (
     <div css={style.ChatInputContainerStyle}>
       <Input

@@ -36,7 +36,6 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 
   async handleConnection(@ConnectedSocket() socket: Socket) {
     const userId = Number(socket.handshake.query["user-id"]);
-
     const user = await this.prisma.user.findUnique({
       where: { userId },
     });

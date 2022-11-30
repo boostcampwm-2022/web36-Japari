@@ -1,4 +1,5 @@
 import { Story, Meta } from "@storybook/react";
+import { io } from "socket.io-client";
 import ChatInput from ".";
 
 export default {
@@ -6,9 +7,7 @@ export default {
   component: ChatInput,
 } as Meta;
 
-const Template: Story = () => (
-  <ChatInput addLogs={() => {}} pressEnter={() => {}} message="" setMessage={() => {}} sendMessage={() => {}} />
-);
+const Template: Story = () => <ChatInput addLogs={() => {}} socket={io()} />;
 
 export const Default = Template.bind({});
 Default.storyName = "채팅 인풋";
