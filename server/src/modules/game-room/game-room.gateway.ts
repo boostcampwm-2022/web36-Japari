@@ -16,7 +16,6 @@ import { RedisTableName } from "src/constants/redis-table-name";
 import { redisRecordToObject } from "util/convert";
 import { PrismaService } from "../prisma/prisma.service";
 import { v4 as uuid } from "uuid";
-import { getRoomId } from "util/socket";
 import { RoomSettingDto } from "./dto/room-setting.dto";
 import { RoomCredentialDto } from "./dto/room-credential.dto";
 import { WebsocketBadRequestFilter, WebsocketExceptionFilter } from "src/exception-filters/websocket.filter";
@@ -64,16 +63,17 @@ export class GameRoomGateway implements OnGatewayInit, OnGatewayConnection, OnGa
 
     // 입력으로 들어오지 않은 방 정보 추가
     const roomId = uuid();
-    const { minimumPeople } = await this.prisma.game.findUnique({ where: { gameId: Number(gameId) } });
+    const { minimumPeople } = await this.prisma.game.findUnique({ where: { gameId } });
 
     // 새로운 방을 redis에 저장
-    this.redis.hset(
+    await this.redis.hset(
       RedisTableName.GAME_ROOMS,
       roomId,
       JSON.stringify({ title, gameId, maximumPeople, isPrivate, password, minimumPeople, participants: [] })
     );
 
     socket.emit("game-room/create-success", { roomId });
+
     // 방 생성자 방에 입장
     this.join(socket, { roomId, password });
   }
@@ -81,7 +81,7 @@ export class GameRoomGateway implements OnGatewayInit, OnGatewayConnection, OnGa
   @UsePipes(ValidationPipe)
   @SubscribeMessage("game-room/modify")
   async modify(@ConnectedSocket() socket: Socket, @MessageBody() data: RoomSettingDto) {
-    const roomId = getRoomId(socket);
+    const roomId = JSON.parse(await this.redis.hget(RedisTableName.SOCKET_ID_TO_USER_INFO, socket.id));
     const room = JSON.parse(await this.redis.hget(RedisTableName.GAME_ROOMS, roomId));
     const newRoom = { ...room, ...data };
 
@@ -119,6 +119,7 @@ export class GameRoomGateway implements OnGatewayInit, OnGatewayConnection, OnGa
     // 유저를 방에 추가
     const user = JSON.parse(await this.redis.hget(RedisTableName.SOCKET_ID_TO_USER_INFO, socket.id));
     room.participants.push(user);
+    await this.redis.hset(RedisTableName.SOCKET_ID_TO_USER_INFO, socket.id, JSON.stringify({ ...user, roomId }));
     socket.join(roomId);
     socket.leave("lobby");
     await this.redis.hset(RedisTableName.GAME_ROOMS, roomId, JSON.stringify(room));
@@ -132,9 +133,9 @@ export class GameRoomGateway implements OnGatewayInit, OnGatewayConnection, OnGa
 
   @SubscribeMessage("game-room/exit")
   async exit(@ConnectedSocket() socket: Socket) {
-    const roomId = getRoomId(socket);
-
+    const { roomId } = JSON.parse(await this.redis.hget(RedisTableName.SOCKET_ID_TO_USER_INFO, socket.id));
     if (roomId === "lobby") return;
+
     const room = JSON.parse(await this.redis.hget(RedisTableName.GAME_ROOMS, roomId));
 
     // 유저를 방에서 제거
@@ -142,7 +143,7 @@ export class GameRoomGateway implements OnGatewayInit, OnGatewayConnection, OnGa
     room.participants = room.participants.filter(user => user.email !== email);
     socket.leave(roomId);
     socket.join("lobby");
-    this.redis.hset(RedisTableName.GAME_ROOMS, roomId, JSON.stringify(room));
+    await this.redis.hset(RedisTableName.GAME_ROOMS, roomId, JSON.stringify(room));
 
     if (room.participants.length === 0) {
       this.redis.hdel(RedisTableName.GAME_ROOMS, roomId);
