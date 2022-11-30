@@ -9,9 +9,10 @@ import { Socket } from "socket.io-client";
 interface ChatInputProps {
   addLogs: (value: Chat) => void;
   socket: Socket;
+  channel: string;
 }
 
-const ChatInput = ({ addLogs, socket }: ChatInputProps) => {
+const ChatInput = ({ addLogs, socket, channel }: ChatInputProps) => {
   const [message, setMessage] = useState<string>("");
 
   const sendMessage = () => {
@@ -25,7 +26,7 @@ const ChatInput = ({ addLogs, socket }: ChatInputProps) => {
       sendTime: new Date().toTimeString().split(" ")[0],
     };
 
-    socket.emit("chat/lobby", newLog);
+    socket.emit(channel, newLog);
     addLogs(newLog);
     setMessage("");
   };
