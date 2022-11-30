@@ -37,8 +37,21 @@ export class GameRoomGateway implements OnGatewayInit, OnGatewayConnection, OnGa
       const records = await this.redis.hgetall(RedisTableName.GAME_ROOMS);
 
       const gameRooms = redisRecordToObject(records);
+      let data = [];
+      for (let roomId in gameRooms) {
+        const { title, gameId, participants, maximumPeople, isPrivate } = gameRooms[roomId];
 
-      server.to("lobby").emit("game-room/list", gameRooms);
+        data.push({
+          roomId,
+          title,
+          gameId: Number(gameId),
+          currentPeople: participants.length,
+          maximumPeople,
+          isPrivate,
+        });
+      }
+
+      server.to("lobby").emit("game-room/list", data);
     }, 1000);
 
     this.logger.verbose("game room gateway initiated");
@@ -51,7 +64,7 @@ export class GameRoomGateway implements OnGatewayInit, OnGatewayConnection, OnGa
 
     // 입력으로 들어오지 않은 방 정보 추가
     const roomId = uuid();
-    const { minimumPeople } = await this.prisma.game.findUnique({ where: { gameId } });
+    const { minimumPeople } = await this.prisma.game.findUnique({ where: { gameId: Number(gameId) } });
 
     // 새로운 방을 redis에 저장
     this.redis.hset(
@@ -60,6 +73,7 @@ export class GameRoomGateway implements OnGatewayInit, OnGatewayConnection, OnGa
       JSON.stringify({ title, gameId, maximumPeople, isPrivate, password, minimumPeople, participants: [] })
     );
 
+    socket.emit("game-room/create-success", { roomId });
     // 방 생성자 방에 입장
     this.join(socket, { roomId, password });
   }

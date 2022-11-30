@@ -5,7 +5,7 @@ import { Page } from "../../components/Page";
 import Profile from "../../components/Profile";
 import UserList from "../../components/UserList";
 import Chatting from "../../components/Chatting";
-import RoomList from "../../components/RoomList";
+import RoomList, { Room } from "../../components/RoomList";
 import * as dummy from "../dummy";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { userState } from "../../store/user";
@@ -16,6 +16,7 @@ import { socketState } from "../../store/socket";
 const LobbyPage: React.FC = () => {
   const socket = useRecoilValue(socketState);
   const [user, setUser] = useRecoilState(userState);
+  const [gameRooms, setGameRooms] = useState<Room[]>([]);
   const [nicknameModalOpen, setNicknameModalOpen] = useState<boolean>(false);
 
   const closeModal = () => {
@@ -40,12 +41,21 @@ const LobbyPage: React.FC = () => {
     if (!user.nickname) setNicknameModalOpen(true);
   }, [user]);
 
+  useEffect(() => {
+    socket.on("game-room/list", data => {
+      setGameRooms(data);
+    });
+    return () => {
+      socket.off("game-room/list");
+    };
+  }, []);
+
   return (
     <Page>
       <div css={style.LobbyContentContainerStyle}>
         <div css={style.RowContentContainerStyle}>
           <UserList userMap={dummy.dummyUserMap} />
-          <RoomList rooms={dummy.dummyRooms} />
+          <RoomList rooms={gameRooms} />
         </div>
         <div css={style.RowContentContainerStyle}>
           <Profile user={user} />

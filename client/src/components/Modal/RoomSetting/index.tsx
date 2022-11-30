@@ -3,7 +3,9 @@ import Input from "../../Input";
 import Button from "../../Button";
 import Select from "../../Select";
 import * as style from "./styles";
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { useRecoilValue } from "recoil";
+import { socketState } from "../../../store/socket";
 
 interface RoomSettingProps {
   closeModal: () => void;
@@ -15,11 +17,14 @@ const RoomSetting = ({ closeModal }: RoomSettingProps) => {
   const [isPrivate, setIsPrivate] = useState<boolean>(false);
   const [password, setPassword] = useState<string>("");
   const [maximumPeople, setMaximumPeople] = useState<number>(-1);
+
+  const socket = useRecoilValue(socketState);
+
   const createRoom = () => {
     // room 생성 혹은 설정 로직
-    const data = { gameId, title, private: isPrivate, maximumPeople, password };
-    // socket.emit('create_game', data)
-    // console.log(data);
+    const data = { gameId, title, isPrivate, maximumPeople, password };
+
+    socket.emit("game-room/create", data);
     closeModal();
   };
 
