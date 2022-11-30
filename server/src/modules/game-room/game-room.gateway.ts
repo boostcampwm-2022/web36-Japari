@@ -81,7 +81,7 @@ export class GameRoomGateway implements OnGatewayInit, OnGatewayConnection, OnGa
   @UsePipes(ValidationPipe)
   @SubscribeMessage("game-room/modify")
   async modify(@ConnectedSocket() socket: Socket, @MessageBody() data: RoomSettingDto) {
-    const roomId = JSON.parse(await this.redis.hget(RedisTableName.SOCKET_ID_TO_USER_INFO, socket.id));
+    const { roomId } = JSON.parse(await this.redis.hget(RedisTableName.SOCKET_ID_TO_USER_INFO, socket.id));
     const room = JSON.parse(await this.redis.hget(RedisTableName.GAME_ROOMS, roomId));
     const newRoom = { ...room, ...data };
 
