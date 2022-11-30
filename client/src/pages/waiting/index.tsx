@@ -42,11 +42,13 @@ const WaitingPage: React.FC = () => {
   }, [user, setUser]);
 
   useEffect(() => {
-    getGameRoomInfo(roomId).then(res => {
-      setRoom(res);
+    socket.on("game-room/info", data => {
+      setRoom(data);
     });
+    socket.emit("game-room/join", { roomId });
     return () => {
       socket.emit("game-room/exit");
+      socket.off("game-room/info");
     };
   }, [roomId, socket]);
 

@@ -5,10 +5,10 @@ export const selectWrapper = css`
   border-radius: 0.3rem;
   overflow: hidden;
   display: inline-block;
-  padding: 0.1rem 0.25rem;
 `;
 
 export const selectBox = css`
+  padding: 0.1rem 0.25rem;
   border: 0rem;
   outline: none;
 `;

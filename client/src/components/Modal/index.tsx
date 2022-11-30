@@ -13,33 +13,26 @@ export interface ModalProps {
   user?: User;
   gameId?: number;
   roomName?: string;
-  closeModal?: () => void;
+  roomId?: string;
+  closeModal: () => void;
 }
 
-const Modal = ({ ModalType, user, gameId, roomName, closeModal }: ModalProps) => {
+const Modal = ({ ModalType, user, gameId, roomName, closeModal, roomId }: ModalProps) => {
   let modalTitle = "";
   let content = null;
 
   switch (ModalType) {
     case "닉네임 설정":
-      if (!closeModal) {
-        console.error("no props");
-      } else {
-        modalTitle = "닉네임 설정";
-        content = <NickNameSetting closeModal={closeModal} />;
-      }
+      modalTitle = "닉네임 설정";
+      content = <NickNameSetting closeModal={closeModal} />;
       break;
     case "방 설정":
-      if (!closeModal) {
-        console.error("no props");
-      } else {
-        modalTitle = "방 설정";
-        content = <RoomSetting closeModal={closeModal} />;
-      }
+      modalTitle = "방 설정";
+      content = <RoomSetting closeModal={closeModal} />;
       break;
     case "비밀번호 입력":
       modalTitle = "비밀번호 입력";
-      content = <PasswordSetting />;
+      content = <PasswordSetting closeModal={closeModal} roomId={roomId!} />;
       break;
     case "친구 요청":
       modalTitle = "친구 요청";

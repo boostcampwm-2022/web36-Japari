@@ -14,13 +14,11 @@ export class WebsocketBadRequestFilter implements WsExceptionFilter {
 
 @Catch()
 export class WebsocketExceptionFilter implements WsExceptionFilter {
-  constructor(private eventName: string) {}
-
   catch(exception: WebsocketException, host: ArgumentsHost) {
     if (host.getType() !== "ws") return;
 
     const ctx = host.switchToWs();
     const socket = ctx.getClient();
-    socket.emit(this.eventName, exception.message);
+    socket.emit(exception.eventName, exception.message);
   }
 }

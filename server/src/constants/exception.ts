@@ -1,3 +1,3 @@
 export class WebsocketException {
-  constructor(public message: string) {}
+  constructor(public eventName: string, public message: string) {}
 }

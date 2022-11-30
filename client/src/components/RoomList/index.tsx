@@ -1,5 +1,5 @@
 /** @jsxImportSource @emotion/react */
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, Fragment } from "react";
 import { useNavigate } from "react-router-dom";
 import { useRecoilValue } from "recoil";
 import { socketState } from "../../store/socket";
@@ -25,17 +25,17 @@ export interface RoomListProps {
 
 const RoomList = ({ rooms }: RoomListProps) => {
   const socket = useRecoilValue(socketState);
-  //   const [rooms, setRooms] = useState<Room[]>([]);
-  // or useQuery
   const navigate = useNavigate();
   const [gameType, setGameType] = useState<number>(0);
-  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-  const closeModal = () => {
-    setIsModalOpen(false);
-  };
+  const [createRoomModalOpen, setCreateRoomModalOpen] = useState<boolean>(false);
+  const [passwordModalOpen, setPasswordModalOpen] = useState<boolean>(false);
 
-  const onClickRecord = (roomId: string) => {
-    socket.emit("game-room/join", { roomId });
+  const onClickRecord = (roomId: string, isPrivate: boolean) => {
+    if (isPrivate) {
+      setPasswordModalOpen(true);
+      return;
+    }
+
     navigate(`/waiting/${roomId}`);
   };
 
@@ -43,13 +43,21 @@ const RoomList = ({ rooms }: RoomListProps) => {
     socket.on("game-room/create-success", data => {
       navigate(`/waiting/${data.roomId}`);
     });
+    socket.on("game-room/password-success", data => {
+      navigate(`/waiting/${data.roomId}`);
+    });
+    socket.on("game-room/password-failed", data => {
+      alert(data);
+    });
 
     socket.on("game-room/error", data => {
-      console.log(data);
+      alert(data);
     });
 
     return () => {
       socket.off("game-room/create-success");
+      socket.off("game-room/password-success");
+      socket.off("game-room/password-failed");
       socket.off("game-room/error");
     };
   }, [navigate, socket]);
@@ -64,13 +72,18 @@ const RoomList = ({ rooms }: RoomListProps) => {
           </div>
           <Select selectType="게임 필터" setValue={setGameType} />
         </div>
-        <Button buttonType="방 만들기" handleClick={() => setIsModalOpen(true)} />
-        {isModalOpen && <Modal ModalType="방 설정" closeModal={closeModal} />}
+        <Button buttonType="방 만들기" handleClick={() => setCreateRoomModalOpen(true)} />
+        {createRoomModalOpen && <Modal ModalType="방 설정" closeModal={() => setCreateRoomModalOpen(false)} />}
       </div>
 
       <div css={style.roomListStyle}>
-        {rooms.map((room, index) => (
-          <RoomRecord key={index} {...room} onClickRecord={() => onClickRecord(room.roomId)} />
+        {rooms.map(room => (
+          <Fragment key={room.roomId}>
+            <RoomRecord {...room} onClickRecord={() => onClickRecord(room.roomId, room.isPrivate)} />
+            {passwordModalOpen && (
+              <Modal ModalType="비밀번호 입력" roomId={room.roomId} closeModal={() => setPasswordModalOpen(false)} />
+            )}
+          </Fragment>
         ))}
       </div>
     </div>

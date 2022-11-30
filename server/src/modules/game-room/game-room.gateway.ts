@@ -22,7 +22,7 @@ import { WebsocketBadRequestFilter, WebsocketExceptionFilter } from "src/excepti
 import { WebsocketException } from "src/constants/exception";
 
 @UseFilters(new WebsocketBadRequestFilter("game-room/error"))
-@UseFilters(new WebsocketExceptionFilter("game-room/error"))
+@UseFilters(WebsocketExceptionFilter)
 @WebSocketGateway(4001, { transports: ["websocket"], namespace: "/" })
 export class GameRoomGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer() public server: Server;
@@ -73,9 +73,6 @@ export class GameRoomGateway implements OnGatewayInit, OnGatewayConnection, OnGa
     );
 
     socket.emit("game-room/create-success", { roomId });
-
-    // 방 생성자 방에 입장
-    this.join(socket, { roomId, password });
   }
 
   @UsePipes(ValidationPipe)
@@ -96,33 +93,51 @@ export class GameRoomGateway implements OnGatewayInit, OnGatewayConnection, OnGa
   }
 
   @UsePipes(ValidationPipe)
-  @SubscribeMessage("game-room/join")
-  async join(@ConnectedSocket() socket, @MessageBody() data: RoomCredentialDto) {
+  @SubscribeMessage("game-room/password")
+  async checkPassword(@ConnectedSocket() socket, @MessageBody() data: RoomCredentialDto) {
     const { roomId, password } = data;
 
     const room = JSON.parse(await this.redis.hget(RedisTableName.GAME_ROOMS, roomId));
 
+    // 잘못된 room id
     if (!room) {
-      throw new WebsocketException("해당 번호의 방이 존재하지 않습니다.");
+      throw new WebsocketException("game-room/password-failed", "잘못된 room id 입니다.");
     }
 
     // 잘못된 비밀번호 입력
     if (room.isPrivate && room.password !== password) {
-      throw new WebsocketException("잘못된 비밀번호입니다.");
+      throw new WebsocketException("game-room/password-failed", "잘못된 비밀번호입니다.");
+    }
+
+    // 패스워드를 올바르게 입력했다고 응답
+    socket.emit("game-room/password-success", {
+      roomId,
+    });
+  }
+
+  @UsePipes(ValidationPipe)
+  @SubscribeMessage("game-room/join")
+  async join(@ConnectedSocket() socket, @MessageBody("roomId") roomId: string) {
+    const room = JSON.parse(await this.redis.hget(RedisTableName.GAME_ROOMS, roomId));
+
+    // 잘못된 room id 접근
+    if (!room) {
+      throw new WebsocketException("game-room/join-failed", "잘못된 room id 입니다.");
     }
 
     // 방 정원 초과
     if (room.participants.length + 1 > room.maximumPeople) {
-      throw new WebsocketException("방 정원이 초과되었습니다.");
+      throw new WebsocketException("game-room/join-failed", "방 정원이 초과되었습니다.");
     }
 
-    // 유저를 방에 추가
+    // 유저가 방에 추가되었다는 사실을 Redis에 저장
     const user = JSON.parse(await this.redis.hget(RedisTableName.SOCKET_ID_TO_USER_INFO, socket.id));
     room.participants.push(user);
     await this.redis.hset(RedisTableName.SOCKET_ID_TO_USER_INFO, socket.id, JSON.stringify({ ...user, roomId }));
+    await this.redis.hset(RedisTableName.GAME_ROOMS, roomId, JSON.stringify(room));
+
     socket.join(roomId);
     socket.leave("lobby");
-    await this.redis.hset(RedisTableName.GAME_ROOMS, roomId, JSON.stringify(room));
 
     // 유저가 들어왔다는 소식을 참여한 유저와 기존에 방에 있던 모든 유저에게 전달
     this.server.to(roomId).emit("game-room/info", {

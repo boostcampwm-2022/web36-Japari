@@ -45,6 +45,7 @@ const ChatInput = ({ addLogs, socket, channel }: ChatInputProps) => {
         value={message}
         setValue={setMessage}
         handleKeyPress={pressEnter}
+        width={"95%"}
       />
       <img src={chatInputEnter} alt="chatLogEnter" onClick={sendMessage} />
     </div>
