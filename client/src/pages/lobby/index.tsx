@@ -28,7 +28,7 @@ const LobbyPage: React.FC = () => {
       "user-id": user.userId,
     };
     socket.connect();
-  }, [user]);
+  }, [user, socket]);
 
   useEffect(() => {
     if (!user) {
@@ -38,7 +38,7 @@ const LobbyPage: React.FC = () => {
       return;
     }
     if (!user.nickname) setNicknameModalOpen(true);
-  }, [user]);
+  }, [user, setUser]);
 
   return (
     <Page>

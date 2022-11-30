@@ -26,7 +26,7 @@ const Chatting = () => {
     return () => {
       socket.off("chat/lobby", addLogs);
     };
-  }, []);
+  }, [socket]);
 
   return (
     <div css={style.ChattingContainerStyle}>
