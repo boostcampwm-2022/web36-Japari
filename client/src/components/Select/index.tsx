@@ -27,7 +27,7 @@ const Select = ({ selectType, width, setValue }: SelectProps) => {
               ${style.selectBox}
               width: ${width};
             `}
-            onChange={e => setValue(e.target.value)}
+            onChange={e => setValue(Number(e.target.value))}
           >
             <option>모든 게임</option>
             <option value={1}>캐치 마인드</option>
@@ -44,7 +44,7 @@ const Select = ({ selectType, width, setValue }: SelectProps) => {
               ${style.selectBox}
               width: ${width};
             `}
-            onChange={e => setValue(e.target.value)}
+            onChange={e => setValue(Number(e.target.value))}
           >
             <option>게임을 선택해 주세요.</option>
             <option value={1}>캐치 마인드</option>
@@ -61,7 +61,7 @@ const Select = ({ selectType, width, setValue }: SelectProps) => {
               ${style.selectBox}
               width: ${width};
             `}
-            onChange={e => setValue(e.target.value)}
+            onChange={e => setValue(Number(e.target.value))}
           >
             <option>인원을 선택해 주세요.</option>
             <option value={4}>4명</option>
