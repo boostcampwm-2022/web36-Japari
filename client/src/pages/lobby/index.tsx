@@ -47,7 +47,7 @@ const LobbyPage: React.FC = () => {
       setGameRooms(data);
     });
     return () => {
-      socket.off("gmae-room/list");
+      socket.off("game-room/list");
     };
   }, []);
 
