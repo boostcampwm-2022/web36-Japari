@@ -1,4 +1,4 @@
-import { Inject, Logger } from "@nestjs/common";
+import { Inject, Logger, UseFilters, UsePipes, ValidationPipe } from "@nestjs/common";
 import {
   ConnectedSocket,
   MessageBody,
@@ -12,7 +12,10 @@ import {
 import Redis from "ioredis";
 import { Server, Socket } from "socket.io";
 import { RedisTableName } from "src/constants/redis-table-name";
+import { WebsocketBadRequestFilter } from "src/exception-filters/websocket.filter";
+import { ChatDto } from "./chat.dto";
 
+@UseFilters(new WebsocketBadRequestFilter("chat/error"))
 @WebSocketGateway(4001, { transports: ["websocket"], namespace: "/" })
 export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer() public server: Server;
@@ -24,8 +27,9 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     this.logger.verbose("chat gateway initiated");
   }
 
+  @UsePipes(ValidationPipe)
   @SubscribeMessage("chat/lobby")
-  async handleLobbyChat(@ConnectedSocket() socket: Socket, @MessageBody() data) {
+  async handleLobbyChat(@ConnectedSocket() socket: Socket, @MessageBody() data: ChatDto) {
     const { message, sendTime } = data;
     const userInfo = JSON.parse(await this.redis.hget(RedisTableName.SOCKET_ID_TO_USER_INFO, socket.id));
     socket.to("lobby").emit("chat/lobby", {
@@ -35,8 +39,9 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     });
   }
 
+  @UsePipes(ValidationPipe)
   @SubscribeMessage("chat/room")
-  async handleRoomChat(@ConnectedSocket() socket: Socket, @MessageBody() data) {
+  async handleRoomChat(@ConnectedSocket() socket: Socket, @MessageBody() data: ChatDto) {
     const { message, sendTime } = data;
     const userInfo = JSON.parse(await this.redis.hget(RedisTableName.SOCKET_ID_TO_USER_INFO, socket.id));
 

@@ -10,8 +10,8 @@ export class GameController {
     return this.gameService.findAllGame();
   }
 
-  @Get("/:game-id")
-  async getGame(@Param("game-id", ParseIntPipe) gameId: number) {
+  @Get("/:id")
+  async getGame(@Param("id", ParseIntPipe) gameId: number) {
     return this.gameService.findGame(gameId);
   }
 }
