@@ -3,7 +3,6 @@ import { useState, useEffect } from "react";
 import ChatLog from "./ChatLog";
 import ChatInput from "./ChatInput";
 import * as style from "./styles";
-import io from "socket.io-client";
 import { socketState } from "../../store/socket";
 
 import { useRecoilValue } from "recoil";
