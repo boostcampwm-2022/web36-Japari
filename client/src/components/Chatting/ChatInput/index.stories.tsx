@@ -7,7 +7,7 @@ export default {
   component: ChatInput,
 } as Meta;
 
-const Template: Story = () => <ChatInput addLogs={() => {}} socket={io()} />;
+const Template: Story = () => <ChatInput addLogs={() => {}} socket={io()} channel="lobby" />;
 
 export const Default = Template.bind({});
 Default.storyName = "채팅 인풋";
