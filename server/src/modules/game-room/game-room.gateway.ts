@@ -134,7 +134,7 @@ export class GameRoomGateway implements OnGatewayInit, OnGatewayConnection, OnGa
   @SubscribeMessage("game-room/exit")
   async exit(@ConnectedSocket() socket: Socket) {
     const { roomId } = JSON.parse(await this.redis.hget(RedisTableName.SOCKET_ID_TO_USER_INFO, socket.id));
-    if (roomId === "lobby") return;
+    if (!roomId || roomId === "lobby") return;
 
     const room = JSON.parse(await this.redis.hget(RedisTableName.GAME_ROOMS, roomId));
 
@@ -142,12 +142,16 @@ export class GameRoomGateway implements OnGatewayInit, OnGatewayConnection, OnGa
     const { email } = JSON.parse(await this.redis.hget(RedisTableName.SOCKET_ID_TO_USER_INFO, socket.id));
     room.participants = room.participants.filter(user => user.email !== email);
     socket.leave(roomId);
-    socket.join("lobby");
     await this.redis.hset(RedisTableName.GAME_ROOMS, roomId, JSON.stringify(room));
-
     if (room.participants.length === 0) {
       this.redis.hdel(RedisTableName.GAME_ROOMS, roomId);
     }
+
+    // 유저를 로비로 보낸다
+    socket.join("lobby");
+    const userInfo = JSON.parse(await this.redis.hget(RedisTableName.SOCKET_ID_TO_USER_INFO, socket.id));
+    userInfo.roomId = "lobby";
+    await this.redis.hset(RedisTableName.SOCKET_ID_TO_USER_INFO, socket.id, JSON.stringify(userInfo));
 
     // 유저가 나갔다는 소식을 방에 남게 될 모든 유저에게 전달
     socket.to(roomId).emit("game-room/info", {

@@ -44,8 +44,13 @@ const RoomList = ({ rooms }: RoomListProps) => {
       navigate(`/waiting/${data.roomId}`);
     });
 
+    socket.on("game-room/error", data => {
+      console.log(data);
+    });
+
     return () => {
       socket.off("game-room/create-success");
+      socket.off("game-room/error");
     };
   }, [navigate, socket]);
 
