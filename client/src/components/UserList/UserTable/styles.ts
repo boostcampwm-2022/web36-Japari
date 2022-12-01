@@ -6,7 +6,7 @@ export const TableContainerStyle = (theme: Theme) => css`
   width: inherit;
   border-radius: 0.75rem;
   flex-grow: 1;
-  padding: 1.5rem 2rem 2rem 2rem;
+  padding: 1.5rem 0.5rem 2rem 0.5rem;
   box-sizing: border-box;
   box-shadow: 0 0.25rem 0.25rem rgba(0, 0, 0, 0.2);
 
@@ -22,7 +22,9 @@ export const TableRankContainerStyle = css`
 `;
 
 export const TableStyle = css`
-  overflow-y: scroll;
+  overflow-y: overlay;
+  padding: 0 1.5rem 0 1.5rem;
+  box-sizing: border-box;
   height: 100%;
 `;
 

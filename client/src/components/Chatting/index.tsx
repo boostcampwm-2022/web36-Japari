@@ -1,56 +1,58 @@
 /** @jsxImportSource @emotion/react */
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import ChatLog from "./ChatLog";
 import ChatInput from "./ChatInput";
 import * as style from "./styles";
-
-const dummyLog = [
-  {
-    sender: "user1",
-    message: "안녕하세요",
-    sendTime: new Date(),
-  },
-  {
-    sender: "user2",
-    message: "안녕하세요",
-    sendTime: new Date(),
-  },
-  {
-    sender: "user3",
-    message: "안녕하세요",
-    sendTime: new Date(),
-  },
-  {
-    sender: "user4",
-    message: "안",
-    sendTime: new Date(),
-  },
-  {
-    sender: "user5",
-    message: "안녕하세요5555555",
-    sendTime: new Date(),
-  },
-  {
-    sender: "user6",
-    message: "안녕하세요666666666666666666666666",
-    sendTime: new Date(),
-  },
-];
+import { socketState } from "../../store/socket";
+import { useLocation } from "react-router-dom";
+import { useRecoilValue } from "recoil";
 
 export type Chat = {
   sender: string;
   message: string;
-  sendTime: Date;
+  sendTime: string;
 };
 
 const Chatting = () => {
-  const [logs, setLogs] = useState<Chat[]>(dummyLog);
+  const [logs, setLogs] = useState<Chat[]>([]);
+  const socket = useRecoilValue(socketState);
+  const [channel, setChannel] = useState("");
+  const location = useLocation();
+
+  const addLogs = (newLog: Chat) => {
+    setLogs((current: Chat[]) => [...current, newLog]);
+  };
+
+  const checkLocation = () => {
+    const currentPage = location.pathname.split("/").slice(1)[0];
+    switch (currentPage) {
+      case "lobby":
+        setChannel("chat/lobby");
+        return;
+      case "waiting":
+      case "playing":
+        setChannel("chat/room");
+        return;
+    }
+  };
+
+  useEffect(() => {
+    checkLocation();
+  }, []);
+
+  useEffect(() => {
+    if (channel === "") return;
+    socket.on(channel, addLogs);
+    return () => {
+      socket.off(channel, addLogs);
+    };
+  }, [channel, socket]);
 
   return (
     <div css={style.ChattingContainerStyle}>
       <ChatLog logs={logs} />
       <hr css={style.ChattingHRStyle} />
-      <ChatInput />
+      <ChatInput addLogs={addLogs} socket={socket} channel={channel} />
     </div>
   );
 };

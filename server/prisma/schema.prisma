@@ -10,30 +10,33 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model user {
-  user_id    Int     @default(autoincrement()) @id
+model User {
+  userId    Int     @default(autoincrement()) @id @map("user_id")
   email String
   nickname  String? 
   score Int @default(0)
-  profile_image String  @default("/public/profile/default.jpg")
-  jwt_refresh_token String?
+  profileImage String  @default("/profile/default.png") @map("profile_image")
+  jwtRefreshToken String? @map("jwt_refresh_token")
 
   // https://github.com/prisma/prisma/discussions/13214
-  from_users friend[] @relation("from_user")
-  to_users friend[] @relation("to_user")
+  from_users Friend[] @relation("from_user")
+  to_users Friend[] @relation("to_user")
+	@@map("user")
 }
 
-model game {
-  game_id Int @default(autoincrement()) @id
+model Game {
+  gameId Int @default(autoincrement()) @id @map("game_id")
   name String
-  minimum_people Int
+  minimumPeople Int @map("minimum_people")
+	@@map("game")
 }
 
-model friend {
-  from_user     user @relation(name: "from_user", fields: [from_user_id], references: [user_id])
-  from_user_id  Int
-  to_user       user @relation(name: "to_user", fields: [to_user_id], references: [user_id])
-  to_user_id    Int
+model Friend {
+  fromUser     User @relation(name: "from_user", fields: [fromUserId], references: [userId])
+  fromUserId  Int @map("from_user_id")
+  toUser       User @relation(name: "to_user", fields: [toUserId], references: [userId])
+  toUserId    Int @map("to_user_id")
 
-  @@id([from_user_id, to_user_id])
+  @@id([fromUserId, toUserId])
+	@@map("friend")
 }

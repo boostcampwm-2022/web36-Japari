@@ -1,5 +1,7 @@
 /** @jsxImportSource @emotion/react */
 import { useNavigate } from "react-router-dom";
+import { useRecoilValue } from "recoil";
+import { socketState } from "../../store/socket";
 import Button from "../Button";
 import Cam, { CamProps } from "../Cam";
 import { Room } from "../RoomList";
@@ -16,6 +18,7 @@ export interface ProfileProps {
 }
 
 const WaitingRoomInfo = ({ roomRecord, camList }: WaitingRoomInfoProps) => {
+  const socket = useRecoilValue(socketState);
   // [camList, setCamList] = useState<Cam[]>([]);
   const navigate = useNavigate();
 
@@ -26,7 +29,7 @@ const WaitingRoomInfo = ({ roomRecord, camList }: WaitingRoomInfoProps) => {
   const handleGameStartButton = () => {
     // socket.emit('start_game', {gameRoomId: roomRecord.gameRoomId})
 
-    navigate(`/playing/${roomRecord.gameRoomId}`);
+    navigate(`/playing/${roomRecord.roomId}`);
     // socket.on('start_game') 시 naviagte가 되도록 변경될 여지 있음
   };
 
@@ -37,8 +40,8 @@ const WaitingRoomInfo = ({ roomRecord, camList }: WaitingRoomInfoProps) => {
       </div>
       <div css={style.mainWrapperStyle}>
         <div css={style.camListContainerStyle}>
-          {camList.map(cam => (
-            <Cam {...cam} />
+          {camList.map((cam, idx) => (
+            <Cam key={idx} {...cam} />
           ))}
         </div>
         <div css={style.footerStyle}>
