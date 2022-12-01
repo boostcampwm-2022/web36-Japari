@@ -1,4 +1,5 @@
 import { Inject, Logger } from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
 import { JwtService } from "@nestjs/jwt";
 import {
   ConnectedSocket,
@@ -10,11 +11,12 @@ import {
 } from "@nestjs/websockets";
 import Redis from "ioredis";
 import { Server, Socket } from "socket.io";
+import { SERVER_SOCKET_PORT } from "./constants/config";
 import { RedisTableName } from "./constants/redis-table-name";
 import { GameRoomGateway } from "./modules/game-room/game-room.gateway";
 import { PrismaService } from "./modules/prisma/prisma.service";
 
-@WebSocketGateway(4001, { transports: ["websocket"], namespace: "/" })
+@WebSocketGateway(SERVER_SOCKET_PORT, { transports: ["websocket"], namespace: "/" })
 export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer() public server: Server;
   private logger = new Logger("App Gateway");

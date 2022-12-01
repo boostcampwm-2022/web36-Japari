@@ -10,10 +10,11 @@ import {
 } from "@nestjs/websockets";
 import Redis from "ioredis";
 import { Server, Socket } from "socket.io";
+import { SERVER_SOCKET_PORT } from "src/constants/config";
 import { RedisTableName } from "src/constants/redis-table-name";
 import { redisRecordToObject } from "util/convert";
 
-@WebSocketGateway(4001, { transports: ["websocket"], namespace: "/" })
+@WebSocketGateway(SERVER_SOCKET_PORT, { transports: ["websocket"], namespace: "/" })
 export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer() public server: Server;
   private logger = new Logger("Chat Gateway");
