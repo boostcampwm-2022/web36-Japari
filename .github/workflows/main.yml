@@ -6,7 +6,8 @@ on:
 
 env:
   CI: false
-  REACT_APP_OAUTH_GITHUB_AUTH_SERVER: ${{ secrets.REACT_APP_OAUTH_GITHUB_AUTH_SERVER }} 
+  REACT_APP_OAUTH_GITHUB_AUTH_SERVER: ${{ secrets.REACT_APP_OAUTH_GITHUB_AUTH_SERVER }}
+  REACT_APP_SOCKET_SERVER_URL: ${{ secrets.REACT_APP_SOCKET_SERVER_URL }}
   DATABASE_URL: ${{ secrets.DATABASE_URL }}
   REDIS_HOST: ${{ secrets.REDIS_HOST }}
   REDIS_PORT: ${{ secrets.REDIS_PORT }}
@@ -17,6 +18,8 @@ env:
   OAUTH_GITHUB_EMAIL_API: ${{ secrets.OAUTH_GITHUB_EMAIL_API }}
   OAUTH_GITHUB_ACCESS_TOKEN_API: ${{ secrets.OAUTH_GITHUB_ACCESS_TOKEN_API }}
   REDIRECT_URI: ${{ secrets.REDIRECT_URI }}
+  SERVER_PORT: ${{ secrets.SERVER_PORT }}
+  SERVER_SOCKET_PORT: ${{ secrets.SERVER_SOCKET_PORT }}
 
 jobs:
   deploy:
@@ -36,6 +39,7 @@ jobs:
         working-directory: ./client
         run: |
           echo REACT_APP_OAUTH_GITHUB_AUTH_SERVER=$REACT_APP_OAUTH_GITHUB_AUTH_SERVER > .env
+          echo REACT_APP_SOCKET_SERVER_URL=$REACT_APP_SOCKET_SERVER_URL >> .env
         
       - name: client 빌드
         working-directory: ./client
@@ -60,6 +64,8 @@ jobs:
           echo OAUTH_GITHUB_CLIENT_SECRET=$OAUTH_GITHUB_CLIENT_SECRET >> .env
           echo OAUTH_GITHUB_EMAIL_API=$OAUTH_GITHUB_EMAIL_API >> .env
           echo OAUTH_GITHUB_ACCESS_TOKEN_API=$OAUTH_GITHUB_ACCESS_TOKEN_API >> .env
+          echo SERVER_PORT=$SERVER_PORT >> .env
+          echo SERVER_SOCKET_PORT=$SERVER_SOCKET_PORT >> .env
           echo REDIRECT_URI=$REDIRECT_URI >> .env
 
       - name: pm2 프로세스 재실행
