@@ -3,7 +3,7 @@ import { PassportStrategy } from "@nestjs/passport";
 import { ExtractJwt, Strategy } from "passport-jwt";
 import { PrismaService } from "src/modules/prisma/prisma.service";
 import { Request } from "express";
-import { ConfigService } from "@nestjs/config";
+import { JWT_SECRET_KEY } from "src/constants/config";
 
 interface JwtPayload {
   userId: number;
@@ -11,9 +11,9 @@ interface JwtPayload {
 
 @Injectable()
 export class RefreshTokenStrategy extends PassportStrategy(Strategy, "jwt-refresh-token") {
-  constructor(private config: ConfigService, private prisma: PrismaService) {
+  constructor(private prisma: PrismaService) {
     super({
-      secretOrKey: config.get<string>("JWT_SECRET_KEY"),
+      secretOrKey: JWT_SECRET_KEY,
       jwtFromRequest: ExtractJwt.fromExtractors([
         (req: Request) => {
           return req.cookies["jwt-refresh-token"];

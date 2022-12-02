@@ -20,12 +20,12 @@ import { RoomSettingDto } from "./dto/room-setting.dto";
 import { RoomCredentialDto } from "./dto/room-credential.dto";
 import { WebsocketBadRequestFilter, WebsocketExceptionFilter } from "src/exception-filters/websocket.filter";
 import { WebsocketException } from "src/constants/exception";
-import { SERVER_SOCKET_PORT } from "src/constants/config";
 import { RedisService } from "../redis/redis.service";
+import { SERVER_SOCKET_PORT } from "src/constants/config";
 
 @UseFilters(new WebsocketBadRequestFilter("game-room/error"))
 @UseFilters(WebsocketExceptionFilter)
-@WebSocketGateway()
+@WebSocketGateway(SERVER_SOCKET_PORT, { transports: ["websocket"], namespace: "/" })
 export class GameRoomGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer() public server: Server;
   private logger = new Logger("Chat Gateway");

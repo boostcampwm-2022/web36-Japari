@@ -1,9 +1,6 @@
-import { ConfigService } from "@nestjs/config";
-import { JwtModule as JwtModuleWithoutRegister } from "@nestjs/jwt";
+import { JwtModule as JwtModuleBeforeRegister } from "@nestjs/jwt";
+import { JWT_SECRET_KEY } from "src/constants/config";
 
-export const JwtModule = JwtModuleWithoutRegister.registerAsync({
-  useFactory: async (config: ConfigService) => ({
-    secret: config.get<string>("JWT_SECRET_KEY"),
-  }),
-  inject: [ConfigService],
+export const JwtModule = JwtModuleBeforeRegister.register({
+  secret: JWT_SECRET_KEY,
 });

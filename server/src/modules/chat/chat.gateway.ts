@@ -18,7 +18,7 @@ import { RedisService } from "../redis/redis.service";
 import { ChatDto } from "./chat.dto";
 
 @UseFilters(new WebsocketBadRequestFilter("chat/error"))
-@WebSocketGateway()
+@WebSocketGateway(SERVER_SOCKET_PORT, { transports: ["websocket"], namespace: "/" })
 export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer() public server: Server;
   private logger = new Logger("Chat Gateway");

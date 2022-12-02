@@ -1,1 +1,11 @@
 export const SERVER_SOCKET_PORT = Number(process.env.SERVER_SOCKET_PORT);
+export const SERVER_PORT = Number(process.env.SERVER_PORT);
+export const REDIRECT_URI = process.env.REDIRECT_URI;
+export const OAUTH_GITHUB_CLIENT_ID = process.env.OAUTH_GITHUB_CLIENT_ID;
+export const OAUTH_GITHUB_CLIENT_SECRET = process.env.OAUTH_GITHUB_CLIENT_SECRET;
+export const OAUTH_GITHUB_ACCESS_TOKEN_API = process.env.OAUTH_GITHUB_ACCESS_TOKEN_API;
+export const OAUTH_GITHUB_EMAIL_API = process.env.OAUTH_GITHUB_EMAIL_API;
+export const JWT_SECRET_KEY = process.env.JWT_SECRET_KEY;
+export const REDIS_HOST = process.env.REDIS_HOST;
+export const REDIS_PORT = Number(process.env.REDIS_PORT);
+export const REDIS_PASSWORD = process.env.REDIS_PASSWORD;

@@ -1,20 +1,20 @@
-import { Controller, Get, Param, Post, Query, Redirect, Req, Res, UseGuards } from "@nestjs/common";
+import { Controller, Get, Param, Post, Query, Req, Res, UseGuards } from "@nestjs/common";
 import { RequestWithUser, RequestWithUserAndRefreshToken, Response } from "express";
 import { AuthService } from "./auth.service";
 import { AccessTokenGuard } from "../jwt/jwt-access-token.guard";
 import { RefreshTokenGuard } from "../jwt/jwt-refresh-token.guard";
-import { ConfigService } from "@nestjs/config";
+import { REDIRECT_URI } from "src/constants/config";
 
 @Controller("auth")
 export class AuthController {
-  constructor(private authService: AuthService, private config: ConfigService) {}
+  constructor(private authService: AuthService) {}
 
   @Get("/login/:site")
   async login(@Param("site") site: string, @Query("code") code: string, @Res() res: Response) {
     const { jwtAccessToken, jwtRefreshToken } = await this.authService.login(site, code);
     res.cookie("jwt-access-token", jwtAccessToken, { httpOnly: true });
     res.cookie("jwt-refresh-token", jwtRefreshToken, { httpOnly: true });
-    res.redirect(this.config.get<string>("REDIRECT_URI"));
+    res.redirect(REDIRECT_URI);
   }
 
   @UseGuards(AccessTokenGuard)
