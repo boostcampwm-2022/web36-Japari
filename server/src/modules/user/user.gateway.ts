@@ -15,7 +15,7 @@ import { RedisTableName } from "src/constants/redis-table-name";
 import { redisRecordToObject } from "util/convert";
 import { RedisService } from "../redis/redis.service";
 
-@WebSocketGateway(SERVER_SOCKET_PORT, { transports: ["websocket"], namespace: "/" })
+@WebSocketGateway()
 export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer() public server: Server;
   private logger = new Logger("Chat Gateway");

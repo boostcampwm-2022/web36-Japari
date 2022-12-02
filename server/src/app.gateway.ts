@@ -14,7 +14,7 @@ import { GameRoomGateway } from "./modules/game-room/game-room.gateway";
 import { PrismaService } from "./modules/prisma/prisma.service";
 import { RedisService } from "./modules/redis/redis.service";
 
-@WebSocketGateway(SERVER_SOCKET_PORT, { transports: ["websocket"], namespace: "/" })
+@WebSocketGateway()
 export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer() public server: Server;
   private logger = new Logger("App Gateway");

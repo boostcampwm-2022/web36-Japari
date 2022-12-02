@@ -20,7 +20,6 @@ class RedisModuleWithoutConfig {
         다른 도메인에서 console.log(this.redis)를 해보면 id: 1234 프로퍼티가 출력된다
       */
       useFactory: (config: ConfigService) => {
-        console.log(config.get("REDIS_HOST"));
         const logger = new Logger("Redis Module");
 
         const client = new IORedis({

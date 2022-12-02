@@ -25,7 +25,7 @@ import { RedisService } from "../redis/redis.service";
 
 @UseFilters(new WebsocketBadRequestFilter("game-room/error"))
 @UseFilters(WebsocketExceptionFilter)
-@WebSocketGateway(SERVER_SOCKET_PORT, { transports: ["websocket"], namespace: "/" })
+@WebSocketGateway()
 export class GameRoomGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer() public server: Server;
   private logger = new Logger("Chat Gateway");
