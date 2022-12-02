@@ -6,7 +6,6 @@ import {
   ParseIntPipe,
   Patch,
   Req,
-  UseFilters,
   UseGuards,
   UsePipes,
   ValidationPipe,

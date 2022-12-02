@@ -1,4 +1,4 @@
-import { Controller, Get, Param, ParseIntPipe } from "@nestjs/common";
+import { Controller, Get, Param } from "@nestjs/common";
 import { GameRoomService } from "./game-room.service";
 
 @Controller("gameroom")

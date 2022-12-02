@@ -10,7 +10,6 @@ import { PrismaModule } from "src/modules/prisma/prisma.module";
 import { JwtModule } from "../jwt/jwt.module";
 
 @Module({
-  // dynamic module: https://docs.nestjs.com/fundamentals/dynamic-modules
   imports: [PassportModule, JwtModule, HttpModule, PrismaModule],
   controllers: [AuthController],
   providers: [AuthService, GithubService, AccessTokenStrategy, RefreshTokenStrategy],

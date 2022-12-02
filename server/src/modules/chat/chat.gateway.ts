@@ -1,4 +1,4 @@
-import { Inject, Logger, UseFilters, UsePipes, ValidationPipe } from "@nestjs/common";
+import { Logger, UseFilters, UsePipes, ValidationPipe } from "@nestjs/common";
 import {
   ConnectedSocket,
   MessageBody,
@@ -9,15 +9,14 @@ import {
   WebSocketGateway,
   WebSocketServer,
 } from "@nestjs/websockets";
-import Redis from "ioredis";
 import { Server, Socket } from "socket.io";
 import { SERVER_SOCKET_PORT } from "src/constants/config";
 import { RedisTableName } from "src/constants/redis-table-name";
-import { WebsocketBadRequestFilter } from "src/exception-filters/websocket.filter";
+import { WsBadRequestFilter } from "src/exception-filters/websocket.filter";
 import { RedisService } from "../redis/redis.service";
 import { ChatDto } from "./chat.dto";
 
-@UseFilters(new WebsocketBadRequestFilter("chat/error"))
+@UseFilters(new WsBadRequestFilter("chat/error"))
 @WebSocketGateway(SERVER_SOCKET_PORT, { transports: ["websocket"], namespace: "/" })
 export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer() public server: Server;

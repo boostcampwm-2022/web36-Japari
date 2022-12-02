@@ -1,5 +1,4 @@
-import { Inject, Logger } from "@nestjs/common";
-import { JwtService } from "@nestjs/jwt";
+import { Logger } from "@nestjs/common";
 import {
   ConnectedSocket,
   OnGatewayConnection,
@@ -8,7 +7,6 @@ import {
   WebSocketGateway,
   WebSocketServer,
 } from "@nestjs/websockets";
-import Redis from "ioredis";
 import { Server, Socket } from "socket.io";
 import { SERVER_SOCKET_PORT } from "src/constants/config";
 import { RedisTableName } from "src/constants/redis-table-name";

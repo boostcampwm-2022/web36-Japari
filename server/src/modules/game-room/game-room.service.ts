@@ -1,7 +1,5 @@
-import { Inject, Injectable, NotFoundException } from "@nestjs/common";
-import Redis from "ioredis";
+import { Injectable } from "@nestjs/common";
 import { RedisTableName } from "src/constants/redis-table-name";
-import { PrismaService } from "src/modules/prisma/prisma.service";
 import { RedisService } from "../redis/redis.service";
 
 @Injectable()
