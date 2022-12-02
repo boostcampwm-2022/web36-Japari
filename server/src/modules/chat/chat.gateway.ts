@@ -14,6 +14,7 @@ import { Server, Socket } from "socket.io";
 import { SERVER_SOCKET_PORT } from "src/constants/config";
 import { RedisTableName } from "src/constants/redis-table-name";
 import { WebsocketBadRequestFilter } from "src/exception-filters/websocket.filter";
+import { RedisService } from "../redis/redis.service";
 import { ChatDto } from "./chat.dto";
 
 @UseFilters(new WebsocketBadRequestFilter("chat/error"))
@@ -22,7 +23,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   @WebSocketServer() public server: Server;
   private logger = new Logger("Chat Gateway");
 
-  constructor(@Inject("RedisProvider") private redis: Redis) {}
+  constructor(private redis: RedisService) {}
 
   afterInit(server: Server) {
     this.logger.verbose("chat gateway initiated");

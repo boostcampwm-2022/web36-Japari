@@ -21,6 +21,7 @@ import { RoomCredentialDto } from "./dto/room-credential.dto";
 import { WebsocketBadRequestFilter, WebsocketExceptionFilter } from "src/exception-filters/websocket.filter";
 import { WebsocketException } from "src/constants/exception";
 import { SERVER_SOCKET_PORT } from "src/constants/config";
+import { RedisService } from "../redis/redis.service";
 
 @UseFilters(new WebsocketBadRequestFilter("game-room/error"))
 @UseFilters(WebsocketExceptionFilter)
@@ -29,7 +30,7 @@ export class GameRoomGateway implements OnGatewayInit, OnGatewayConnection, OnGa
   @WebSocketServer() public server: Server;
   private logger = new Logger("Chat Gateway");
 
-  constructor(@Inject("RedisProvider") private redis: Redis, private prisma: PrismaService) {}
+  constructor(private redis: RedisService, private prisma: PrismaService) {}
 
   afterInit(server: Server) {
     // 매초마다 로비에 있는 유저들에게 방 목록을 전송
