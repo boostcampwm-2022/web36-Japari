@@ -40,3 +40,9 @@ model Friend {
   @@id([fromUserId, toUserId])
 	@@map("friend")
 }
+
+model RefreshTokenBlackList {
+  index Int     @default(autoincrement()) @id @map("user_id")
+  token String  @db.VarChar(500)
+  @@map("refresh_token_black_list")
+}

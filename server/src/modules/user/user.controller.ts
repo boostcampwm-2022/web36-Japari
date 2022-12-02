@@ -11,19 +11,20 @@ import {
   ValidationPipe,
 } from "@nestjs/common";
 import { RequestWithUser } from "express";
-import { AccessTokenGuard } from "../jwt/jwt-access-token.guard";
+import { JwtGuard } from "../jwt/jwt.guard";
 import { NewNickName } from "./dto/new-nickname.dto";
 import { NewProfileImage } from "./dto/new-profile-image.dto";
 import { UserService } from "./user.service";
 
-@UseGuards(AccessTokenGuard)
+@UseGuards(JwtGuard)
 @Controller("user")
 export class UserController {
   constructor(private userService: UserService) {}
 
   @Get("/")
   async getLoggedInUser(@Req() req: RequestWithUser) {
-    return this.userService.findUser(req.user.userId);
+    console.log(req.user);
+    // return this.userService.findUser(req.user.userId);
   }
 
   @Get("/list")

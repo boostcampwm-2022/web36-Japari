@@ -1,8 +1,7 @@
 import { Controller, Get, Param, Post, Query, Req, Res, UseGuards } from "@nestjs/common";
 import { RequestWithUser, RequestWithUserAndRefreshToken, Response } from "express";
 import { AuthService } from "./auth.service";
-import { AccessTokenGuard } from "../jwt/jwt-access-token.guard";
-import { RefreshTokenGuard } from "../jwt/jwt-refresh-token.guard";
+import { JwtGuard } from "../jwt/jwt.guard";
 import { REDIRECT_URI } from "src/constants/config";
 
 @Controller("auth")
@@ -12,12 +11,12 @@ export class AuthController {
   @Get("/login/:site")
   async login(@Param("site") site: string, @Query("code") code: string, @Res() res: Response) {
     const { jwtAccessToken, jwtRefreshToken } = await this.authService.login(site, code);
-    res.cookie("jwt-access-token", jwtAccessToken, { httpOnly: true });
-    res.cookie("jwt-refresh-token", jwtRefreshToken, { httpOnly: true });
+    res.cookie("jwt-access-token", jwtAccessToken, { httpOnly: true, maxAge: 6 * 60 * 1000 });
+    res.cookie("jwt-refresh-token", jwtRefreshToken, { httpOnly: true, maxAge: 14 * 60 * 60 * 1000 });
     res.redirect(REDIRECT_URI);
   }
 
-  @UseGuards(AccessTokenGuard)
+  @UseGuards(JwtGuard)
   @Post("/logout")
   async logout(@Req() req: RequestWithUser, @Res() res: Response) {
     await this.authService.logout(req.user);
@@ -26,15 +25,9 @@ export class AuthController {
     return res.json();
   }
 
-  @UseGuards(AccessTokenGuard)
+  @UseGuards(JwtGuard)
   @Get("/is-login")
   async isLogin() {
     return { isLogin: true };
-  }
-
-  @UseGuards(RefreshTokenGuard)
-  @Get("/refresh-token")
-  async refreshToken(@Req() req: RequestWithUserAndRefreshToken) {
-    return this.authService.refreshJwtTokens(req.user, req.oldRefreshToken);
   }
 }

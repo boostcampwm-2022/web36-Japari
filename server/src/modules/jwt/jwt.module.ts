@@ -1,6 +1,16 @@
-import { JwtModule as JwtModuleBeforeRegister } from "@nestjs/jwt";
+import { Module } from "@nestjs/common";
+import { JwtModule as JwtModuleBeforeRegister, JwtService } from "@nestjs/jwt";
 import { JWT_SECRET_KEY } from "src/constants/config";
+import { PrismaService } from "../prisma/prisma.service";
+import { JwtGuard } from "./jwt.guard";
 
-export const JwtModule = JwtModuleBeforeRegister.register({
-  secret: JWT_SECRET_KEY,
-});
+@Module({
+  imports: [
+    JwtModuleBeforeRegister.register({
+      secret: JWT_SECRET_KEY,
+    }),
+  ],
+  providers: [JwtService, JwtGuard, PrismaService],
+  exports: [JwtService, JwtGuard],
+})
+export class JwtModule {}
