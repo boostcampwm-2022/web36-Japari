@@ -12,11 +12,11 @@ import {
 import { Server, Socket } from "socket.io";
 import { SERVER_SOCKET_PORT } from "src/constants/config";
 import { RedisTableName } from "src/constants/redis-table-name";
-import { WsBadRequestFilter } from "src/exception-filters/websocket.filter";
+import { SocketBadRequestFilter } from "src/exception-filters/websocket.filter";
 import { RedisService } from "../redis/redis.service";
 import { ChatDto } from "./chat.dto";
 
-@UseFilters(new WsBadRequestFilter("chat/error"))
+@UseFilters(new SocketBadRequestFilter("chat/error"))
 @WebSocketGateway(SERVER_SOCKET_PORT, { transports: ["websocket"], namespace: "/" })
 export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer() public server: Server;

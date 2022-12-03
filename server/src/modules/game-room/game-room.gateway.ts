@@ -16,13 +16,13 @@ import { PrismaService } from "../prisma/prisma.service";
 import { v4 as uuid } from "uuid";
 import { RoomSettingDto } from "./dto/room-setting.dto";
 import { RoomCredentialDto } from "./dto/room-credential.dto";
-import { WsBadRequestFilter, WsExceptionFilter } from "src/exception-filters/websocket.filter";
-import { WsException } from "src/constants/exception";
+import { SocketBadRequestFilter, SocketExceptionFilter } from "src/exception-filters/websocket.filter";
+import { SocketException } from "src/constants/exception";
 import { RedisService } from "../redis/redis.service";
 import { SERVER_SOCKET_PORT } from "src/constants/config";
 
-@UseFilters(new WsBadRequestFilter("game-room/error"))
-@UseFilters(WsExceptionFilter)
+@UseFilters(new SocketBadRequestFilter("game-room/error"))
+@UseFilters(SocketExceptionFilter)
 @WebSocketGateway(SERVER_SOCKET_PORT, { transports: ["websocket"], namespace: "/" })
 export class GameRoomGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer() public server: Server;
@@ -101,12 +101,12 @@ export class GameRoomGateway implements OnGatewayInit, OnGatewayConnection, OnGa
 
     // 잘못된 room id
     if (!room) {
-      throw new WsException("game-room/password-failed", "잘못된 room id 입니다.");
+      throw new SocketException("game-room/password-failed", "잘못된 room id 입니다.");
     }
 
     // 잘못된 비밀번호 입력
     if (room.isPrivate && room.password !== password) {
-      throw new WsException("game-room/password-failed", "잘못된 비밀번호입니다.");
+      throw new SocketException("game-room/password-failed", "잘못된 비밀번호입니다.");
     }
 
     // 패스워드를 올바르게 입력했다고 응답
@@ -122,12 +122,12 @@ export class GameRoomGateway implements OnGatewayInit, OnGatewayConnection, OnGa
 
     // 잘못된 room id 접근
     if (!room) {
-      throw new WsException("game-room/join-failed", "잘못된 room id 입니다.");
+      throw new SocketException("game-room/join-failed", "잘못된 room id 입니다.");
     }
 
     // 방 정원 초과
     if (room.participants.length + 1 > room.maximumPeople) {
-      throw new WsException("game-room/join-failed", "방 정원이 초과되었습니다.");
+      throw new SocketException("game-room/join-failed", "방 정원이 초과되었습니다.");
     }
 
     // 유저가 방에 추가되었다는 사실을 Redis에 저장
