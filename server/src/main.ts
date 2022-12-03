@@ -3,7 +3,7 @@ dotenv.config();
 
 import { NestFactory } from "@nestjs/core";
 import { AppModule } from "./app.module";
-import * as cookieParser from "cookie-parser";
+import cookieParser from "cookie-parser";
 import { SERVER_PORT } from "./constants/config";
 
 async function bootstrap() {
