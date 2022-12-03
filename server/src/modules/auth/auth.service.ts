@@ -1,12 +1,13 @@
 import { BadRequestException, Injectable, UnauthorizedException } from "@nestjs/common";
-import { JwtService } from "@nestjs/jwt";
+import { JwtService } from "./jwt/jwt.service";
+
 import { User } from "@prisma/client";
 import { PrismaService } from "src/modules/prisma/prisma.service";
 import { GithubService } from "./github.service";
 
 @Injectable()
 export class AuthService {
-  constructor(private prisma: PrismaService, private jwtService: JwtService, private githubService: GithubService) {}
+  constructor(private prisma: PrismaService, private jwt: JwtService, private githubService: GithubService) {}
 
   async login(site: string, code: string) {
     let email: string;
@@ -51,8 +52,8 @@ export class AuthService {
   async createTokens(user: User) {
     const { userId } = user;
     const payload = { userId };
-    const jwtAccessToken = this.jwtService.sign(payload, { expiresIn: "3h" });
-    const jwtRefreshToken = this.jwtService.sign(payload, { expiresIn: "14d" });
+    const jwtAccessToken = this.jwt.sign(payload, { expiresIn: "3h" });
+    const jwtRefreshToken = this.jwt.sign(payload, { expiresIn: "14d" });
 
     return { jwtAccessToken, jwtRefreshToken };
   }

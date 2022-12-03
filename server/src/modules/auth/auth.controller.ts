@@ -1,7 +1,7 @@
 import { Controller, Get, Param, Post, Query, Req, Res, UseGuards } from "@nestjs/common";
 import { RequestWithUser, RequestWithUserAndRefreshToken, Response } from "express";
 import { AuthService } from "./auth.service";
-import { JwtGuard } from "../jwt/jwt.guard";
+import { JwtGuard } from "./jwt/jwt.guard";
 import { REDIRECT_URI } from "src/constants/config";
 
 @Controller("auth")
@@ -13,6 +13,7 @@ export class AuthController {
     const { jwtAccessToken, jwtRefreshToken } = await this.authService.login(site, code);
     res.cookie("jwt-access-token", jwtAccessToken, { httpOnly: true, maxAge: 6 * 60 * 1000 });
     res.cookie("jwt-refresh-token", jwtRefreshToken, { httpOnly: true, maxAge: 14 * 60 * 60 * 1000 });
+    console.log("whoo");
     res.redirect(REDIRECT_URI);
   }
 
@@ -28,6 +29,7 @@ export class AuthController {
   @UseGuards(JwtGuard)
   @Get("/is-login")
   async isLogin() {
+    console.log("herer");
     return { isLogin: true };
   }
 }

@@ -7,7 +7,7 @@ import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
 import { RedisModule } from "./modules/redis/redis.module";
 import { AppGateway } from "./app.gateway";
-import { JwtModule } from "./modules/jwt/jwt.module";
+import { JwtModule } from "./modules/auth/jwt/jwt.module";
 import { UserModule } from "./modules/user/user.module";
 import { GameRoomModule } from "./modules/game-room/game-room.module";
 

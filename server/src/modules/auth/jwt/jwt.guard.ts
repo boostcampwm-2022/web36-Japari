@@ -1,8 +1,9 @@
 import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from "@nestjs/common";
-import { JwtService } from "@nestjs/jwt";
+import { JwtService } from "./jwt.service";
+
 import { Request, Response } from "express";
 import { JwtError } from "src/constants/jwt-error";
-import { PrismaService } from "../prisma/prisma.service";
+import { PrismaService } from "../../prisma/prisma.service";
 
 @Injectable()
 export class JwtGuard implements CanActivate {
@@ -11,7 +12,6 @@ export class JwtGuard implements CanActivate {
   async canActivate(context: ExecutionContext) {
     const req: Request = context.switchToHttp().getRequest();
     const res: Response = context.switchToHttp().getResponse();
-    // console.log(req.user);
     const accessToken = req.cookies["jwt-access-token"];
     const refreshToken = req.cookies["jwt-refresh-token"];
 
@@ -24,8 +24,9 @@ export class JwtGuard implements CanActivate {
       const { userId } = payload;
 
       // 2-A. access token이 유효하므로 req에 유저 정보를 넣어주고 통과시킨다.
-      const user = await this.prisma.user.findUnique({ where: userId });
+      const user = await this.prisma.user.findFirst({ where: { userId } });
       req.user = user;
+
       return true;
     } catch (err) {
       switch (err.name) {
@@ -39,7 +40,7 @@ export class JwtGuard implements CanActivate {
       }
     }
 
-    // access token이 만료 되었다.
+    /* access token이 만료 되었다. */
 
     // 3. refresh token이 없다면 Unauthorized.
     if (!refreshToken) {

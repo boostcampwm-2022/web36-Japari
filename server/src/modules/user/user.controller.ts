@@ -11,7 +11,7 @@ import {
   ValidationPipe,
 } from "@nestjs/common";
 import { RequestWithUser } from "express";
-import { JwtGuard } from "../jwt/jwt.guard";
+import { JwtGuard } from "../auth/jwt/jwt.guard";
 import { NewNickName } from "./dto/new-nickname.dto";
 import { NewProfileImage } from "./dto/new-profile-image.dto";
 import { UserService } from "./user.service";
@@ -23,8 +23,7 @@ export class UserController {
 
   @Get("/")
   async getLoggedInUser(@Req() req: RequestWithUser) {
-    console.log(req.user);
-    // return this.userService.findUser(req.user.userId);
+    return this.userService.findUser(req.user.userId);
   }
 
   @Get("/list")
