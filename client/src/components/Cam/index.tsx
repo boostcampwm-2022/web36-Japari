@@ -2,6 +2,7 @@
 import * as style from "./styles";
 
 export interface CamProps {
+  videoRef?: React.LegacyRef<HTMLVideoElement>;
   isVideoOn: boolean;
   isAudioOn: boolean;
   profile: string;
@@ -13,11 +14,12 @@ export interface ProfileProps {
   profile: string;
 }
 
-const Cam = ({ isVideoOn, isAudioOn, profile, nickname, scoreRank }: CamProps) => {
+const Cam = ({ videoRef, isVideoOn, isAudioOn, profile, nickname, scoreRank }: CamProps) => {
+  console.log(videoRef);
   return (
     <div css={style.camContainerStyle}>
       <div css={style.camWrapperStyle}>
-        <video autoPlay playsInline></video>
+        <video ref={videoRef} autoPlay playsInline></video>
         {!isVideoOn && <Profile profile={profile} />}
       </div>
       <span css={style.camNickNameStyle}>{nickname}</span>
