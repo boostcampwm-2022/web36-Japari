@@ -80,7 +80,10 @@ const Camtest = () => {
   };
 
   const joinRoom = () => {
-    socket.emit("media/joinRoom", roomId);
+    socket.emit("media/joinRoom", { roomId }, (data: { rtpCapabilities: RtpCapabilities }) => {
+      rtpCapabilites = data.rtpCapabilities;
+      createDevice();
+    });
   };
 
   const createDevice = async () => {
@@ -95,13 +98,16 @@ const Camtest = () => {
   };
 
   const createSendTransport = async () => {
-    socket.emit("media/createWebRtcTransport", { consumer: false });
+    socket.emit("media/createWebRtcTransport", { consumer: false }, (transportOptions: TransportOptions) => {
+      const producerTransport = device.createSendTransport(transportOptions);
+      handleCreateProducerTransport(producerTransport);
+    });
   };
 
-  const handleCreateWebRtcTransportSuccess = (producerTransport: Transport) => {
+  const handleCreateProducerTransport = (producerTransport: Transport) => {
     producerTransport.on("connect", ({ dtlsParameters }, cb, eb) => {
       try {
-        socket.emit("transport-connect", { dtlsParameters });
+        socket.emit("media/transport-connect", { dtlsParameters });
         cb();
       } catch (error: any) {
         eb(error);
@@ -112,10 +118,12 @@ const Camtest = () => {
       try {
         socket.emit(
           "media/transport-produce",
-          { kind: parameters.kind, rtpCapabilites: parameters.rtpParameters, appData: parameters.appData },
-          (id: string, producerExist: boolean) => {
-            cb({ id });
-            if (producerExist) getProducers();
+          { kind: parameters.kind, rtpParameters: parameters.rtpParameters, appData: parameters.appData },
+          ({ duplicated, id, producersExist }: { duplicated: boolean; id: string; producersExist: boolean }) => {
+            if (!duplicated) {
+              cb({ id });
+              if (producersExist) getProducers();
+            }
           }
         );
       } catch (error: any) {
@@ -132,25 +140,27 @@ const Camtest = () => {
   };
 
   const getProducers = () => {
-    socket.emit("getProducers");
+    socket.emit("media/getProducers", (producerList: string[]) => {
+      producerList.forEach(signalNewConsumerTransport);
+    });
   };
 
-  const signalNewConsumerTransport = async (remoteProduceId: string) => {
-    socket.emit("createWebRtcTransport", { consumer: true }, (params: TransportOptions) => {
+  const signalNewConsumerTransport = async (remoteProducerId: string) => {
+    socket.emit("media/createWebRtcTransport", { consumer: true }, (transportOptions: TransportOptions) => {
       try {
-        let consumerTransport = device.createRecvTransport(params);
+        let consumerTransport = device.createRecvTransport(transportOptions);
         consumerTransport.on("connect", ({ dtlsParameters }, cb, eb) => {
           try {
-            socket.emit("transport-recv-connect", {
+            socket.emit("media/transport-recv-connect", {
               dtlsParameters,
-              serverConsumerTransportId: params.id,
+              serverConsumerTransportId: transportOptions.id,
             });
             cb();
           } catch (error: any) {
             eb(error);
           }
         });
-        connectRecvTransport(consumerTransport, remoteProduceId, params.id);
+        connectRecvTransport(consumerTransport, remoteProducerId, transportOptions.id);
       } catch (err) {
         console.log(err);
         return;
@@ -160,32 +170,34 @@ const Camtest = () => {
 
   const connectRecvTransport = (
     consumerTransport: Transport,
-    remoteProduceId: string,
+    remoteProducerId: string,
     serverConsumerTransportId: string
   ) => {
+    console.log("connectRecvTransport");
     socket.emit(
-      "consume",
+      "media/consume",
       {
-        rtpCapabilites: device.rtpCapabilities,
-        remoteProduceId,
+        rtpCapabilities: device.rtpCapabilities,
+        remoteProducerId,
         serverConsumerTransportId,
       },
       async (params: ConsumerOptions) => {
+        console.log(params);
         const consumer = await consumerTransport.consume(params);
 
         setConsumerTransports((current: ConsumerTransport[]) => [
-          ...consumerTransports,
+          ...current,
           {
             consumerTransport,
             serverConsumerTransportId: params.id,
-            producerId: remoteProduceId,
+            producerId: remoteProducerId,
             consumer,
           },
         ]);
 
         const { track } = consumer;
-        setCams(current => [...current, remoteProduceId]);
-        const refIndex = cams.indexOf(remoteProduceId);
+        setCams(current => [...current, remoteProducerId]);
+        const refIndex = cams.indexOf(remoteProducerId);
         remoteVideoRef.current[refIndex].srcObject = new MediaStream([track]);
       }
     );
@@ -193,28 +205,11 @@ const Camtest = () => {
 
   useEffect(() => {
     getLocalStream();
-    socket.on("media/joinRoom-success", (data: { rtpCapabilities: RtpCapabilities }) => {
-      rtpCapabilites = data.rtpCapabilities;
-      createDevice();
-    });
-    socket.on("media/createWebRtcTransport-success", (params: TransportOptions) => {
-      console.log(params);
-      const producerTransport = device.createSendTransport(params);
-      handleCreateWebRtcTransportSuccess(producerTransport);
-    });
-    socket.on("media/getProducers-success", producerList => {
-      producerList.forEach(signalNewConsumerTransport);
-    });
-    socket.on("new-producer", ({ producerId }) => {
+    socket.on("media/new-producer", ({ producerId }) => {
       signalNewConsumerTransport(producerId);
     });
-    socket.emit("media/join");
     return () => {
-      socket.off("media/join-success");
-      socket.off("media/joinRoom-success");
-      socket.off("media/createWebRtcTransport-success");
-      socket.off("media/getProducers-success");
-      socket.off("new-producer");
+      socket.off("media/new-producer");
       socket.emit("media/disconnect");
     };
   }, []);
@@ -225,6 +220,7 @@ const Camtest = () => {
       {cams.map((cam, idx) => {
         return (
           <Cam
+            key={idx}
             videoRef={(el: HTMLVideoElement) => {
               if (el) remoteVideoRef.current[idx] = el;
             }}
