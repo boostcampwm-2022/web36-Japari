@@ -11,8 +11,9 @@ import {
 } from "@nestjs/websockets";
 import { Server, Socket } from "socket.io";
 import { SERVER_SOCKET_PORT } from "src/constants/config";
-import { RedisTableName } from "src/constants/redis-table-name";
+import { CatchMindState, RedisTableName } from "src/constants/enum";
 import { SocketBadRequestFilter } from "src/exception-filters/websocket.filter";
+import { CatchMindService } from "../play/catch-mind.service";
 import { RedisService } from "../redis/redis.service";
 import { ChatDto } from "./chat.dto";
 
@@ -22,7 +23,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   @WebSocketServer() public server: Server;
   private logger = new Logger("Chat Gateway");
 
-  constructor(private redis: RedisService) {}
+  constructor(private redis: RedisService, private catchMindService: CatchMindService) {}
 
   afterInit(server: Server) {
     this.logger.verbose("chat gateway initiated");
@@ -32,7 +33,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   @SubscribeMessage("chat/lobby")
   async handleLobbyChat(@ConnectedSocket() socket: Socket, @MessageBody() data: ChatDto) {
     const { message, sendTime } = data;
-    const userInfo = JSON.parse(await this.redis.hget(RedisTableName.SOCKET_ID_TO_USER_INFO, socket.id));
+    const userInfo = await this.redis.getFrom(RedisTableName.SOCKET_ID_TO_USER_INFO, socket.id);
     socket.to("lobby").emit("chat/lobby", {
       sender: userInfo.nickname,
       message,
@@ -43,8 +44,16 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   @UsePipes(ValidationPipe)
   @SubscribeMessage("chat/room")
   async handleRoomChat(@ConnectedSocket() socket: Socket, @MessageBody() data: ChatDto) {
+    // 캐치마인드 게임 중일 경우 catchMindService에 처리를 위임한다.
+    const { roomId } = await this.redis.getFrom(RedisTableName.SOCKET_ID_TO_USER_INFO, socket.id);
+    const playData = await this.redis.getFrom(RedisTableName.PLAY_DATA, roomId);
+    if (playData && playData.gameId === 1 && playData.state === CatchMindState.DRAW) {
+      this.catchMindService.judge(socket, roomId, data.message);
+      return;
+    }
+
     const { message, sendTime } = data;
-    const userInfo = JSON.parse(await this.redis.hget(RedisTableName.SOCKET_ID_TO_USER_INFO, socket.id));
+    const userInfo = await this.redis.getFrom(RedisTableName.SOCKET_ID_TO_USER_INFO, socket.id);
 
     socket.to(userInfo.roomId).emit("chat/room", {
       sender: userInfo.nickname,

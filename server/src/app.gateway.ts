@@ -9,7 +9,7 @@ import {
 } from "@nestjs/websockets";
 import { Server, Socket } from "socket.io";
 import { SERVER_SOCKET_PORT } from "./constants/config";
-import { RedisTableName } from "./constants/redis-table-name";
+import { RedisTableName } from "./constants/enum";
 import { GameRoomGateway } from "./modules/game-room/game-room.gateway";
 import { PrismaService } from "./modules/prisma/prisma.service";
 import { RedisService } from "./modules/redis/redis.service";
@@ -49,17 +49,13 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
     };
 
     socket.join("lobby");
-    this.redis.hset(
-      RedisTableName.SOCKET_ID_TO_USER_INFO,
-      socket.id,
-      JSON.stringify({ ...userPublicInfo, userId, roomId: "lobby" })
-    );
-    this.redis.hset(RedisTableName.ONLINE_USERS, userId, JSON.stringify({ ...userPublicInfo, socketId: socket.id }));
+    this.redis.setTo(RedisTableName.SOCKET_ID_TO_USER_INFO, socket.id, { ...userPublicInfo, userId, roomId: "lobby" });
+    this.redis.setTo(RedisTableName.ONLINE_USERS, String(userId), { ...userPublicInfo, socketId: socket.id });
   }
 
   async handleDisconnect(@ConnectedSocket() socket: Socket) {
     await this.gameRoomGateway.exit(socket);
-    const { userId } = JSON.parse(await this.redis.hget(RedisTableName.SOCKET_ID_TO_USER_INFO, socket.id));
+    const { userId } = await this.redis.getFrom(RedisTableName.SOCKET_ID_TO_USER_INFO, socket.id);
     this.redis.hdel(RedisTableName.SOCKET_ID_TO_USER_INFO, socket.id);
     this.redis.hdel(RedisTableName.ONLINE_USERS, userId);
   }

@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
-import { RedisTableName } from "src/constants/redis-table-name";
+import { RedisTableName } from "src/constants/enum";
 import { PrismaService } from "src/modules/prisma/prisma.service";
 import { RedisService } from "../redis/redis.service";
 

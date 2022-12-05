@@ -10,7 +10,7 @@ import {
   WebSocketServer,
 } from "@nestjs/websockets";
 import { Server, Socket } from "socket.io";
-import { RedisTableName } from "src/constants/redis-table-name";
+import { RedisTableName } from "src/constants/enum";
 import { redisRecordToObject } from "util/convert";
 import { PrismaService } from "../prisma/prisma.service";
 import { v4 as uuid } from "uuid";
@@ -66,11 +66,15 @@ export class GameRoomGateway implements OnGatewayInit, OnGatewayConnection, OnGa
     const { minimumPeople } = await this.prisma.game.findUnique({ where: { gameId } });
 
     // 새로운 방을 redis에 저장
-    await this.redis.hset(
-      RedisTableName.GAME_ROOMS,
-      roomId,
-      JSON.stringify({ title, gameId, maximumPeople, isPrivate, password, minimumPeople, participants: [] })
-    );
+    await this.redis.setTo(RedisTableName.GAME_ROOMS, roomId, {
+      title,
+      gameId,
+      maximumPeople,
+      isPrivate,
+      password,
+      minimumPeople,
+      participants: [],
+    });
 
     socket.emit("game-room/create-success", { roomId });
   }
@@ -78,12 +82,12 @@ export class GameRoomGateway implements OnGatewayInit, OnGatewayConnection, OnGa
   @UsePipes(ValidationPipe)
   @SubscribeMessage("game-room/modify")
   async modify(@ConnectedSocket() socket: Socket, @MessageBody() data: RoomSettingDto) {
-    const { roomId } = JSON.parse(await this.redis.hget(RedisTableName.SOCKET_ID_TO_USER_INFO, socket.id));
-    const room = JSON.parse(await this.redis.hget(RedisTableName.GAME_ROOMS, roomId));
+    const { roomId } = await this.redis.getFrom(RedisTableName.SOCKET_ID_TO_USER_INFO, socket.id);
+    const room = await this.redis.getFrom(RedisTableName.GAME_ROOMS, roomId);
     const newRoom = { ...room, ...data };
 
     // 방 설정 변경
-    this.redis.hset(RedisTableName.GAME_ROOMS, roomId, JSON.stringify(newRoom));
+    this.redis.setTo(RedisTableName.GAME_ROOMS, roomId, newRoom);
 
     // 방 설정 변경 사실을 방에 있는 모든 유저에게 전달
     this.server.to(roomId).emit("game-room/info", {
@@ -97,7 +101,7 @@ export class GameRoomGateway implements OnGatewayInit, OnGatewayConnection, OnGa
   async checkPassword(@ConnectedSocket() socket, @MessageBody() data: RoomCredentialDto) {
     const { roomId, password } = data;
 
-    const room = JSON.parse(await this.redis.hget(RedisTableName.GAME_ROOMS, roomId));
+    const room = await this.redis.getFrom(RedisTableName.GAME_ROOMS, roomId);
 
     // 잘못된 room id
     if (!room) {
@@ -118,7 +122,7 @@ export class GameRoomGateway implements OnGatewayInit, OnGatewayConnection, OnGa
   @UsePipes(ValidationPipe)
   @SubscribeMessage("game-room/join")
   async join(@ConnectedSocket() socket, @MessageBody("roomId") roomId: string) {
-    const room = JSON.parse(await this.redis.hget(RedisTableName.GAME_ROOMS, roomId));
+    const room = await this.redis.getFrom(RedisTableName.GAME_ROOMS, roomId);
 
     // 잘못된 room id 접근
     if (!room) {
@@ -131,10 +135,10 @@ export class GameRoomGateway implements OnGatewayInit, OnGatewayConnection, OnGa
     }
 
     // 유저가 방에 추가되었다는 사실을 Redis에 저장
-    const user = JSON.parse(await this.redis.hget(RedisTableName.SOCKET_ID_TO_USER_INFO, socket.id));
-    room.participants.push(user);
-    await this.redis.hset(RedisTableName.SOCKET_ID_TO_USER_INFO, socket.id, JSON.stringify({ ...user, roomId }));
-    await this.redis.hset(RedisTableName.GAME_ROOMS, roomId, JSON.stringify(room));
+    const user = await this.redis.getFrom(RedisTableName.SOCKET_ID_TO_USER_INFO, socket.id);
+    room.participants.push({ ...user, socketId: socket.id });
+    await this.redis.updateTo(RedisTableName.SOCKET_ID_TO_USER_INFO, socket.id, { roomId });
+    await this.redis.setTo(RedisTableName.GAME_ROOMS, roomId, room);
 
     socket.join(roomId);
     socket.leave("lobby");
@@ -148,25 +152,25 @@ export class GameRoomGateway implements OnGatewayInit, OnGatewayConnection, OnGa
 
   @SubscribeMessage("game-room/exit")
   async exit(@ConnectedSocket() socket: Socket) {
-    const { roomId } = JSON.parse(await this.redis.hget(RedisTableName.SOCKET_ID_TO_USER_INFO, socket.id));
+    const { roomId } = await this.redis.getFrom(RedisTableName.SOCKET_ID_TO_USER_INFO, socket.id);
     if (!roomId || roomId === "lobby") return;
 
-    const room = JSON.parse(await this.redis.hget(RedisTableName.GAME_ROOMS, roomId));
+    const room = await this.redis.getFrom(RedisTableName.GAME_ROOMS, roomId);
 
     // 유저를 방에서 제거
-    const { email } = JSON.parse(await this.redis.hget(RedisTableName.SOCKET_ID_TO_USER_INFO, socket.id));
+    const { email } = await this.redis.getFrom(RedisTableName.SOCKET_ID_TO_USER_INFO, socket.id);
     room.participants = room.participants.filter(user => user.email !== email);
     socket.leave(roomId);
-    await this.redis.hset(RedisTableName.GAME_ROOMS, roomId, JSON.stringify(room));
+    await this.redis.setTo(RedisTableName.GAME_ROOMS, roomId, room);
     if (room.participants.length === 0) {
       this.redis.hdel(RedisTableName.GAME_ROOMS, roomId);
     }
 
     // 유저를 로비로 보낸다
     socket.join("lobby");
-    const userInfo = JSON.parse(await this.redis.hget(RedisTableName.SOCKET_ID_TO_USER_INFO, socket.id));
+    const userInfo = await this.redis.getFrom(RedisTableName.SOCKET_ID_TO_USER_INFO, socket.id);
     userInfo.roomId = "lobby";
-    await this.redis.hset(RedisTableName.SOCKET_ID_TO_USER_INFO, socket.id, JSON.stringify(userInfo));
+    await this.redis.setTo(RedisTableName.SOCKET_ID_TO_USER_INFO, socket.id, userInfo);
 
     // 유저가 나갔다는 소식을 방에 남게 될 모든 유저에게 전달
     socket.to(roomId).emit("game-room/info", {
