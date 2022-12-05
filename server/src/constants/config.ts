@@ -1,1 +1,14 @@
+export const {
+  REDIRECT_URI,
+  OAUTH_GITHUB_CLIENT_ID,
+  OAUTH_GITHUB_CLIENT_SECRET,
+  OAUTH_GITHUB_ACCESS_TOKEN_API,
+  OAUTH_GITHUB_EMAIL_API,
+  JWT_SECRET_KEY,
+  REDIS_HOST,
+  REDIS_PASSWORD,
+} = process.env;
+
+export const SERVER_PORT = Number(process.env.SERVER_PORT);
 export const SERVER_SOCKET_PORT = Number(process.env.SERVER_SOCKET_PORT);
+export const REDIS_PORT = Number(process.env.REDIS_PORT);

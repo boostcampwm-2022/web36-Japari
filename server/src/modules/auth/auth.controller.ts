@@ -1,40 +1,29 @@
-import { Controller, Get, Param, Post, Query, Redirect, Req, Res, UseGuards } from "@nestjs/common";
-import { RequestWithUser, RequestWithUserAndRefreshToken, Response } from "express";
+import { Controller, Get, Param, Post, Query, Req, Res, UseGuards } from "@nestjs/common";
+import { Request, Response } from "express";
 import { AuthService } from "./auth.service";
-import { AccessTokenGuard } from "../jwt/jwt-access-token.guard";
-import { RefreshTokenGuard } from "../jwt/jwt-refresh-token.guard";
-import { ConfigService } from "@nestjs/config";
+import { JwtGuard } from "./jwt/jwt.guard";
+import { REDIRECT_URI } from "src/constants/config";
 
 @Controller("auth")
 export class AuthController {
-  constructor(private authService: AuthService, private config: ConfigService) {}
+  constructor(private authService: AuthService) {}
 
   @Get("/login/:site")
   async login(@Param("site") site: string, @Query("code") code: string, @Res() res: Response) {
-    const { jwtAccessToken, jwtRefreshToken } = await this.authService.login(site, code);
-    res.cookie("jwt-access-token", jwtAccessToken, { httpOnly: true });
-    res.cookie("jwt-refresh-token", jwtRefreshToken, { httpOnly: true });
-    res.redirect(this.config.get<string>("REDIRECT_URI"));
+    await this.authService.login(site, code, res);
+    return res.redirect(REDIRECT_URI);
   }
 
-  @UseGuards(AccessTokenGuard)
+  @UseGuards(JwtGuard)
   @Post("/logout")
-  async logout(@Req() req: RequestWithUser, @Res() res: Response) {
-    await this.authService.logout(req.user);
-    res.clearCookie("jwt-access-token");
-    res.clearCookie("jwt-refresh-token");
+  async logout(@Req() req: Request, @Res() res: Response) {
+    await this.authService.logout(req, res);
     return res.json();
   }
 
-  @UseGuards(AccessTokenGuard)
+  @UseGuards(JwtGuard)
   @Get("/is-login")
   async isLogin() {
     return { isLogin: true };
-  }
-
-  @UseGuards(RefreshTokenGuard)
-  @Get("/refresh-token")
-  async refreshToken(@Req() req: RequestWithUserAndRefreshToken) {
-    return this.authService.refreshJwtTokens(req.user, req.oldRefreshToken);
   }
 }

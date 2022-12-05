@@ -5,9 +5,10 @@ import { GameController } from "./game.controller";
 import { GameService } from "./game.service";
 import { PrismaModule } from "src/modules/prisma/prisma.module";
 import { RedisModule } from "../redis/redis.module";
+import { JwtModule } from "../auth/jwt/jwt.module";
 
 @Module({
-  imports: [PrismaModule, RedisModule],
+  imports: [PrismaModule],
   controllers: [GameController],
   providers: [GameService],
 })
