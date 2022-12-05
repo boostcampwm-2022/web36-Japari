@@ -29,7 +29,6 @@ const NickNameSetting = ({ closeModal }: NickNameSettingProps) => {
         return;
       })
       .then(data => {
-        // console.log(user);
         setUser({ ...(user as User), nickname: data.nickname });
       });
     alert("닉네임 설정이 완료되었습니다.");
