@@ -24,49 +24,78 @@ export default function CatchMind() {
   const [scores, setScores] = useState<Map<number, number>>(new Map<number, number>());
   const [survivors, setSurvivors] = useState<number[]>([]);
 
-  const getCoordinates = (event: MouseEvent): Coordinate | undefined => {
+  const getCoordinates = (e: MouseEvent): Coordinate | undefined => {
+    if (!canvasRef.current) return;
     const canvas = canvasRef.current as HTMLCanvasElement;
     if (!canvas) return;
     return {
-      x: event.pageX - canvas.offsetLeft,
-      y: event.pageY - canvas.offsetTop,
+      x: e.pageX - canvas.offsetLeft,
+      y: e.pageY - canvas.offsetTop,
     };
   };
 
   const startDrawing = useCallback((e: MouseEvent) => {
     const coordinates = getCoordinates(e);
     if (coordinates) {
+      console.log(1);
       setIsDrawing(true);
       setPosition(coordinates);
     }
   }, []);
 
-  const drawPaints = useCallback((curPosition: Coordinate, nextPosition: Coordinate) => {
-    //
-  }, []);
+  const drawPaints = (curPosition: Coordinate, nextPosition: Coordinate) => {
+    if (!canvasRef.current) return;
+    const canvas: HTMLCanvasElement = canvasRef.current;
+    const ctx = canvas.getContext("2d");
+    console.log(4);
+    if (!ctx) return;
+    ctx.strokeStyle = "red";
+    ctx.lineWidth = 2.5;
+    console.log(5);
+    ctx.beginPath();
+    ctx.moveTo(curPosition.x, curPosition.y);
+    ctx.lineTo(nextPosition.x, nextPosition.y);
+    ctx.closePath();
+    ctx.stroke();
+  };
 
-  const onDrawing = useCallback((e: MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (isDrawing) {
-      const nextPosition = getCoordinates(e);
-      if (position && nextPosition) {
-        drawPaints(position, nextPosition);
+  const onDrawing = useCallback(
+    (e: MouseEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+      console.log(2);
+      if (isDrawing) {
+        const nextPosition = getCoordinates(e);
+        if (position && nextPosition) {
+          console.log(3);
+          drawPaints(position, nextPosition);
+          setPosition(nextPosition);
+        }
       }
-    }
+    },
+    [isDrawing, position]
+  );
+
+  const exitPaint = useCallback(() => {
+    setIsDrawing(false);
+    console.log(6);
   }, []);
 
   useEffect(() => {
+    if (!canvasRef.current) return;
     const canvas = canvasRef.current as HTMLCanvasElement;
-    const ctx = canvas.getContext("2d");
-    if (!canvas) return;
-    if (!ctx) return;
-    // ctx.strokeStyle = "black";
-    // ctx.lineWidth = 2.5;
 
     canvas.addEventListener("mousedown", startDrawing);
-    canvas.addEventListener("mousedown", onDrawing);
-  }, []);
+    canvas.addEventListener("mousemove", onDrawing);
+    canvas.addEventListener("mouseup", exitPaint);
+    canvas.addEventListener("mouseleave", exitPaint);
+    return () => {
+      canvas.removeEventListener("mousedown", startDrawing);
+      canvas.removeEventListener("mousemove", onDrawing);
+      canvas.removeEventListener("mouseup", exitPaint);
+      canvas.removeEventListener("mouseleave", exitPaint);
+    };
+  }, [startDrawing, onDrawing, exitPaint]);
 
   return (
     <div css={style.gameWrapperStyle}>
