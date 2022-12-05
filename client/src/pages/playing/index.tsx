@@ -5,7 +5,7 @@ import { Page } from "../../components/Page";
 import { camList } from "../dummy";
 import InGameCamList from "../../components/InGameCamList";
 import Chatting from "../../components/Chatting";
-import Canvas from "../../components/canvas";
+import Game from "../../components/Game";
 
 const PlayingPage: React.FC = () => {
   // user 정보 로직
@@ -18,8 +18,7 @@ const PlayingPage: React.FC = () => {
         <InGameCamList camList={camsLeft} />
         <div css={style.GameAndChatContainerStyle}>
           <div css={style.GameContainerStyle}>
-            게임
-            <Canvas />
+            <Game gameId={1} />
           </div>
           <Chatting />
         </div>
