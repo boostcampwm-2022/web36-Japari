@@ -80,10 +80,6 @@ const Camtest = () => {
   };
 
   const joinRoom = () => {
-    socket.on("media/joinRoom-success", (data: { rtpCapabilities: RtpCapabilities }) => {
-      rtpCapabilites = data.rtpCapabilities;
-      createDevice();
-    });
     socket.emit("media/joinRoom", roomId);
   };
 
@@ -99,38 +95,35 @@ const Camtest = () => {
   };
 
   const createSendTransport = async () => {
-    socket.on("media/createWebRtcTransport-success", ({ params }: { params: TransportOptions }) => {
-      let producerTransport = device.createSendTransport(params);
-      console.log(producerTransport);
+    socket.emit("media/createWebRtcTransport", { consumer: false });
+  };
 
-      producerTransport.on("connect", ({ dtlsParameters }, cb, eb) => {
-        try {
-          socket.emit("transport-connect", { dtlsParameters });
-          cb();
-        } catch (error: any) {
-          eb(error);
-        }
-      });
-
-      producerTransport.on("produce", (parameters, cb, eb) => {
-        try {
-          socket.emit(
-            "transport-produce",
-            { kind: parameters.kind, rtpCapabilites: parameters.rtpParameters, appData: parameters.appData },
-            (id: string, producerExist: boolean) => {
-              cb({ id });
-              if (producerExist) getProducers();
-            }
-          );
-        } catch (error: any) {
-          eb(error);
-        }
-      });
-
-      connectSendTransport(producerTransport);
+  const handleCreateWebRtcTransportSuccess = (producerTransport: Transport) => {
+    producerTransport.on("connect", ({ dtlsParameters }, cb, eb) => {
+      try {
+        socket.emit("transport-connect", { dtlsParameters });
+        cb();
+      } catch (error: any) {
+        eb(error);
+      }
     });
 
-    socket.emit("media/createWebRtcTransport", { consumer: false });
+    producerTransport.on("produce", (parameters, cb, eb) => {
+      try {
+        socket.emit(
+          "media/transport-produce",
+          { kind: parameters.kind, rtpCapabilites: parameters.rtpParameters, appData: parameters.appData },
+          (id: string, producerExist: boolean) => {
+            cb({ id });
+            if (producerExist) getProducers();
+          }
+        );
+      } catch (error: any) {
+        eb(error);
+      }
+    });
+
+    connectSendTransport(producerTransport);
   };
 
   const connectSendTransport = async (producerTransport: Transport) => {
@@ -139,9 +132,7 @@ const Camtest = () => {
   };
 
   const getProducers = () => {
-    socket.emit("getProducers", (producers: string[]) => {
-      producers.forEach(signalNewConsumerTransport);
-    });
+    socket.emit("getProducers");
   };
 
   const signalNewConsumerTransport = async (remoteProduceId: string) => {
@@ -202,15 +193,29 @@ const Camtest = () => {
 
   useEffect(() => {
     getLocalStream();
-    socket.on("video-join-success", data => {
-      getLocalStream();
+    socket.on("media/joinRoom-success", (data: { rtpCapabilities: RtpCapabilities }) => {
+      rtpCapabilites = data.rtpCapabilities;
+      createDevice();
+    });
+    socket.on("media/createWebRtcTransport-success", (params: TransportOptions) => {
+      console.log(params);
+      const producerTransport = device.createSendTransport(params);
+      handleCreateWebRtcTransportSuccess(producerTransport);
+    });
+    socket.on("media/getProducers-success", producerList => {
+      producerList.forEach(signalNewConsumerTransport);
     });
     socket.on("new-producer", ({ producerId }) => {
       signalNewConsumerTransport(producerId);
     });
+    socket.emit("media/join");
     return () => {
-      socket.off("video-join-success");
-      // socket.emit("media/disconnect");
+      socket.off("media/join-success");
+      socket.off("media/joinRoom-success");
+      socket.off("media/createWebRtcTransport-success");
+      socket.off("media/getProducers-success");
+      socket.off("new-producer");
+      socket.emit("media/disconnect");
     };
   }, []);
 
