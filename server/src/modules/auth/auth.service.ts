@@ -1,14 +1,14 @@
 import { BadRequestException, Injectable, UnauthorizedException } from "@nestjs/common";
-import { JwtService } from "@nestjs/jwt";
-import { User } from "@prisma/client";
+import { JwtService } from "./jwt/jwt.service";
+import { Request, Response } from "express";
 import { PrismaService } from "src/modules/prisma/prisma.service";
 import { GithubService } from "./github.service";
 
 @Injectable()
 export class AuthService {
-  constructor(private prisma: PrismaService, private jwtService: JwtService, private githubService: GithubService) {}
+  constructor(private prisma: PrismaService, private jwt: JwtService, private githubService: GithubService) {}
 
-  async login(site: string, code: string) {
+  async login(site: string, code: string, res: Response) {
     let email: string;
     switch (site) {
       case "github":
@@ -19,7 +19,7 @@ export class AuthService {
       case "naver":
         return;
       case "google":
-        break;
+        return;
       default:
         throw new BadRequestException(`${site} 로그인 기능은 제공하지 않습니다.`);
     }
@@ -30,10 +30,7 @@ export class AuthService {
       user = await this.signup(email);
     }
 
-    // jwt
-    const { jwtAccessToken, jwtRefreshToken } = await this.createTokens(user);
-    this.saveRefreshTokenToDB(user, jwtRefreshToken);
-    return { jwtAccessToken, jwtRefreshToken };
+    return this.jwt.issueTokens(user.userId, res);
   }
 
   async signup(email: string) {
@@ -44,31 +41,7 @@ export class AuthService {
     });
   }
 
-  async logout(user: User) {
-    return this.saveRefreshTokenToDB(user, null);
-  }
-
-  async createTokens(user: User) {
-    const { userId } = user;
-    const payload = { userId };
-    const jwtAccessToken = this.jwtService.sign(payload, { expiresIn: "3h" });
-    const jwtRefreshToken = this.jwtService.sign(payload, { expiresIn: "7d" });
-
-    return { jwtAccessToken, jwtRefreshToken };
-  }
-
-  async saveRefreshTokenToDB(user: User, jwtRefreshToken: string) {
-    await this.prisma.user.update({
-      where: { userId: user.userId },
-      data: { jwtRefreshToken },
-    });
-  }
- 
-  async refreshJwtTokens(user: User, jwtRefreshToken: string) {
-    if (!user.jwtRefreshToken) throw new UnauthorizedException();
-    if (user.jwtRefreshToken != jwtRefreshToken) throw new UnauthorizedException();
-
-    const { jwtAccessToken, jwtRefreshToken: newJwtRefreshToken } = await this.createTokens(user);
-    return { jwtAccessToken, jwtRefreshToken: newJwtRefreshToken };
+  async logout(req: Request, res: Response) {
+    return this.jwt.deleteTokens(req, res);
   }
 }

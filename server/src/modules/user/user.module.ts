@@ -6,10 +6,10 @@ import { UserService } from "./user.service";
 import { PrismaModule } from "src/modules/prisma/prisma.module";
 import { RedisModule } from "../redis/redis.module";
 import { UserGateway } from "./user.gateway";
-import { JwtModule } from "../jwt/jwt.module";
+import { AuthModule } from "../auth/auth.module";
 
 @Module({
-  imports: [PrismaModule, RedisModule, JwtModule],
+  imports: [PrismaModule, RedisModule, AuthModule],
   controllers: [UserController],
   providers: [UserService, UserGateway],
 })

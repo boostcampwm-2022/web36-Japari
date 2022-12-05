@@ -9,9 +9,9 @@ import {
 } from "@nestjs/websockets";
 import Redis from "ioredis";
 import { Server, Socket } from "socket.io";
-import { WebsocketBadRequestFilter } from "src/exception-filters/websocket.filter";
+import { SocketBadRequestFilter } from "src/exception-filters/websocket.filter";
 
-@UseFilters(new WebsocketBadRequestFilter("media/error"))
+@UseFilters(new SocketBadRequestFilter("media/error"))
 @WebSocketGateway(4001, { transports: ["websocket"], namespace: "/" })
 export class MediaGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer() public server: Server;
