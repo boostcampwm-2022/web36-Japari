@@ -23,9 +23,13 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 
   afterInit(server: Server) {
     this.logger.verbose("app gateway initiated");
+
+    // (디버그용) Redis 데이터 전부 삭제
+    /*
     this.redis.del(RedisTableName.SOCKET_ID_TO_USER_INFO);
     this.redis.del(RedisTableName.ONLINE_USERS);
     this.redis.del(RedisTableName.GAME_ROOMS);
+    */
   }
 
   async handleConnection(@ConnectedSocket() socket: Socket) {
@@ -48,14 +52,14 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
     this.redis.hset(
       RedisTableName.SOCKET_ID_TO_USER_INFO,
       socket.id,
-      JSON.stringify({ ...userPublicInfo, roomId: "lobby" })
+      JSON.stringify({ ...userPublicInfo, userId, roomId: "lobby" })
     );
-    this.redis.hset(RedisTableName.ONLINE_USERS, userId, JSON.stringify(userPublicInfo));
+    this.redis.hset(RedisTableName.ONLINE_USERS, userId, JSON.stringify({ ...userPublicInfo, socketId: socket.id }));
   }
 
   async handleDisconnect(@ConnectedSocket() socket: Socket) {
     await this.gameRoomGateway.exit(socket);
-    const userId = JSON.parse(await this.redis.hget(RedisTableName.SOCKET_ID_TO_USER_INFO, socket.id));
+    const { userId } = JSON.parse(await this.redis.hget(RedisTableName.SOCKET_ID_TO_USER_INFO, socket.id));
     this.redis.hdel(RedisTableName.SOCKET_ID_TO_USER_INFO, socket.id);
     this.redis.hdel(RedisTableName.ONLINE_USERS, userId);
   }
