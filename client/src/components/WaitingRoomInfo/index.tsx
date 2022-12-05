@@ -4,6 +4,7 @@ import { useRecoilValue } from "recoil";
 import { socketState } from "../../store/socket";
 import Button from "../Button";
 import Cam, { CamProps } from "../Cam";
+import Camtest from "../Camtest";
 import { Room } from "../RoomList";
 import RoomRecord from "../RoomList/RoomRecord";
 import * as style from "./styles";
@@ -40,9 +41,10 @@ const WaitingRoomInfo = ({ roomRecord, camList }: WaitingRoomInfoProps) => {
       </div>
       <div css={style.mainWrapperStyle}>
         <div css={style.camListContainerStyle}>
-          {camList.map((cam, idx) => (
+          {/* {camList.map((cam, idx) => (
             <Cam key={idx} {...cam} />
-          ))}
+          ))} */}
+          <Camtest />
         </div>
         <div css={style.footerStyle}>
           <Button buttonType="방 나가기" handleClick={handleRootOutButton} />

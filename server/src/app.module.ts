@@ -10,9 +10,20 @@ import { AppGateway } from "./app.gateway";
 import { JwtModule } from "./modules/auth/jwt/jwt.module";
 import { UserModule } from "./modules/user/user.module";
 import { GameRoomModule } from "./modules/game-room/game-room.module";
+import { MediaModule } from "./modules/media/media.module";
 
 @Module({
-  imports: [AuthModule, GameModule, PrismaModule, JwtModule, RedisModule, ChatModule, UserModule, GameRoomModule],
+  imports: [
+    AuthModule,
+    GameModule,
+    PrismaModule,
+    JwtModule,
+    RedisModule,
+    ChatModule,
+    UserModule,
+    GameRoomModule,
+    MediaModule,
+  ],
 
   controllers: [AppController],
 

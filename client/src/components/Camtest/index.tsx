@@ -80,10 +80,11 @@ const Camtest = () => {
   };
 
   const joinRoom = () => {
-    socket.emit("joinRoom", { roomId }, (data: { rtpCapabilities: RtpCapabilities }) => {
+    socket.on("media/joinRoom-success", (data: { rtpCapabilities: RtpCapabilities }) => {
       rtpCapabilites = data.rtpCapabilities;
       createDevice();
     });
+    socket.emit("media/joinRoom", roomId);
   };
 
   const createDevice = async () => {
@@ -98,8 +99,9 @@ const Camtest = () => {
   };
 
   const createSendTransport = async () => {
-    socket.emit("createWebRtcTransport", { consumer: false }, (params: TransportOptions) => {
+    socket.on("media/createWebRtcTransport-success", ({ params }: { params: TransportOptions }) => {
       let producerTransport = device.createSendTransport(params);
+      console.log(producerTransport);
 
       producerTransport.on("connect", ({ dtlsParameters }, cb, eb) => {
         try {
@@ -127,6 +129,8 @@ const Camtest = () => {
 
       connectSendTransport(producerTransport);
     });
+
+    socket.emit("media/createWebRtcTransport", { consumer: false });
   };
 
   const connectSendTransport = async (producerTransport: Transport) => {
@@ -206,6 +210,7 @@ const Camtest = () => {
     });
     return () => {
       socket.off("video-join-success");
+      // socket.emit("media/disconnect");
     };
   }, []);
 

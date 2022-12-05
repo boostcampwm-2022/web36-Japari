@@ -15,7 +15,6 @@ export interface ProfileProps {
 }
 
 const Cam = ({ videoRef, isVideoOn, isAudioOn, profile, nickname, scoreRank }: CamProps) => {
-  console.log(videoRef);
   return (
     <div css={style.camContainerStyle}>
       <div css={style.camWrapperStyle}>
