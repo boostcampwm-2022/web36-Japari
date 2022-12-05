@@ -5,17 +5,22 @@ import { Page } from "../../components/Page";
 import { camList } from "../dummy";
 import InGameCamList from "../../components/InGameCamList";
 import Chatting from "../../components/Chatting";
+import Canvas from "../../components/canvas";
 
 const PlayingPage: React.FC = () => {
   // user 정보 로직
   const camsLeft = camList.filter((cam, idx) => idx % 2 === 0);
   const camsRight = camList.filter((cam, idx) => idx % 2 === 1);
+
   return (
     <Page>
       <div css={style.PlayingContentContainerStyle}>
         <InGameCamList camList={camsLeft} />
         <div css={style.GameAndChatContainerStyle}>
-          <div css={style.GameContainerStyle}>게임</div>
+          <div css={style.GameContainerStyle}>
+            게임
+            <Canvas />
+          </div>
           <Chatting />
         </div>
         <InGameCamList camList={camsRight} />
