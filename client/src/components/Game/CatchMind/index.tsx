@@ -12,6 +12,10 @@ interface Coordinate {
   y: number;
 }
 
+const WAIT_TIME = 10;
+const DRAW_TIME = 10;
+const RESULT_TIME = 10;
+
 export default function CatchMind() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [position, setPosition] = useState<Coordinate | undefined>(undefined);
@@ -45,7 +49,7 @@ export default function CatchMind() {
       setDrawerId(data.drawerId);
       setDebug(`Round ${data.round}이 곧 시작됩니다.`);
 
-      setTime(10);
+      setTime(WAIT_TIME);
     });
     return () => {
       socket.off("catch-mind/round-start");
@@ -56,7 +60,7 @@ export default function CatchMind() {
     socket.on("catch-mind/draw-start", data => {
       setDebug(`Round ${round} 진행중...`);
 
-      setTime(12);
+      setTime(DRAW_TIME);
     });
 
     return () => {
@@ -69,7 +73,7 @@ export default function CatchMind() {
       setDebug(`Round ${data.round} 결과...`);
       console.log(`Round ${data.round} 결과`, data);
 
-      setTime(15);
+      setTime(RESULT_TIME);
     });
 
     return () => {
