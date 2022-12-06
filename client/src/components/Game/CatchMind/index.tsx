@@ -6,6 +6,7 @@ import { User } from "@dto";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { userState } from "../../../store/user";
 import { socketState } from "../../../store/socket";
+import { debounce } from "lodash";
 
 const WAIT_TIME = 10;
 const DRAW_TIME = 10;
@@ -16,7 +17,6 @@ export default function CatchMind() {
   const ctxRef = useRef<any>(null);
   const [isDrawing, setIsDrawing] = useState(false);
   const [isSending, setIsSending] = useState(false);
-  const [debounce, setDebounce] = useState("");
   const socket = useRecoilValue(socketState);
 
   const [user, setUser] = useRecoilState(userState);
@@ -39,7 +39,7 @@ export default function CatchMind() {
       if (data.answer) setAnswer(answer);
       setRound(data.round);
       setDrawerId(data.drawerId);
-      alert(`Round ${data.round}이 곧 시작됩니다...`);
+      console.log(`Round ${data.round}이 곧 시작됩니다...`);
       if (data.answer) {
         setAnswer(data.answer);
       } else {
@@ -71,7 +71,7 @@ export default function CatchMind() {
       data.scoreInfo.forEach(({ nickname, score, totalScore }: any) => {
         resultSummary += `${nickname} / ${score} / ${totalScore}` + "\n";
       });
-      alert(resultSummary);
+      console.log(resultSummary);
 
       setAnswer(data.answer);
 
@@ -109,12 +109,19 @@ export default function CatchMind() {
         ctx.lineTo(e.offsetX, e.offsetY);
         ctx.stroke();
         const imageData = canvasRef.current?.toDataURL("image/png");
-        console.log("sending");
-        socket.emit("catch-mind/image", imageData);
+        handleDebounce(imageData);
       }
       ctx.moveTo(e.offsetX, e.offsetY);
     },
     [isDrawing]
+  );
+
+  const handleDebounce = useCallback(
+    debounce(data => {
+      socket.emit("catch-mind/image", data);
+      console.log("send");
+    }, 100),
+    []
   );
 
   const stopDrawing = useCallback(() => {
@@ -139,8 +146,8 @@ export default function CatchMind() {
   useEffect(() => {
     if (!canvasRef.current) return;
     const canvas = canvasRef.current;
-    canvas.width = 804;
-    canvas.height = 514;
+    canvas.width = 700;
+    canvas.height = 510;
 
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
