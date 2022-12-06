@@ -47,7 +47,6 @@ const WaitingPage: React.FC = () => {
     });
     socket.emit("game-room/join", { roomId });
     return () => {
-      socket.emit("game-room/exit");
       socket.off("game-room/info");
     };
   }, [roomId, socket]);

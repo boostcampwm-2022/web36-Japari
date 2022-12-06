@@ -45,15 +45,14 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   @UsePipes(ValidationPipe)
   @SubscribeMessage("chat/room")
   async handleRoomChat(@ConnectedSocket() socket: Socket, @MessageBody() data: ChatDto) {
-    // 캐치마인드 게임 중일 경우 catchMindService에 처리를 위임한다.
-    const { roomId } = await this.redis.getFrom(RedisTableName.SOCKET_ID_TO_USER_INFO, socket.id);
-    const playData = await this.redis.getFrom(RedisTableName.PLAY_DATA, roomId);
-    if (playData && playData.gameId === 1 && playData.state === CatchMindState.DRAW) {
-      this.catchMindService.judge(socket, roomId, data.message);
+    const { message, sendTime } = data;
+
+    // 캐치마인드 그리기 중일 경우 catchMindService에 처리를 위임한다.
+    if (await this.catchMindService.isDrawing(socket)) {
+      await this.catchMindService.judge(socket, this.server, message, sendTime);
       return;
     }
 
-    const { message, sendTime } = data;
     const userInfo = await this.redis.getFrom(RedisTableName.SOCKET_ID_TO_USER_INFO, socket.id);
 
     socket.to(userInfo.roomId).emit("chat/room", {

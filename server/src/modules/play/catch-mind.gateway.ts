@@ -39,9 +39,13 @@ export class CatchMindGateway implements OnGatewayInit, OnGatewayConnection, OnG
 
   @SubscribeMessage("catch-mind/start")
   async start(@ConnectedSocket() socket: Socket) {
+    // 이미 게임 중일 경우 요청을 무시한다.
     const { roomId } = await this.redis.getFrom(RedisTableName.SOCKET_ID_TO_USER_INFO, socket.id);
     const playData = await this.redis.getFrom(RedisTableName.PLAY_DATA, roomId);
-    if (playData) return; // 이미 게임 중일 경우 무시한다.
+    if (playData) return;
+
+    // 룸 내의 다른 인원들이 전부 게임을 시작하게 만든다.
+    socket.to(roomId).emit("play/start");
 
     // PLAY_DATA 테이블의 roomId 레코드를 초기화한다.
     const room = await this.redis.getFrom(RedisTableName.GAME_ROOMS, roomId);
@@ -64,6 +68,7 @@ export class CatchMindGateway implements OnGatewayInit, OnGatewayConnection, OnG
     };
     await this.redis.setTo(RedisTableName.PLAY_DATA, roomId, newRecord);
 
+    // 방에 라운드가 시작 됐음을 알린다
     this.catchMindService.notifyRoundStart(this.server, roomId, room.participants, newRecord);
   }
 

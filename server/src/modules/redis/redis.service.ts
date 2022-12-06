@@ -14,6 +14,6 @@ export class RedisService extends Redis {
 
   async updateTo(tableName: RedisTableName, key: string, value: any) {
     const oldValue = await this.getFrom(tableName, key);
-    return this.hset(tableName, key, JSON.stringify({ ...oldValue, value }));
+    return this.hset(tableName, key, JSON.stringify({ ...oldValue, ...value }));
   }
 }

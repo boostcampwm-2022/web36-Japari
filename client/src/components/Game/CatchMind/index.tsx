@@ -7,6 +7,10 @@ import { useRecoilState, useRecoilValue } from "recoil";
 import { userState } from "../../../store/user";
 import { socketState } from "../../../store/socket";
 
+const WAIT_TIME = 10;
+const DRAW_TIME = 10;
+const RESULT_TIME = 10;
+
 export default function CatchMind() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const ctxRef = useRef<any>(null);
@@ -17,11 +21,82 @@ export default function CatchMind() {
 
   const [user, setUser] = useRecoilState(userState);
   const [time, setTime] = useState<number>(120);
-  const [answer, setAnswer] = useState<string>("테스트");
+  const timeRef = useRef<number | null>(null);
+  const [answer, setAnswer] = useState<string>("");
   const [round, setRound] = useState<number>(1);
   const [drawerId, setDrawerId] = useState<number>(0);
-  const [scores, setScores] = useState<Map<number, number>>(new Map<number, number>());
-  const [survivors, setSurvivors] = useState<number[]>([]);
+  const [debug, setDebug] = useState<string>("");
+  const timer = useRef<NodeJS.Timer | null>(null);
+
+  if (timeRef) {
+    timeRef.current = time;
+  }
+
+  useEffect(() => {
+    setDebug("캐치마인드 시작");
+    socket.emit("catch-mind/start");
+    socket.on("catch-mind/round-start", data => {
+      if (data.answer) setAnswer(answer);
+      setRound(data.round);
+      setDrawerId(data.drawerId);
+      alert(`Round ${data.round}이 곧 시작됩니다...`);
+      if (data.answer) {
+        setAnswer(data.answer);
+      } else {
+        setAnswer("");
+      }
+      setTime(WAIT_TIME);
+    });
+    return () => {
+      socket.off("catch-mind/round-start");
+    };
+  }, [socket]);
+
+  useEffect(() => {
+    socket.on("catch-mind/draw-start", data => {
+      alert(`Round ${data.round} 시작!`);
+
+      setTime(DRAW_TIME);
+    });
+
+    return () => {
+      socket.off("catch-mind/draw-start");
+    };
+  }, [socket]);
+
+  useEffect(() => {
+    socket.on("catch-mind/result", data => {
+      let resultSummary = `Round ${data.round} 결과` + "\n";
+      resultSummary += `닉네임 / 라운드 / 게임` + "\n";
+      data.scoreInfo.forEach(({ nickname, score, totalScore }: any) => {
+        resultSummary += `${nickname} / ${score} / ${totalScore}` + "\n";
+      });
+      alert(resultSummary);
+
+      setAnswer(data.answer);
+
+      setTime(RESULT_TIME);
+    });
+
+    return () => {
+      socket.off("catch-mind/result");
+    };
+  }, [socket]);
+
+  // 타이머
+  useEffect(() => {
+    timer.current = setInterval(() => {
+      if (timeRef.current && timeRef.current > 0) {
+        setTime(time => time - 1);
+      }
+    }, 1000);
+
+    return () => {
+      if (timer.current) {
+        clearInterval(timer.current);
+      }
+    };
+  }, []);
 
   const startDrawing = useCallback((e: MouseEvent) => {
     setIsDrawing(true);

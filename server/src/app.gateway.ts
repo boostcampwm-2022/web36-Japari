@@ -54,9 +54,10 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
   }
 
   async handleDisconnect(@ConnectedSocket() socket: Socket) {
+    this.logger.warn(`socket ${socket.id} disconnected`);
     await this.gameRoomGateway.exit(socket);
     const { userId } = await this.redis.getFrom(RedisTableName.SOCKET_ID_TO_USER_INFO, socket.id);
-    this.redis.hdel(RedisTableName.SOCKET_ID_TO_USER_INFO, socket.id);
+    await this.redis.hdel(RedisTableName.SOCKET_ID_TO_USER_INFO, socket.id);
     this.redis.hdel(RedisTableName.ONLINE_USERS, userId);
   }
 }

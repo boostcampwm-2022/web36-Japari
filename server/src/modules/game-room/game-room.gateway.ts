@@ -26,7 +26,7 @@ import { SERVER_SOCKET_PORT } from "src/constants/config";
 @WebSocketGateway(SERVER_SOCKET_PORT, { transports: ["websocket"], namespace: "/" })
 export class GameRoomGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer() public server: Server;
-  private logger = new Logger("Chat Gateway");
+  private logger = new Logger("Game Room Gateway");
 
   constructor(private redis: RedisService, private prisma: PrismaService) {}
 
@@ -134,14 +134,17 @@ export class GameRoomGateway implements OnGatewayInit, OnGatewayConnection, OnGa
       throw new SocketException("game-room/join-failed", "방 정원이 초과되었습니다.");
     }
 
-    // 유저가 방에 추가되었다는 사실을 Redis에 저장
-    const user = await this.redis.getFrom(RedisTableName.SOCKET_ID_TO_USER_INFO, socket.id);
-    room.participants.push({ ...user, socketId: socket.id });
+    // 소켓 - roomId 매핑
     await this.redis.updateTo(RedisTableName.SOCKET_ID_TO_USER_INFO, socket.id, { roomId });
-    await this.redis.setTo(RedisTableName.GAME_ROOMS, roomId, room);
 
+    // 소켓 룸 변경
     socket.join(roomId);
     socket.leave("lobby");
+
+    // 게임 방 정보 갱신
+    const user = await this.redis.getFrom(RedisTableName.SOCKET_ID_TO_USER_INFO, socket.id);
+    room.participants.push({ ...user, socketId: socket.id });
+    await this.redis.setTo(RedisTableName.GAME_ROOMS, roomId, room);
 
     // 유저가 들어왔다는 소식을 참여한 유저와 기존에 방에 있던 모든 유저에게 전달
     this.server.to(roomId).emit("game-room/info", {
@@ -152,9 +155,10 @@ export class GameRoomGateway implements OnGatewayInit, OnGatewayConnection, OnGa
 
   @SubscribeMessage("game-room/exit")
   async exit(@ConnectedSocket() socket: Socket) {
-    const { roomId } = await this.redis.getFrom(RedisTableName.SOCKET_ID_TO_USER_INFO, socket.id);
-    if (!roomId || roomId === "lobby") return;
+    const user = await this.redis.getFrom(RedisTableName.SOCKET_ID_TO_USER_INFO, socket.id);
+    if (!user || user.roomId === "lobby") return;
 
+    const { roomId } = user;
     const room = await this.redis.getFrom(RedisTableName.GAME_ROOMS, roomId);
 
     // 유저를 방에서 제거
