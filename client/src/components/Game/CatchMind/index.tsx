@@ -3,13 +3,17 @@ import React, { useRef, useState, useEffect, useCallback } from "react";
 import * as style from "./styles";
 import timerImage from "../../../assets/icons/timer.png";
 import { User } from "@dto";
-import { useRecoilState } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 import { userState } from "../../../store/user";
+import { socketState } from "../../../store/socket";
 
 export default function CatchMind() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const ctxRef = useRef<any>(null);
   const [isDrawing, setIsDrawing] = useState(false);
+  const [isSending, setIsSending] = useState(false);
+  const [debounce, setDebounce] = useState("");
+  const socket = useRecoilValue(socketState);
 
   const [user, setUser] = useRecoilState(userState);
   const [time, setTime] = useState<number>(120);
@@ -29,6 +33,8 @@ export default function CatchMind() {
       if (isDrawing) {
         ctx.lineTo(e.offsetX, e.offsetY);
         ctx.stroke();
+        const imageData = canvasRef.current?.toDataURL("image/png");
+        socket.emit("catch-mind/image", imageData);
       }
       ctx.moveTo(e.offsetX, e.offsetY);
     },
@@ -66,6 +72,15 @@ export default function CatchMind() {
     ctx.strokeStyle = "2";
     ctxRef.current = ctx;
   }, []);
+
+  useEffect(() => {
+    socket.on("catch-mind/image", data => {
+      console.log(data);
+    });
+    return () => {
+      socket.off("catch-mind/image");
+    };
+  }, [socket]);
 
   return (
     <div css={style.gameWrapperStyle}>
