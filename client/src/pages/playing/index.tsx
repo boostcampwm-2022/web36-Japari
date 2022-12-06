@@ -13,12 +13,12 @@ const PlayingPage: React.FC = () => {
   return (
     <Page>
       <div css={style.PlayingContentContainerStyle}>
-        <InGameCamList camList={camsLeft} />
+        {/* <InGameCamList camList={camsLeft} /> */}
         <div css={style.GameAndChatContainerStyle}>
           <div css={style.GameContainerStyle}>게임</div>
           <Chatting />
         </div>
-        <InGameCamList camList={camsRight} />
+        {/* <InGameCamList camList={camsRight} /> */}
       </div>
     </Page>
   );

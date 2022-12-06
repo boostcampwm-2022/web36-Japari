@@ -1,12 +1,16 @@
+/** @jsxImportSource @emotion/react */
+import { User } from "@dto";
 import { Device } from "mediasoup-client";
 import { Consumer, ConsumerOptions } from "mediasoup-client/lib/Consumer";
 import { ProducerOptions } from "mediasoup-client/lib/Producer";
-import { RtpCapabilities } from "mediasoup-client/lib/RtpParameters";
+import { MediaKind, RtpCapabilities, RtpParameters } from "mediasoup-client/lib/RtpParameters";
 import { Transport, TransportOptions } from "mediasoup-client/lib/Transport";
-import React, { useEffect, useRef, useState } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
-import { useRecoilValue } from "recoil";
+import { useRecoilValue, useRecoilState } from "recoil";
 import { socketState } from "../../store/socket";
+import { userState } from "../../store/user";
+import { audioState, videoState, streamState } from "./../../store/media";
 import Cam from "../Cam";
 import * as style from "./styles";
 
@@ -18,12 +22,20 @@ type ConsumerTransport = {
 };
 
 const Camtest = () => {
+  const [localStream, setLocalStream] = useRecoilState(streamState);
+  const audio = useRecoilValue(audioState);
+  const video = useRecoilValue(videoState);
   const socket = useRecoilValue(socketState);
+  const user = useRecoilValue(userState);
+
+  const [remoteStream, setRemoteStream] = useState<Map<string, MediaStream>>(new Map());
+
   const location = useLocation();
   const roomId = location.pathname.split("/").slice(-1)[0];
 
-  const localVideoRef = useRef<HTMLVideoElement | null>(null);
-  const remoteVideoRef = useRef<HTMLVideoElement[]>([]);
+  const [cams, setCams] = useState<any[]>([]);
+  // const localVideoRef = useRef<HTMLVideoElement | null>(null);
+  // const remoteVideoRef = useRef<HTMLVideoElement[]>([]);
 
   let params = {
     encodings: [
@@ -43,7 +55,7 @@ const Camtest = () => {
         scalabilityMode: "S1T3",
       },
     ],
-    codeOptions: {
+    codecOptions: {
       videoGoogleStartBitrate: 1000,
     },
   };
@@ -51,7 +63,6 @@ const Camtest = () => {
   let videoParams: ProducerOptions = params;
   let rtpCapabilites: RtpCapabilities;
   const [device, setDevice] = useState<Device>(new Device());
-  const [cams, setCams] = useState<any[]>([]);
   const [consumerTransports, setConsumerTransports] = useState<ConsumerTransport[]>([]);
 
   const getLocalStream = () => {
@@ -69,10 +80,12 @@ const Camtest = () => {
       });
   };
 
-  const streamSuccess = (stream: any) => {
-    if (!localVideoRef.current) return;
+  const streamSuccess = (stream: MediaStream) => {
+    setLocalStream(stream);
 
-    localVideoRef.current.srcObject = stream;
+    stream.getAudioTracks()[0].enabled = audio;
+    stream.getVideoTracks()[0].enabled = video;
+
     audioParams = { track: stream.getAudioTracks()[0], ...audioParams };
     videoParams = { track: stream.getVideoTracks()[0], ...videoParams };
 
@@ -140,12 +153,14 @@ const Camtest = () => {
   };
 
   const getProducers = () => {
-    socket.emit("media/getProducers", (producerList: string[]) => {
-      producerList.forEach(signalNewConsumerTransport);
+    socket.emit("media/getProducers", (producerList: { producerId: string; userInfo: User }[]) => {
+      producerList.forEach(producerData => {
+        signalNewConsumerTransport(producerData.producerId, producerData.userInfo);
+      });
     });
   };
 
-  const signalNewConsumerTransport = async (remoteProducerId: string) => {
+  const signalNewConsumerTransport = async (remoteProducerId: string, userInfo: User) => {
     socket.emit("media/createWebRtcTransport", { consumer: true }, (transportOptions: TransportOptions) => {
       try {
         let consumerTransport = device.createRecvTransport(transportOptions);
@@ -160,7 +175,7 @@ const Camtest = () => {
             eb(error);
           }
         });
-        connectRecvTransport(consumerTransport, remoteProducerId, transportOptions.id);
+        connectRecvTransport(consumerTransport, remoteProducerId, transportOptions.id, userInfo);
       } catch (err) {
         console.log(err);
         return;
@@ -171,9 +186,9 @@ const Camtest = () => {
   const connectRecvTransport = (
     consumerTransport: Transport,
     remoteProducerId: string,
-    serverConsumerTransportId: string
+    serverConsumerTransportId: string,
+    userInfo: User
   ) => {
-    console.log("connectRecvTransport");
     socket.emit(
       "media/consume",
       {
@@ -181,8 +196,13 @@ const Camtest = () => {
         remoteProducerId,
         serverConsumerTransportId,
       },
-      async (params: ConsumerOptions) => {
-        console.log(params);
+      async (params: {
+        id: string;
+        producerId: string;
+        kind: MediaKind;
+        rtpParameters: RtpParameters;
+        serverConsumerId: string;
+      }) => {
         const consumer = await consumerTransport.consume(params);
 
         setConsumerTransports((current: ConsumerTransport[]) => [
@@ -196,39 +216,72 @@ const Camtest = () => {
         ]);
 
         const { track } = consumer;
-        setCams(current => [...current, remoteProducerId]);
-        const refIndex = cams.indexOf(remoteProducerId);
-        remoteVideoRef.current[refIndex].srcObject = new MediaStream([track]);
+        addCam(remoteProducerId, userInfo, track);
+
+        socket.emit("media/consumer-resume", { serverConsumerId: params.serverConsumerId });
       }
     );
   };
 
+  const addCam = (remoteProducerId: string, userInfo: User, track: MediaStreamTrack) => {
+    setRemoteStream(current => new Map(current).set(remoteProducerId, new MediaStream([track])));
+
+    setCams(current => [
+      ...current,
+      {
+        userInfo,
+        remoteProducerId,
+      },
+    ]);
+  };
+
   useEffect(() => {
     getLocalStream();
-    socket.on("media/new-producer", ({ producerId }) => {
-      signalNewConsumerTransport(producerId);
+    socket.on("media/new-producer", ({ producerId, userInfo }) => {
+      signalNewConsumerTransport(producerId, userInfo);
+    });
+    socket.on("media/producer-closed", (remoteProducerId: string) => {
+      const producerToClose = consumerTransports.find(transportData => transportData.producerId === remoteProducerId);
+      producerToClose?.consumerTransport.close();
+      producerToClose?.consumer.close();
+
+      setConsumerTransports(current => current.filter(transportData => transportData.producerId !== remoteProducerId));
+      setCams(current => current.filter(cam => cam.remoteProducerId !== remoteProducerId));
+      setRemoteStream(current => {
+        const newRemoteStream = new Map(current);
+        newRemoteStream.delete(remoteProducerId);
+        return newRemoteStream;
+      });
     });
     return () => {
       socket.off("media/new-producer");
+      socket.off("media/producer-closed");
       socket.emit("media/disconnect");
     };
   }, []);
 
   return (
-    <div>
-      <Cam videoRef={localVideoRef} isVideoOn={true} isAudioOn={true} profile="profile/default/png" nickname="test" />
+    <div css={style.CamsContainerStyle}>
+      {user && (
+        <Cam
+          mediaStream={localStream}
+          isVideoOn={true}
+          isAudioOn={true}
+          profile={user.profileImage}
+          nickname={user.nickname}
+        />
+      )}
       {cams.map((cam, idx) => {
         return (
-          <Cam
-            key={idx}
-            videoRef={(el: HTMLVideoElement) => {
-              if (el) remoteVideoRef.current[idx] = el;
-            }}
-            isVideoOn={true}
-            isAudioOn={true}
-            profile="profile/default/png"
-            nickname="test"
-          />
+          <Fragment key={idx}>
+            <Cam
+              mediaStream={remoteStream.get(cam.remoteProducerId) ?? null}
+              isVideoOn={true}
+              isAudioOn={true}
+              profile={cam.userInfo.profileImage}
+              nickname={cam.userInfo.nickname}
+            />
+          </Fragment>
         );
       })}
     </div>

@@ -11,14 +11,13 @@ import * as style from "./styles";
 
 export interface WaitingRoomInfoProps {
   roomRecord: Room;
-  camList: CamProps[];
 }
 
 export interface ProfileProps {
   profile: string;
 }
 
-const WaitingRoomInfo = ({ roomRecord, camList }: WaitingRoomInfoProps) => {
+const WaitingRoomInfo = ({ roomRecord }: WaitingRoomInfoProps) => {
   const socket = useRecoilValue(socketState);
   // [camList, setCamList] = useState<Cam[]>([]);
   const navigate = useNavigate();
@@ -40,12 +39,12 @@ const WaitingRoomInfo = ({ roomRecord, camList }: WaitingRoomInfoProps) => {
         <RoomRecord {...roomRecord} />
       </div>
       <div css={style.mainWrapperStyle}>
-        <div css={style.camListContainerStyle}>
-          {/* {camList.map((cam, idx) => (
+        {/* <div css={style.camListContainerStyle}>
+          {camList.map((cam, idx) => (
             <Cam key={idx} {...cam} />
-          ))} */}
-          <Camtest />
-        </div>
+          ))}
+        </div> */}
+        <Camtest />
         <div css={style.footerStyle}>
           <Button buttonType="방 나가기" handleClick={handleRootOutButton} />
           <Button buttonType="게임 시작" handleClick={handleGameStartButton} />

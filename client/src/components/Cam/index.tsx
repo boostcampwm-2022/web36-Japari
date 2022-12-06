@@ -1,8 +1,10 @@
 /** @jsxImportSource @emotion/react */
+import { useEffect, useRef } from "react";
 import * as style from "./styles";
 
 export interface CamProps {
-  videoRef?: React.LegacyRef<HTMLVideoElement>;
+  // videoRef?: React.LegacyRef<HTMLVideoElement>;
+  mediaStream: MediaStream | null;
   isVideoOn: boolean;
   isAudioOn: boolean;
   profile: string;
@@ -14,7 +16,15 @@ export interface ProfileProps {
   profile: string;
 }
 
-const Cam = ({ videoRef, isVideoOn, isAudioOn, profile, nickname, scoreRank }: CamProps) => {
+const Cam = ({ mediaStream, isVideoOn, isAudioOn, profile, nickname, scoreRank }: CamProps) => {
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    if (!videoRef.current) return;
+    console.log(nickname, videoRef.current, mediaStream);
+    videoRef.current.srcObject = mediaStream;
+  }, [mediaStream]);
+
   return (
     <div css={style.camContainerStyle}>
       <div css={style.camWrapperStyle}>

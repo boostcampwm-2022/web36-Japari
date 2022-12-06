@@ -26,8 +26,10 @@ import {
   RtpParameters,
   Transport,
   WebRtcTransport,
+  WebRtcTransportOptions,
 } from "mediasoup/node/lib/types";
 import { RedisService } from "../redis/redis.service";
+import { RedisTableName } from "src/constants/redis-table-name";
 
 const mediaCodecs: RtpCodecCapability[] = [
   { kind: "audio", mimeType: "audio/opus", clockRate: 48000, channels: 2 },
@@ -126,7 +128,7 @@ export class MediaGateway implements OnGatewayInit, OnGatewayConnection, OnGatew
     return new Promise(async (resolve, reject) => {
       try {
         // https://mediasoup.org/documentation/v3/mediasoup/api/#WebRtcTransportOptions
-        const webRtcTransport_options = {
+        const webRtcTransport_options: WebRtcTransportOptions = {
           listenIps: [
             {
               ip: "127.0.0.1", // replace with relevant IP address
@@ -185,10 +187,14 @@ export class MediaGateway implements OnGatewayInit, OnGatewayConnection, OnGatew
     const { roomId } = this.peers[socket.id];
 
     let producerList = [];
-    this.producers.forEach(producerData => {
-      if (producerData.socketId !== socket.id && producerData.roomId === roomId)
-        producerList = [...producerList, producerData.producer.id];
-    });
+    for (const producerData of this.producers) {
+      if (producerData.socketId !== socket.id && producerData.roomId === roomId) {
+        const userInfo = JSON.parse(
+          await this.redis.hget(RedisTableName.SOCKET_ID_TO_USER_INFO, producerData.socketId)
+        );
+        producerList = [...producerList, { producerId: producerData.producer.id, userInfo }];
+      }
+    }
 
     return producerList;
   }
@@ -232,11 +238,12 @@ export class MediaGateway implements OnGatewayInit, OnGatewayConnection, OnGatew
     return { id: producer.id, producersExist: this.producers.length > 1 ? true : false };
   }
 
-  informConsumers = (roomId: string, socketId: string, producerId: string) => {
+  informConsumers = async (roomId: string, socketId: string, producerId: string) => {
+    const userInfo = JSON.parse(await this.redis.hget(RedisTableName.SOCKET_ID_TO_USER_INFO, socketId));
     this.producers.forEach(producerData => {
       if (producerData.socketId !== socketId && producerData.roomId === roomId) {
         const producerSocket = this.peers[producerData.socketId].socket;
-        producerSocket.emit("media/new-producer", { producerId: producerId });
+        producerSocket.emit("media/new-producer", { producerId, userInfo });
       }
     });
   };
@@ -270,7 +277,6 @@ export class MediaGateway implements OnGatewayInit, OnGatewayConnection, OnGatew
       serverConsumerTransportId,
     }: { rtpCapabilities: RtpCapabilities; remoteProducerId: string; serverConsumerTransportId: string }
   ) {
-    console.log(rtpCapabilities, remoteProducerId, serverConsumerTransportId);
     const { roomId } = this.peers[socket.id];
     const router = this.rooms[roomId].router;
 
@@ -278,12 +284,6 @@ export class MediaGateway implements OnGatewayInit, OnGatewayConnection, OnGatew
       transportData => transportData.consumer && transportData.transport.id == serverConsumerTransportId
     ).transport;
 
-    console.log(
-      router.canConsume({
-        producerId: remoteProducerId,
-        rtpCapabilities,
-      })
-    );
     if (
       router.canConsume({
         producerId: remoteProducerId,
@@ -295,10 +295,9 @@ export class MediaGateway implements OnGatewayInit, OnGatewayConnection, OnGatew
         rtpCapabilities,
         paused: true,
       });
-      console.log(consumer);
 
       consumer.on("producerclose", () => {
-        socket.emit("media/producer-closed");
+        socket.emit("media/producer-closed", remoteProducerId);
         consumerTransport.close([]);
         this.transports = this.transports.filter(transportData => transportData.transport.id !== consumerTransport.id);
         consumer.close();
@@ -315,9 +314,17 @@ export class MediaGateway implements OnGatewayInit, OnGatewayConnection, OnGatew
         serverConsumerId: consumer.id,
       };
 
-      console.log(params);
       return params;
     }
+  }
+
+  @SubscribeMessage("media/consumer-resume")
+  async handleConsumerResume(
+    @ConnectedSocket() socket: Socket,
+    @MessageBody() { serverConsumerId }: { serverConsumerId: string }
+  ) {
+    const { consumer } = this.consumers.find(consumerData => consumerData.consumer.id === serverConsumerId);
+    await consumer.resume();
   }
 
   @SubscribeMessage("media/disconnect")
@@ -336,13 +343,15 @@ export class MediaGateway implements OnGatewayInit, OnGatewayConnection, OnGatew
     this.producers = removeItems(this.producers, socket.id, "producer");
     this.transports = removeItems(this.transports, socket.id, "transport");
 
-    const { roomId } = this.peers[socket.id];
-    delete this.peers[socket.id];
+    if (this.peers[socket.id]) {
+      const { roomId } = this.peers[socket.id];
+      delete this.peers[socket.id];
 
-    this.rooms[roomId] = {
-      router: this.rooms[roomId].router,
-      peers: this.rooms[roomId].peers.filter(socketId => socketId !== socket.id),
-    };
+      this.rooms[roomId] = {
+        router: this.rooms[roomId].router,
+        peers: this.rooms[roomId].peers.filter(socketId => socketId !== socket.id),
+      };
+    }
   }
 
   handleConnection(@ConnectedSocket() socket: Socket) {}

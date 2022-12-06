@@ -6,6 +6,7 @@ import { AppModule } from "./app.module";
 import cookieParser from "cookie-parser";
 import { SERVER_PORT } from "./constants/config";
 import * as mediasoup from "mediasoup";
+import { readFileSync } from "fs";
 
 export let worker: mediasoup.types.Worker;
 
