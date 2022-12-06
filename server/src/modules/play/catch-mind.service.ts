@@ -44,13 +44,13 @@ export class CatchMindService {
 
   async notifyDrawState(server: Server, roomId: string) {
     await this.redis.updateTo(RedisTableName.PLAY_DATA, roomId, { state: CatchMindState.DRAW });
-    server.to(roomId).emit("catch-mind/draw-start", { message: "draw-start" });
-
-    const record = await this.redis.getFrom(RedisTableName.PLAY_DATA, roomId);
+    const { round } = await this.redis.getFrom(RedisTableName.PLAY_DATA, roomId);
+    server.to(roomId).emit("catch-mind/draw-start", { round });
 
     // 120초 뒤 result state start
     setTimeout(async () => {
       const { state } = await this.redis.getFrom(RedisTableName.PLAY_DATA, roomId);
+      this.logger.warn(state);
       if (state !== CatchMindState.DRAW) return;
       this.notifyResultState(server, roomId);
     }, DRAW_TIME * 1000);
@@ -66,7 +66,18 @@ export class CatchMindService {
     });
 
     // 사용자 전원에게 게임 결과를 전송한다
-    server.to(roomId).emit("catch-mind/result", { round, answer, scores, totalScores });
+    const users = await this.prisma.user.findMany({
+      where: {
+        userId: { in: Object.keys(scores).map(score => Number(score)) },
+      },
+      select: { userId: true, nickname: true },
+    });
+
+    const scoreInfo = users.map(({ userId, nickname }) => {
+      return { nickname, score: scores[String(userId)], totalScore: totalScores[String(userId)] };
+    });
+
+    server.to(roomId).emit("catch-mind/result", { round, answer, scoreInfo });
 
     // 마지막 라운드가 될 경우 게임을 종료한다.
     if (round === 5) {

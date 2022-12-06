@@ -24,11 +24,9 @@ export default function CatchMind() {
   const [user, setUser] = useRecoilState(userState);
   const [time, setTime] = useState<number>(120);
   const timeRef = useRef<number | null>(null);
-  const [answer, setAnswer] = useState<string>("테스트");
+  const [answer, setAnswer] = useState<string>("");
   const [round, setRound] = useState<number>(1);
   const [drawerId, setDrawerId] = useState<number>(0);
-  const [scores, setScores] = useState<Map<number, number>>(new Map<number, number>());
-  const [totalScores, setTotalScores] = useState<Map<number, number>>(new Map<number, number>());
   const [debug, setDebug] = useState<string>("");
   const timer = useRef<NodeJS.Timer | null>(null);
 
@@ -47,7 +45,14 @@ export default function CatchMind() {
 
       setRound(data.round);
       setDrawerId(data.drawerId);
-      setDebug(`Round ${data.round}이 곧 시작됩니다.`);
+
+      alert(`Round ${data.round}이 곧 시작됩니다...`);
+
+      if (data.answer) {
+        setAnswer(data.answer);
+      } else {
+        setAnswer("");
+      }
 
       setTime(WAIT_TIME);
     });
@@ -58,7 +63,7 @@ export default function CatchMind() {
 
   useEffect(() => {
     socket.on("catch-mind/draw-start", data => {
-      setDebug(`Round ${round} 진행중...`);
+      alert(`Round ${data.round} 시작!`);
 
       setTime(DRAW_TIME);
     });
@@ -70,8 +75,14 @@ export default function CatchMind() {
 
   useEffect(() => {
     socket.on("catch-mind/result", data => {
-      setDebug(`Round ${data.round} 결과...`);
-      console.log(`Round ${data.round} 결과`, data);
+      let resultSummary = `Round ${data.round} 결과` + "\n";
+      resultSummary += `닉네임 / 라운드 / 게임` + "\n";
+      data.scoreInfo.forEach(({ nickname, score, totalScore }: any) => {
+        resultSummary += `${nickname} / ${score} / ${totalScore}` + "\n";
+      });
+      alert(resultSummary);
+
+      setAnswer(data.answer);
 
       setTime(RESULT_TIME);
     });
@@ -81,6 +92,7 @@ export default function CatchMind() {
     };
   }, [socket]);
 
+  // 타이머
   useEffect(() => {
     timer.current = setInterval(() => {
       if (timeRef.current && timeRef.current > 0) {
@@ -94,15 +106,6 @@ export default function CatchMind() {
       }
     };
   }, []);
-
-  // useEffect(() => {
-  //   console.log(time, timer.current);
-  //   if (time <= 0 && timer.current) {
-  //     console.log("cleared!");
-  //     clearInterval(timer.current);
-  //     timer.current = null;
-  //   }
-  // }, [time, timer.current]);
 
   const getCoordinates = (event: MouseEvent): Coordinate | undefined => {
     const canvas = canvasRef.current as HTMLCanvasElement;
@@ -162,7 +165,6 @@ export default function CatchMind() {
           <div css={style.roundStyle}>
             <span>Round {round} / 5</span>
           </div>
-          <div>{debug}</div>
         </div>
         <canvas css={style.canvasStyle} ref={canvasRef} />
       </div>
