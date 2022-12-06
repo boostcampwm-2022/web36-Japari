@@ -34,6 +34,7 @@ export default function CatchMind() {
         ctx.lineTo(e.offsetX, e.offsetY);
         ctx.stroke();
         const imageData = canvasRef.current?.toDataURL("image/png");
+        console.log("sending");
         socket.emit("catch-mind/image", imageData);
       }
       ctx.moveTo(e.offsetX, e.offsetY);
@@ -74,8 +75,11 @@ export default function CatchMind() {
   }, []);
 
   useEffect(() => {
+    console.log(1);
     socket.on("catch-mind/image", data => {
-      console.log(data);
+      // data
+      console.log("receiving");
+      // ctxRef.current.drawImage(data, 0, 0);
     });
     return () => {
       socket.off("catch-mind/image");

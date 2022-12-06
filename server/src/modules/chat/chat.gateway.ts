@@ -33,6 +33,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   @SubscribeMessage("chat/lobby")
   async handleLobbyChat(@ConnectedSocket() socket: Socket, @MessageBody() data: ChatDto) {
     const { message, sendTime } = data;
+    console.log(data);
     const userInfo = await this.redis.getFrom(RedisTableName.SOCKET_ID_TO_USER_INFO, socket.id);
     socket.to("lobby").emit("chat/lobby", {
       sender: userInfo.nickname,
