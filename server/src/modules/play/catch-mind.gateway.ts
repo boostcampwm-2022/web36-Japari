@@ -73,11 +73,9 @@ export class CatchMindGateway implements OnGatewayInit, OnGatewayConnection, OnG
   }
 
   @SubscribeMessage("catch-mind/image")
-  async handleCatchMindImage(@ConnectedSocket() socket: Socket, @MessageBody() data: any) {
-    const userInfo = await this.redis.getFrom(RedisTableName.SOCKET_ID_TO_USER_INFO, socket.id);
-    console.log(data);
-    console.log(userInfo);
-    socket.to(userInfo.roomId).emit("catch-mind/image", data);
+  async handleCatchMindImage(@ConnectedSocket() socket: Socket, @MessageBody() imageSrc: any) {
+    const { roomId } = await this.redis.getFrom(RedisTableName.SOCKET_ID_TO_USER_INFO, socket.id);
+    socket.to(roomId).emit("catch-mind/image", imageSrc);
   }
 
   async handleConnection(@ConnectedSocket() socket: Socket) {}

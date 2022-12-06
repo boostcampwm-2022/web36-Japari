@@ -8,38 +8,89 @@ import { userState } from "../../../store/user";
 import { socketState } from "../../../store/socket";
 import { debounce } from "lodash";
 
+enum Color {
+  WHITE = "white",
+  BLACK = "black",
+  RED = "red",
+  YELLOW = "yellow",
+  GREEN = "green",
+  PURPLE = "purple",
+  GRAY = "gray",
+  ORANGE = "orange",
+  BLUE = "blue",
+  SKYBLUE = "skyblue",
+  PINK = "pink",
+  BROWN = "brown",
+  GOLD = "gold",
+  DARKBLUE = "darkblue",
+}
+
 const WAIT_TIME = 10;
 const DRAW_TIME = 10;
 const RESULT_TIME = 10;
 
+enum CatchMindState {
+  WAIT,
+  DRAW,
+  RESULT,
+}
+
 export default function CatchMind() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const ctxRef = useRef<any>(null);
   const [isDrawing, setIsDrawing] = useState(false);
-  const [isSending, setIsSending] = useState(false);
+
   const socket = useRecoilValue(socketState);
 
   const [user, setUser] = useRecoilState(userState);
-  const [time, setTime] = useState<number>(120);
+  const [time, setTime] = useState<number>(WAIT_TIME);
   const timeRef = useRef<number | null>(null);
   const [answer, setAnswer] = useState<string>("");
   const [round, setRound] = useState<number>(1);
+  const stateRef = useRef<number>(0);
   const [drawerId, setDrawerId] = useState<number>(0);
-  const [debug, setDebug] = useState<string>("");
   const timer = useRef<NodeJS.Timer | null>(null);
 
   if (timeRef) {
     timeRef.current = time;
   }
 
+  const getContextObject = useCallback(() => {
+    const ctx = canvasRef.current?.getContext("2d");
+    return ctx as CanvasRenderingContext2D;
+  }, []);
+
+  const clearCanvas = useCallback(() => {
+    const ctx = canvasRef.current?.getContext("2d");
+    if (!ctx) return;
+    ctx.clearRect(0, 0, canvasRef.current!.width, canvasRef.current!.height);
+  }, []);
+
+  const writeCenter = useCallback((text: string, dx?: number, dy?: number) => {
+    const canvas = canvasRef.current as HTMLCanvasElement;
+    const ctx = getContextObject();
+    const metrics = ctx.measureText(text);
+    const width = metrics.width;
+    const height = metrics.actualBoundingBoxDescent - metrics.actualBoundingBoxAscent;
+
+    const x = canvas.width / 2 - width / 2;
+    const y = canvas.height / 2 - height / 2;
+
+    ctx.fillText(text, x + (dx ?? 0), y + (dy ?? 0));
+  }, []);
+
   useEffect(() => {
-    setDebug("캐치마인드 시작");
     socket.emit("catch-mind/start");
     socket.on("catch-mind/round-start", data => {
+      stateRef.current = CatchMindState.WAIT;
+
       if (data.answer) setAnswer(answer);
       setRound(data.round);
       setDrawerId(data.drawerId);
-      console.log(`Round ${data.round}이 곧 시작됩니다...`);
+
+      clearCanvas();
+      const ctx = getContextObject();
+      writeCenter(`Round ${data.round} 준비`);
+
       if (data.answer) {
         setAnswer(data.answer);
       } else {
@@ -54,7 +105,15 @@ export default function CatchMind() {
 
   useEffect(() => {
     socket.on("catch-mind/draw-start", data => {
-      alert(`Round ${data.round} 시작!`);
+      stateRef.current = CatchMindState.DRAW;
+
+      clearCanvas();
+      const ctx = getContextObject();
+      writeCenter(`Round ${data.round} 시작!`);
+
+      setTimeout(() => {
+        clearCanvas();
+      }, 1000);
 
       setTime(DRAW_TIME);
     });
@@ -66,12 +125,18 @@ export default function CatchMind() {
 
   useEffect(() => {
     socket.on("catch-mind/result", data => {
-      let resultSummary = `Round ${data.round} 결과` + "\n";
-      resultSummary += `닉네임 / 라운드 / 게임` + "\n";
-      data.scoreInfo.forEach(({ nickname, score, totalScore }: any) => {
-        resultSummary += `${nickname} / ${score} / ${totalScore}` + "\n";
+      stateRef.current = CatchMindState.RESULT;
+
+      clearCanvas();
+      const ctx = getContextObject();
+      ctx.font = "30px LINESeedKR";
+      writeCenter(`Round ${data.round} 결과`, 0, -120);
+      writeCenter(`닉네임 / 라운드 / 게임`, 0, -60);
+      ctx.font = "20px LINESeedKR";
+      data.scoreInfo.forEach(({ nickname, score, totalScore }: any, index: number) => {
+        writeCenter(`${nickname} / ${score} / ${totalScore}`, 0, -10 + index * 30);
       });
-      console.log(resultSummary);
+      ctx.font = "40px LINESeedKR";
 
       setAnswer(data.answer);
 
@@ -104,7 +169,7 @@ export default function CatchMind() {
 
   const onDrawing = useCallback(
     (e: MouseEvent) => {
-      const ctx = ctxRef.current;
+      const ctx = getContextObject();
       if (isDrawing) {
         ctx.lineTo(e.offsetX, e.offsetY);
         ctx.stroke();
@@ -119,7 +184,6 @@ export default function CatchMind() {
   const handleDebounce = useCallback(
     debounce(data => {
       socket.emit("catch-mind/image", data);
-      console.log("send");
     }, 100),
     []
   );
@@ -129,8 +193,10 @@ export default function CatchMind() {
   }, []);
 
   useEffect(() => {
-    if (!canvasRef.current) return;
-    const canvas = canvasRef.current as HTMLCanvasElement;
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    if (stateRef.current !== CatchMindState.DRAW) return;
+    if (drawerId !== user?.userId) return;
     canvas.addEventListener("mousedown", startDrawing);
     canvas.addEventListener("mousemove", onDrawing);
     canvas.addEventListener("mouseup", stopDrawing);
@@ -141,7 +207,7 @@ export default function CatchMind() {
       canvas.removeEventListener("mouseup", stopDrawing);
       canvas.removeEventListener("mouseleave", stopDrawing);
     };
-  }, [startDrawing, onDrawing, stopDrawing]);
+  }, [startDrawing, onDrawing, stopDrawing, stateRef.current, drawerId]);
 
   useEffect(() => {
     if (!canvasRef.current) return;
@@ -149,19 +215,21 @@ export default function CatchMind() {
     canvas.width = 700;
     canvas.height = 510;
 
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
+    const ctx = getContextObject();
+    ctx.font = "40px LINESeedKR bold";
     ctx.strokeStyle = "black";
     ctx.strokeStyle = "2";
-    ctxRef.current = ctx;
   }, []);
 
   useEffect(() => {
-    console.log(1);
-    socket.on("catch-mind/image", data => {
-      // data
-      console.log("receiving");
-      // ctxRef.current.drawImage(data, 0, 0);
+    socket.on("catch-mind/image", imageSrc => {
+      const image = new Image();
+      image.onload = () => {
+        if (stateRef.current !== CatchMindState.DRAW) return;
+        const ctx = getContextObject();
+        ctx.drawImage(image, 0, 0);
+      };
+      image.src = imageSrc;
     });
     return () => {
       socket.off("catch-mind/image");

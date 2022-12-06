@@ -50,7 +50,6 @@ export class CatchMindService {
     // 120초 뒤 result state start
     setTimeout(async () => {
       const { state } = await this.redis.getFrom(RedisTableName.PLAY_DATA, roomId);
-      this.logger.warn(state);
       if (state !== CatchMindState.DRAW) return;
       this.notifyResultState(server, roomId);
     }, DRAW_TIME * 1000);
