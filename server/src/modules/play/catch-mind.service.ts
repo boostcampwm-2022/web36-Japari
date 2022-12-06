@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, Logger } from "@nestjs/common";
 import { Server, Socket } from "socket.io";
 import { CatchMindState, RedisTableName } from "src/constants/enum";
 import { randFromArray } from "util/random";
@@ -7,13 +7,14 @@ import { RedisService } from "../redis/redis.service";
 
 @Injectable()
 export class CatchMindService {
+  private logger = new Logger("Catch Mind Service");
   constructor(private redis: RedisService, private prisma: PrismaService) {}
 
   async notifyRoundStart(server: Server, roomId: string, participants: any[], record: any) {
-    const { drawerId, scores, totalScores, answer } = record;
+    const { drawerId, round, scores, totalScores, answer } = record;
     participants.forEach(({ userId, socketId }) => {
       const resp = {
-        round: 1,
+        round,
         drawerId,
         scores,
         totalScores,
@@ -42,7 +43,7 @@ export class CatchMindService {
     // 120초 뒤 result state start
     setTimeout(() => {
       this.notifyResultState(server, roomId);
-    }, 120 * 1000);
+    }, 12 * 1000);
   }
 
   async notifyResultState(server: Server, roomId: string) {
@@ -50,6 +51,8 @@ export class CatchMindService {
     await this.redis.setTo(RedisTableName.PLAY_DATA, roomId, { ...record, state: CatchMindState.RESULT });
 
     const { round, scores, totalScores } = record;
+    this.logger.debug("result record");
+    this.logger.debug(record);
 
     Object.entries(scores).forEach(([userId, score]) => {
       totalScores[userId] += score;
@@ -85,6 +88,11 @@ export class CatchMindService {
       totalScores,
     };
     await this.redis.updateTo(RedisTableName.PLAY_DATA, roomId, newRecord);
+
+    // 15초 뒤 round start
+    setTimeout(() => {
+      this.notifyRoundStart(server, roomId, room.participants, newRecord);
+    }, 15 * 1000);
   }
 
   async judge(socket: Socket, roomId: string, trial: string) {}

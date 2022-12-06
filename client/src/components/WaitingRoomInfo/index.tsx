@@ -1,4 +1,5 @@
 /** @jsxImportSource @emotion/react */
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useRecoilValue } from "recoil";
 import { socketState } from "../../store/socket";
@@ -29,9 +30,15 @@ const WaitingRoomInfo = ({ roomRecord, camList }: WaitingRoomInfoProps) => {
   const handleGameStartButton = () => {
     // socket.emit('start_game', {gameRoomId: roomRecord.gameRoomId})
 
-    navigate(`/playing/${roomRecord.roomId}`);
+    navigate(`/playing/${roomRecord.roomId}`, { state: { gameId: roomRecord.gameId } });
     // socket.on('start_game') 시 naviagte가 되도록 변경될 여지 있음
   };
+
+  useEffect(() => {
+    socket.on("play/start", () => {
+      navigate(`/playing/${roomRecord.roomId}`, { state: { gameId: roomRecord.gameId } });
+    });
+  }, [socket]);
 
   return (
     <div css={style.waitingRoomInfoStyle}>
