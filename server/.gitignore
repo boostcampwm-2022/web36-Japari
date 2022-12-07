@@ -2,7 +2,7 @@
 /dist
 /node_modules
 .env
-/ssl
+ssl
 
 # Logs
 logs

@@ -4,24 +4,30 @@ import { useNavigate } from "react-router-dom";
 import { useRecoilValue } from "recoil";
 import { socketState } from "../../store/socket";
 import Button from "../Button";
+import Audio from "../Audio";
 import Cam, { CamProps } from "../Cam";
 import { Room } from "../RoomList";
 import RoomRecord from "../RoomList/RoomRecord";
 import * as style from "./styles";
+import { User } from "@dto";
+import { useCams } from "../../hooks/useCams";
+import { userState } from "../../store/user";
 
 export interface WaitingRoomInfoProps {
   roomRecord: Room;
-  camList: CamProps[];
+  participants: User[];
 }
 
 export interface ProfileProps {
   profile: string;
 }
 
-const WaitingRoomInfo = ({ roomRecord, camList }: WaitingRoomInfoProps) => {
+const WaitingRoomInfo = ({ roomRecord, participants }: WaitingRoomInfoProps) => {
   const socket = useRecoilValue(socketState);
+  const user = useRecoilValue(userState);
   // [camList, setCamList] = useState<Cam[]>([]);
   const navigate = useNavigate();
+  const { videoStream, audioStream } = useCams();
 
   const handleRootOutButton = () => {
     navigate("/lobby");
@@ -48,9 +54,25 @@ const WaitingRoomInfo = ({ roomRecord, camList }: WaitingRoomInfoProps) => {
       </div>
       <div css={style.mainWrapperStyle}>
         <div css={style.camListContainerStyle}>
-          {camList.map((cam, idx) => (
-            <Cam key={idx} {...cam} />
-          ))}
+          {participants.map(participant => {
+            const videoStreamInfo = videoStream.get(participant.email);
+            const audioStreamInfo = audioStream.get(participant.email);
+
+            return (
+              <div key={participant.userId}>
+                {videoStreamInfo && (
+                  <Cam
+                    mediaStream={videoStreamInfo.mediaStream ?? null}
+                    isVideoOn={true}
+                    userInfo={videoStreamInfo.userInfo}
+                  />
+                )}
+                {audioStreamInfo && user?.userId !== audioStreamInfo.userInfo.userId && (
+                  <Audio mediaStream={audioStreamInfo.mediaStream ?? null} />
+                )}
+              </div>
+            );
+          })}
         </div>
         <div css={style.footerStyle}>
           <Button buttonType="방 나가기" handleClick={handleRootOutButton} />

@@ -7,6 +7,7 @@ export const {
   JWT_SECRET_KEY,
   REDIS_HOST,
   REDIS_PASSWORD,
+  WEBRTC_HOST,
 } = process.env;
 
 export const SERVER_PORT = Number(process.env.SERVER_PORT);

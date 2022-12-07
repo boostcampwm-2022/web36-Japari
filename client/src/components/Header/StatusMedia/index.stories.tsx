@@ -1,13 +1,13 @@
 // make Storybook for Mic and Cam toggle icon
 import { Meta, Story } from "@storybook/react";
-import StatusMicCam, { StatusMicCamProps } from ".";
+import StatusMedia from ".";
 
 export default {
   title: "공통 컴포넌트/헤더/마이크,카메라",
-  component: StatusMicCam,
+  component: StatusMedia,
 } as Meta;
 
-const Template: Story<StatusMicCamProps> = args => <StatusMicCam {...args} />;
+const Template: Story = args => <StatusMedia {...args} />;
 export const Default = Template.bind({});
 Default.storyName = "마이크,카메라";
 Default.args = {

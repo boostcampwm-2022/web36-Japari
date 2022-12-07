@@ -1,27 +1,37 @@
 /** @jsxImportSource @emotion/react */
+import { useEffect, useRef } from "react";
+import { useRecoilValue } from "recoil";
+import { userState } from "../../store/user";
+import { User } from "@dto";
 import * as style from "./styles";
 
 export interface CamProps {
+  mediaStream: MediaStream | null;
   isVideoOn: boolean;
-  isAudioOn: boolean;
-  profile: string;
-  nickname?: string;
-  scoreRank?: string;
+  userInfo: User;
 }
 
 export interface ProfileProps {
   profile: string;
 }
 
-const Cam = ({ isVideoOn, isAudioOn, profile, nickname, scoreRank }: CamProps) => {
+const Cam = ({ mediaStream, isVideoOn, userInfo }: CamProps) => {
+  const user = useRecoilValue(userState);
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    if (!videoRef.current) return;
+    videoRef.current.srcObject = mediaStream;
+  }, [mediaStream]);
+
   return (
     <div css={style.camContainerStyle}>
       <div css={style.camWrapperStyle}>
-        <video autoPlay playsInline></video>
-        {!isVideoOn && <Profile profile={profile} />}
+        <video ref={videoRef} autoPlay playsInline muted={user?.userId === userInfo.userId}></video>
+        {!isVideoOn && <Profile profile={userInfo.profileImage} />}
       </div>
-      <span css={style.camNickNameStyle}>{nickname}</span>
-      <span css={style.camScoreStyle}>{scoreRank}</span>
+      <span css={style.camNickNameStyle}>{userInfo.nickname}</span>
+      <span css={style.camScoreStyle}>{userInfo.score}</span>
     </div>
   );
 };

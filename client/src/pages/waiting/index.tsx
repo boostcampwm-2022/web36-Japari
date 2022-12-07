@@ -69,7 +69,7 @@ const WaitingPage: React.FC = () => {
                 currentPeople: room.participants.length,
                 gameId: Number(room.gameId),
               }}
-              camList={dummy.camList}
+              participants={room.participants}
             />
           )}
         </div>
