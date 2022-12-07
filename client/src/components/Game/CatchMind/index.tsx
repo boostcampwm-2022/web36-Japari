@@ -26,8 +26,8 @@ enum Color {
 }
 
 const WAIT_TIME = 5;
-const DRAW_TIME = 15;
-const RESULT_TIME = 10;
+const DRAW_TIME = 60;
+const RESULT_TIME = 5;
 
 enum CatchMindState {
   WAIT,
@@ -35,12 +35,30 @@ enum CatchMindState {
   RESULT,
 }
 
+const COLOR_LIST = [
+  "BLACK",
+  "WHITE",
+  "RED",
+  "YELLOW",
+  "GREEN",
+  "PURPLE",
+  "GRAY",
+  "ORANGE",
+  "BLUE",
+  "SKYBLUE",
+  "PINK",
+  "BROWN",
+  "GOLD",
+  "DARKBLUE",
+];
+
 export default function CatchMind() {
   const socket = useRecoilValue(socketState);
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isDrawing, setIsDrawing] = useState(false);
-  const colorRef = useRef<string>("black");
+  const [currentColor, setCurrentColor] = useState<string>("black");
+  const currentColorRef = useRef<string>("black");
 
   const [user, setUser] = useRecoilState(userState);
   const [time, setTime] = useState<number>(WAIT_TIME);
@@ -56,6 +74,7 @@ export default function CatchMind() {
     timeRef.current = time;
   }
   roundRef.current = round;
+  currentColorRef.current = currentColor;
 
   const getContextObject = useCallback(() => {
     const ctx = canvasRef.current?.getContext("2d");
@@ -66,7 +85,7 @@ export default function CatchMind() {
     const ctx = getContextObject();
     ctx.fillStyle = Color.WHITE;
     ctx.fillRect(0, 0, canvasRef.current!.width, canvasRef.current!.height);
-    ctx.fillStyle = colorRef.current;
+    ctx.fillStyle = currentColorRef.current;
     ctx.beginPath();
   }, []);
 
@@ -80,7 +99,10 @@ export default function CatchMind() {
     const x = canvas.width / 2 - width / 2;
     const y = canvas.height / 2 - height / 2;
 
+    ctx.strokeStyle = "black";
     ctx.fillText(text, x + (dx ?? 0), y + (dy ?? 0));
+    ctx.strokeStyle = currentColorRef.current;
+    ctx.beginPath();
   }, []);
 
   useEffect(() => {
@@ -215,7 +237,7 @@ export default function CatchMind() {
   useEffect(() => {
     if (!canvasRef.current) return;
     const canvas = canvasRef.current;
-    canvas.width = 700;
+    canvas.width = 800;
     canvas.height = 510;
 
     const ctx = getContextObject();
@@ -240,6 +262,20 @@ export default function CatchMind() {
     };
   }, [socket, round]);
 
+  useEffect(() => {
+    const ctx = getContextObject();
+    ctx.beginPath();
+    ctx.strokeStyle = currentColor;
+  }, [currentColor]);
+
+  const handleSelectColor = useCallback(
+    (color: string) => {
+      if (user?.userId !== drawerId || stateRef.current !== CatchMindState.DRAW) return;
+      setCurrentColor(color);
+    },
+    [drawerId]
+  );
+
   return (
     <div css={style.gameWrapperStyle}>
       <div css={style.gameViewStyle}>
@@ -248,18 +284,40 @@ export default function CatchMind() {
             <img src={timerImage} alt="timer" />
             <span>{time}</span>
           </div>
+
           <div css={style.answerStyle}>
             <span>{answer}</span>
           </div>
+
           <div css={style.roundStyle}>
             <span>Round {round} / 5</span>
           </div>
         </div>
+
         <div css={style.canvasStyle}>
           <canvas ref={canvasRef} />
         </div>
       </div>
-      <div css={style.paletteStyle}></div>
+
+      <div css={style.paletteStyle}>
+        <div>
+          {/* <div css={style.}></div> */}
+          {/* <div css={style.}></div> */}
+          {/* <div css={}></div> */}
+        </div>
+
+        <div css={style.trashCanStyle}>{/* <img src="휴지통" /> */}</div>
+
+        <div css={style.toggleStyle}>{/* <img src="연필/페인트/지우개" /> */}</div>
+
+        <div css={style.selectedColorStyle(currentColor)}></div>
+
+        <div css={style.colorGridStyle}>
+          {COLOR_LIST.map((color, idx) => (
+            <div css={style.colorStyle(color)} onClick={() => handleSelectColor(color)} key={idx}></div>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }
