@@ -25,8 +25,8 @@ enum Color {
   DARKBLUE = "darkblue",
 }
 
-const WAIT_TIME = 10;
-const DRAW_TIME = 60;
+const WAIT_TIME = 5;
+const DRAW_TIME = 15;
 const RESULT_TIME = 10;
 
 enum CatchMindState {
@@ -36,23 +36,26 @@ enum CatchMindState {
 }
 
 export default function CatchMind() {
+  const socket = useRecoilValue(socketState);
+
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isDrawing, setIsDrawing] = useState(false);
-
-  const socket = useRecoilValue(socketState);
+  const colorRef = useRef<string>("black");
 
   const [user, setUser] = useRecoilState(userState);
   const [time, setTime] = useState<number>(WAIT_TIME);
   const timeRef = useRef<number | null>(null);
   const [answer, setAnswer] = useState<string>("");
   const [round, setRound] = useState<number>(1);
+  const roundRef = useRef<number>(1);
   const stateRef = useRef<number>(0);
   const [drawerId, setDrawerId] = useState<number>(0);
-  const timer = useRef<NodeJS.Timer | null>(null);
 
+  const timer = useRef<NodeJS.Timer | null>(null);
   if (timeRef) {
     timeRef.current = time;
   }
+  roundRef.current = round;
 
   const getContextObject = useCallback(() => {
     const ctx = canvasRef.current?.getContext("2d");
@@ -60,9 +63,11 @@ export default function CatchMind() {
   }, []);
 
   const clearCanvas = useCallback(() => {
-    const ctx = canvasRef.current?.getContext("2d");
-    if (!ctx) return;
-    ctx.clearRect(0, 0, canvasRef.current!.width, canvasRef.current!.height);
+    const ctx = getContextObject();
+    ctx.fillStyle = Color.WHITE;
+    ctx.fillRect(0, 0, canvasRef.current!.width, canvasRef.current!.height);
+    ctx.fillStyle = colorRef.current;
+    ctx.beginPath();
   }, []);
 
   const writeCenter = useCallback((text: string, dx?: number, dy?: number) => {
@@ -88,7 +93,6 @@ export default function CatchMind() {
       setDrawerId(data.drawerId);
 
       clearCanvas();
-      const ctx = getContextObject();
       writeCenter(`Round ${data.round} 준비`);
 
       if (data.answer) {
@@ -108,7 +112,6 @@ export default function CatchMind() {
       stateRef.current = CatchMindState.DRAW;
 
       clearCanvas();
-      const ctx = getContextObject();
       writeCenter(`Round ${data.round} 시작!`);
 
       setTimeout(() => {
@@ -182,10 +185,10 @@ export default function CatchMind() {
   );
 
   const handleDebounce = useCallback(
-    debounce(data => {
-      socket.emit("catch-mind/image", data);
+    debounce(imageData => {
+      socket.emit("catch-mind/image", { round, imageData });
     }, 100),
-    []
+    [round]
   );
 
   const stopDrawing = useCallback(() => {
@@ -222,19 +225,20 @@ export default function CatchMind() {
   }, []);
 
   useEffect(() => {
-    socket.on("catch-mind/image", imageSrc => {
+    socket.on("catch-mind/image", data => {
       const image = new Image();
       image.onload = () => {
+        if (roundRef.current !== data.round) return;
         if (stateRef.current !== CatchMindState.DRAW) return;
         const ctx = getContextObject();
         ctx.drawImage(image, 0, 0);
       };
-      image.src = imageSrc;
+      image.src = data.imageSrc;
     });
     return () => {
       socket.off("catch-mind/image");
     };
-  }, [socket]);
+  }, [socket, round]);
 
   return (
     <div css={style.gameWrapperStyle}>
