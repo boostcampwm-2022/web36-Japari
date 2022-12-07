@@ -9,6 +9,7 @@ export const paletteStyle = css`
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
+  align-items: center;
 
   width: 15rem;
   /* height: 40rem; */
@@ -20,11 +21,22 @@ export const paletteStyle = css`
   padding: 0.5rem;
 `;
 
-export const trashCanStyle = css`
-  width: 4rem;
-  height: 4rem;
+export const buttonStyle = css`
   border: 1px solid black;
   border-radius: 5px;
+
+  width: 4rem;
+  padding: 3px 0;
+  cursor: pointer;
+  /* box-sizing: content-box; */
+`;
+
+export const clearStyle = css`
+  width: 4rem;
+  border: 1px solid black;
+  border-radius: 5px;
+  padding: 3px 0;
+  cursor: pointer;
 `;
 
 export const toggleStyle = css`
@@ -32,6 +44,12 @@ export const toggleStyle = css`
   height: 4rem;
   border: 1px solid black;
   border-radius: 5px;
+  cursor: pointer;
+
+  > img {
+    width: 90%;
+    height: 90%;
+  }
 `;
 
 export const selectedColorStyle = (color: string) => css`
@@ -41,6 +59,7 @@ export const selectedColorStyle = (color: string) => css`
   border-radius: 5px;
 
   background-color: ${color};
+  cursor: pointer;
 `;
 
 export const colorGridStyle = css`
@@ -48,6 +67,7 @@ export const colorGridStyle = css`
   grid-template-columns: 1fr 1fr;
   align-items: center;
   justify-items: center;
+  cursor: pointer;
 `;
 
 export const colorStyle = (color: string) => css`
@@ -57,6 +77,7 @@ export const colorStyle = (color: string) => css`
   border-radius: 5px;
 
   background-color: ${color};
+  cursor: pointer;
 `;
 
 export const gameViewStyle = css`

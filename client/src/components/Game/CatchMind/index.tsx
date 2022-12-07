@@ -8,6 +8,16 @@ import { userState } from "../../../store/user";
 import { socketState } from "../../../store/socket";
 import { debounce } from "lodash";
 
+import pencilIcon from "../../../assets/icons/catch-mind-pencil.png";
+import paintIcon from "../../../assets/icons/catch-mind-paint.png";
+import eraserIcon from "../../../assets/icons/catch-mind-eraser.png";
+
+const modeToIcon = {
+  pencil: pencilIcon as string,
+  paint: paintIcon as string,
+  eraser: eraserIcon as string,
+};
+
 enum Color {
   WHITE = "white",
   BLACK = "black",
@@ -24,6 +34,10 @@ enum Color {
   GOLD = "gold",
   DARKBLUE = "darkblue",
 }
+
+const THIN = 1;
+const NORMAL = 4;
+const THICK = 7;
 
 const WAIT_TIME = 5;
 const DRAW_TIME = 60;
@@ -56,8 +70,10 @@ export default function CatchMind() {
   const socket = useRecoilValue(socketState);
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [mode, setMode] = useState<string>("pencil");
   const [isDrawing, setIsDrawing] = useState(false);
   const [currentColor, setCurrentColor] = useState<string>("black");
+  const [currentLineWidth, setCurrentLineWidth] = useState<Number>(2);
   const currentColorRef = useRef<string>("black");
 
   const [user, setUser] = useRecoilState(userState);
@@ -99,10 +115,56 @@ export default function CatchMind() {
     const x = canvas.width / 2 - width / 2;
     const y = canvas.height / 2 - height / 2;
 
-    ctx.strokeStyle = "black";
-    ctx.fillText(text, x + (dx ?? 0), y + (dy ?? 0));
-    ctx.strokeStyle = currentColorRef.current;
     ctx.beginPath();
+    ctx.fillStyle = "black";
+    ctx.fillText(text, x + (dx ?? 0), y + (dy ?? 0));
+    ctx.fillStyle = currentColorRef.current;
+    ctx.beginPath();
+  }, []);
+
+  const handleDebounce = useCallback(
+    debounce(imageData => {
+      socket.emit("catch-mind/image", { round, imageData });
+    }, 100),
+    [round]
+  );
+
+  const stopDrawing = useCallback(() => {
+    setIsDrawing(false);
+  }, []);
+
+  const startDrawing = useCallback((e: MouseEvent) => {
+    setIsDrawing(true);
+  }, []);
+
+  const onDrawing = useCallback(
+    (e: MouseEvent) => {
+      const ctx = getContextObject();
+      if (isDrawing) {
+        ctx.lineTo(e.offsetX, e.offsetY);
+        ctx.stroke();
+        const imageData = canvasRef.current?.toDataURL("image/png");
+        handleDebounce(imageData);
+      }
+      ctx.moveTo(e.offsetX, e.offsetY);
+    },
+    [isDrawing]
+  );
+
+  const handleSelectColor = useCallback(
+    (color: string) => {
+      if (user?.userId !== drawerId || stateRef.current !== CatchMindState.DRAW) return;
+      setCurrentColor(color);
+    },
+    [drawerId]
+  );
+
+  const handleLineWidth = useCallback((width: number) => {
+    console.log(width);
+    const ctx = getContextObject();
+    ctx.beginPath();
+    ctx.lineWidth = width;
+    ctx.closePath();
   }, []);
 
   useEffect(() => {
@@ -188,35 +250,6 @@ export default function CatchMind() {
     };
   }, []);
 
-  const startDrawing = useCallback((e: MouseEvent) => {
-    setIsDrawing(true);
-  }, []);
-
-  const onDrawing = useCallback(
-    (e: MouseEvent) => {
-      const ctx = getContextObject();
-      if (isDrawing) {
-        ctx.lineTo(e.offsetX, e.offsetY);
-        ctx.stroke();
-        const imageData = canvasRef.current?.toDataURL("image/png");
-        handleDebounce(imageData);
-      }
-      ctx.moveTo(e.offsetX, e.offsetY);
-    },
-    [isDrawing]
-  );
-
-  const handleDebounce = useCallback(
-    debounce(imageData => {
-      socket.emit("catch-mind/image", { round, imageData });
-    }, 100),
-    [round]
-  );
-
-  const stopDrawing = useCallback(() => {
-    setIsDrawing(false);
-  }, []);
-
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -243,7 +276,7 @@ export default function CatchMind() {
     const ctx = getContextObject();
     ctx.font = "40px LINESeedKR bold";
     ctx.strokeStyle = "black";
-    ctx.strokeStyle = "2";
+    ctx.lineWidth = 2;
   }, []);
 
   useEffect(() => {
@@ -266,15 +299,8 @@ export default function CatchMind() {
     const ctx = getContextObject();
     ctx.beginPath();
     ctx.strokeStyle = currentColor;
+    ctx.fillStyle = currentColor;
   }, [currentColor]);
-
-  const handleSelectColor = useCallback(
-    (color: string) => {
-      if (user?.userId !== drawerId || stateRef.current !== CatchMindState.DRAW) return;
-      setCurrentColor(color);
-    },
-    [drawerId]
-  );
 
   return (
     <div css={style.gameWrapperStyle}>
@@ -300,15 +326,23 @@ export default function CatchMind() {
       </div>
 
       <div css={style.paletteStyle}>
-        <div>
-          {/* <div css={style.}></div> */}
-          {/* <div css={style.}></div> */}
-          {/* <div css={}></div> */}
+        <div css={style.toggleStyle}>
+          <img src={modeToIcon["pencil"]} />
         </div>
 
-        <div css={style.trashCanStyle}>{/* <img src="휴지통" /> */}</div>
+        <div>
+          <div onClick={() => handleLineWidth(THIN)} css={style.buttonStyle}>
+            얇게
+          </div>
+          <div onClick={() => handleLineWidth(NORMAL)} css={style.buttonStyle}>
+            보통
+          </div>
+          <div onClick={() => handleLineWidth(THICK)} css={style.buttonStyle}>
+            굵게
+          </div>
+        </div>
 
-        <div css={style.toggleStyle}>{/* <img src="연필/페인트/지우개" /> */}</div>
+        <div css={style.clearStyle}>clear</div>
 
         <div css={style.selectedColorStyle(currentColor)}></div>
 
