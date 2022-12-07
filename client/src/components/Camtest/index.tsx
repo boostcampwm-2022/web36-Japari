@@ -272,6 +272,7 @@ const Camtest = () => {
         />
       )}
       {cams.map((cam, idx) => {
+        console.log(cam.userInfo);
         return (
           <Fragment key={idx}>
             <Cam

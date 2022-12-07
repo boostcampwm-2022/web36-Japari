@@ -1,5 +1,7 @@
 /** @jsxImportSource @emotion/react */
 import { useEffect, useRef } from "react";
+import { useRecoilValue } from "recoil";
+import { userState } from "../../store/user";
 import * as style from "./styles";
 
 export interface CamProps {
@@ -17,6 +19,7 @@ export interface ProfileProps {
 }
 
 const Cam = ({ mediaStream, isVideoOn, isAudioOn, profile, nickname, scoreRank }: CamProps) => {
+  const user = useRecoilValue(userState);
   const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
@@ -28,7 +31,7 @@ const Cam = ({ mediaStream, isVideoOn, isAudioOn, profile, nickname, scoreRank }
   return (
     <div css={style.camContainerStyle}>
       <div css={style.camWrapperStyle}>
-        <video ref={videoRef} autoPlay playsInline></video>
+        <video ref={videoRef} autoPlay playsInline muted={nickname === user?.nickname}></video>
         {!isVideoOn && <Profile profile={profile} />}
       </div>
       <span css={style.camNickNameStyle}>{nickname}</span>

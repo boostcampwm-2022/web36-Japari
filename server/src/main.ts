@@ -10,6 +10,11 @@ import { readFileSync } from "fs";
 
 export let worker: mediasoup.types.Worker;
 
+const httpsOptions = {
+  key: readFileSync("src/ssl/key.pem", "utf-8"),
+  cert: readFileSync("src/ssl/cert.pem", "utf-8"),
+};
+
 const createWorker = async () => {
   worker = await mediasoup.createWorker();
 
@@ -26,8 +31,16 @@ createWorker().then(res => {
 });
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, { cors: true });
+  const app = await NestFactory.create(AppModule, { httpsOptions, cors: true });
   app.use(cookieParser());
+  app.use(function (req, res, next) {
+    if (!req.secure) {
+      console.log(req.secure, req.url);
+      res.redirect("https://localhost:4000" + req.url);
+    } else {
+      next();
+    }
+  });
   await app.listen(SERVER_PORT);
 }
 bootstrap();
