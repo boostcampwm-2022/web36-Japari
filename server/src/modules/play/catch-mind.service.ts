@@ -7,7 +7,7 @@ import { PrismaService } from "../prisma/prisma.service";
 import { RedisService } from "../redis/redis.service";
 
 const WAIT_TIME = 10;
-const DRAW_TIME = 10; //120
+const DRAW_TIME = 60; //120
 const RESULT_TIME = 10; //15
 
 @Injectable()
@@ -163,10 +163,12 @@ export class CatchMindService {
     // ex) 7명 중 1등을 할 경우 9점 획득
     // ex) 7명 중 7등을 할 경우 1점 획득
 
-    const participantsCount = Object.values(playData.scores).length - 1;
-    const firstPrize = participantsCount + 1; // 1등이 받을 점수
-    const qualifiersCount = Object.values(playData.scores).filter(score => score > 0).length;
-    const score = Math.floor((firstPrize * (participantsCount - qualifiersCount)) / participantsCount);
+    const nonDrawersScores = Object.entries(playData.scores).filter(([userId]) => Number(userId) !== playData.drawerId);
+
+    const nonDrawersCount = nonDrawersScores.length;
+    const firstPrize = nonDrawersCount + 3; // 1등이 받을 점수
+    const qualifiersCount = nonDrawersScores.filter(([, score]) => score > 0).length;
+    const score = Math.floor((firstPrize * (nonDrawersCount - qualifiersCount)) / nonDrawersCount);
 
     // 2. 맞춘 사람과 그린 사람의 scores를 갱신한다.
     playData.scores[String(userId)] += score;
@@ -181,7 +183,7 @@ export class CatchMindService {
     });
 
     // 4. 전원 정답일 경우 바로 result state로 넘어간다.
-    if (qualifiersCount + 1 === participantsCount) {
+    if (qualifiersCount + 1 === nonDrawersCount) {
       server.to(roomId).emit("chat/room", {
         sender: "시스템",
         message: `모든 유저가 정답을 맞추셨습니다!`,

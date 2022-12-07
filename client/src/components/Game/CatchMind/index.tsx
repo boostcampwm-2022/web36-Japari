@@ -26,7 +26,7 @@ enum Color {
 }
 
 const WAIT_TIME = 10;
-const DRAW_TIME = 10;
+const DRAW_TIME = 60;
 const RESULT_TIME = 10;
 
 enum CatchMindState {

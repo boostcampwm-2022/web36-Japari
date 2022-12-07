@@ -29,10 +29,9 @@ export class UserService {
   }
 
   async updateUserNickname(userId: number, nickname: string) {
-    const userInfo = JSON.parse(await this.redis.hget(RedisTableName.ONLINE_USERS, String(userId)));
-    userInfo.nickname = nickname;
-    await this.redis.hset(RedisTableName.ONLINE_USERS, userId, JSON.stringify(userInfo));
-    await this.redis.hset(RedisTableName.SOCKET_ID_TO_USER_INFO, userInfo.socketId, JSON.stringify(userInfo));
+    const { socketId } = await this.redis.getFrom(RedisTableName.ONLINE_USERS, String(userId));
+    await this.redis.updateTo(RedisTableName.ONLINE_USERS, String(userId), { nickname });
+    await this.redis.updateTo(RedisTableName.SOCKET_ID_TO_USER_INFO, socketId, { nickname });
     return this.prisma.user.update({
       where: { userId },
       data: { nickname },
