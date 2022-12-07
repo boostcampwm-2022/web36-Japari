@@ -56,9 +56,11 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 
   async handleDisconnect(@ConnectedSocket() socket: Socket) {
     this.logger.warn(`socket ${socket.id} disconnected`);
-    await this.gameRoomGateway.exit(socket);
 
-    // Online users 테이블의 레코드 중 같은 소켓 id를 가진 레코드를 지운다.
+    // Redis 테이블 갱신
+
+    // 1. online-users
+    // 같은 소켓 id를 value.socketId에 포함하는 레코드를 지운다.
     const allUsers = await this.redis.hgetall(RedisTableName.ONLINE_USERS);
     const userIdToRemove = Object.entries(allUsers)
       .map(([key, value]) => {
@@ -67,20 +69,61 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
       .filter(([, userInfo]) => userInfo.socketId === socket.id)
       .map(([userId]) => Number(userId))[0];
 
-    console.log("userIdToRemove", userIdToRemove);
     await this.redis.hdel(RedisTableName.ONLINE_USERS, String(userIdToRemove));
 
-    // socket id to user info 테이블 중 같은 유저 id를 가진 레코드를 전부 지운다.
+    // 2. socket-id-to-user-info
+    // value.userId가 userIdToRemove인 레코드를 전부 지운다.
+    // 3. game-rooms
+    // key가 roomId인 레코드 room에 대하여
+    // room.patricipants를 순회하면서 userId가 userIdToRemove인 레코드를 전부 지운다.
+    // 4. play-data
+    // key가 roomId인 레코드 playData에 대하여
+    // playData.scores[userIdToRemove], playData.totalScores[userIdToRemove]를 삭제한다.
     const allSocketUsers = await this.redis.hgetall(RedisTableName.SOCKET_ID_TO_USER_INFO);
-    const socketIdToRemoveList = Object.entries(allSocketUsers)
+    const relatedSocketIdAndRoomIdList = Object.entries(allSocketUsers)
       .map(([key, value]) => {
         return [key, JSON.parse(value)];
       })
       .filter(([, userInfo]) => userInfo.userId === userIdToRemove)
-      .map(([socketId]) => socketId);
+      .map(([socketId, userInfo]) => [socketId, userInfo.roomId]);
 
-    for (const socketId of socketIdToRemoveList) {
+    const usedRoomId = new Map();
+
+    for (const [socketId, roomId] of relatedSocketIdAndRoomIdList) {
+      // socket-id-to-user-info
       await this.redis.hdel(RedisTableName.SOCKET_ID_TO_USER_INFO, socketId);
+
+      // roomId 중복 체크
+      if (usedRoomId.has(roomId)) {
+        continue;
+      }
+      usedRoomId.set(roomId, true);
+
+      // game-rooms
+      const room = await this.redis.getFrom(RedisTableName.GAME_ROOMS, roomId);
+
+      if (room) {
+        room.participants = room.participants.filter(user => user.userId !== userIdToRemove);
+        if (room.participants.length === 0) {
+          await this.redis.hdel(RedisTableName.GAME_ROOMS, roomId);
+        } else {
+          await this.redis.setTo(RedisTableName.GAME_ROOMS, roomId, room);
+        }
+      }
+
+      // play-data
+      const playData = await this.redis.getFrom(RedisTableName.PLAY_DATA, roomId);
+
+      if (playData) {
+        delete playData.scores[String(userIdToRemove)];
+        delete playData.totalScores[String(userIdToRemove)];
+
+        if (Object.keys(playData.scores).length === 0) {
+          await this.redis.hdel(RedisTableName.PLAY_DATA, roomId);
+        } else {
+          await this.redis.setTo(RedisTableName.PLAY_DATA, roomId, playData);
+        }
+      }
     }
   }
 }
