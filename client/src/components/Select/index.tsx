@@ -29,7 +29,9 @@ const Select = ({ selectType, width, setValue }: SelectProps) => {
             `}
             onChange={e => setValue(Number(e.target.value))}
           >
-            <option>모든 게임</option>
+            <option value={0} selected>
+              모든 게임
+            </option>
             <option value={1}>캐치 마인드</option>
             <option value={2}>배틀십</option>
           </select>

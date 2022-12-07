@@ -22,6 +22,7 @@ export class JwtGuard implements CanActivate {
 
       // 1-A. access token이 유효하므로 req에 유저 정보를 넣어주고 통과시킨다.
       const user = await this.prisma.user.findFirst({ where: { userId } });
+      if (!user) return false;
       req.user = user;
 
       return true;
@@ -42,7 +43,7 @@ export class JwtGuard implements CanActivate {
       const payload = this.jwt.verify(refreshToken);
       const { userId } = payload;
       const user = await this.prisma.user.findFirst({ where: { userId } });
-
+      if (!user) return false;
       // 2-A. refresh token이 유효하므로 다음 절차를 따른다.
 
       // i) refresh token이 blacklist에 존재한다면 토큰을 모두 삭제하고 사용자에게 보안 경고 메일을 보낸 뒤 block.

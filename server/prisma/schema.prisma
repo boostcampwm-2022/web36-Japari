@@ -42,7 +42,13 @@ model Friend {
 }
 
 model RefreshTokenBlackList {
-  index Int     @default(autoincrement()) @id @map("user_id")
+  index Int     @default(autoincrement()) @id @map("id")
   token String  @db.VarChar(500)
   @@map("refresh_token_black_list")
+}
+
+model CatchMindWordList {
+  index Int     @default(autoincrement()) @id @map("id")
+  word String
+  @@map("catch_mind_word_list")
 }
