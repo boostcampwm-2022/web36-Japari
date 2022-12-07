@@ -57,8 +57,30 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
   async handleDisconnect(@ConnectedSocket() socket: Socket) {
     this.logger.warn(`socket ${socket.id} disconnected`);
     await this.gameRoomGateway.exit(socket);
-    const { userId } = await this.redis.getFrom(RedisTableName.SOCKET_ID_TO_USER_INFO, socket.id);
-    await this.redis.hdel(RedisTableName.SOCKET_ID_TO_USER_INFO, socket.id);
-    this.redis.hdel(RedisTableName.ONLINE_USERS, userId);
+
+    // Online users 테이블의 레코드 중 같은 소켓 id를 가진 레코드를 지운다.
+    const allUsers = await this.redis.hgetall(RedisTableName.ONLINE_USERS);
+    const userIdToRemove = Object.entries(allUsers)
+      .map(([key, value]) => {
+        return [key, JSON.parse(value)];
+      })
+      .filter(([, userInfo]) => userInfo.socketId === socket.id)
+      .map(([userId]) => Number(userId))[0];
+
+    console.log("userIdToRemove", userIdToRemove);
+    await this.redis.hdel(RedisTableName.ONLINE_USERS, String(userIdToRemove));
+
+    // socket id to user info 테이블 중 같은 유저 id를 가진 레코드를 전부 지운다.
+    const allSocketUsers = await this.redis.hgetall(RedisTableName.SOCKET_ID_TO_USER_INFO);
+    const socketIdToRemoveList = Object.entries(allSocketUsers)
+      .map(([key, value]) => {
+        return [key, JSON.parse(value)];
+      })
+      .filter(([, userInfo]) => userInfo.userId === userIdToRemove)
+      .map(([socketId]) => socketId);
+
+    for (const socketId of socketIdToRemoveList) {
+      await this.redis.hdel(RedisTableName.SOCKET_ID_TO_USER_INFO, socketId);
+    }
   }
 }
