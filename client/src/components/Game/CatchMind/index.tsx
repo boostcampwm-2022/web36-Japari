@@ -126,8 +126,8 @@ export default function CatchMind() {
   }, []);
 
   const handleDebounce = useCallback(
-    debounce(imageData => {
-      socket.emit("catch-mind/image", { round, imageData });
+    debounce(imageSrc => {
+      socket.emit("catch-mind/image", { round, imageSrc });
     }, 100),
     [round]
   );
@@ -307,7 +307,7 @@ export default function CatchMind() {
     return () => {
       socket.off("catch-mind/image");
     };
-  }, [socket, round]);
+  }, [socket]);
 
   useEffect(() => {
     socket.on("catch-mind/end", () => {

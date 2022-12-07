@@ -49,7 +49,6 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
     };
 
     socket.join("lobby");
-    console.log("userId", userId);
     this.redis.setTo(RedisTableName.SOCKET_ID_TO_USER_INFO, socket.id, { ...userPublicInfo, userId, roomId: "lobby" });
     this.redis.setTo(RedisTableName.ONLINE_USERS, String(userId), { ...userPublicInfo, socketId: socket.id });
   }
