@@ -6,6 +6,9 @@ export const gameWrapperStyle = css`
 `;
 
 export const paletteStyle = css`
+  position: relative;
+  bottom: 6px;
+
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
@@ -21,41 +24,62 @@ export const paletteStyle = css`
   padding: 0.5rem;
 `;
 
-export const buttonStyle = css`
-  border: 1px solid black;
-  border-radius: 5px;
+export const toolStyle = css`
+  display: flex;
+  gap: 0.25rem;
+  flex-direction: column;
+`;
 
+export const buttonStyle = (line: string, thisLine: string) => css`
+  border-radius: 5px;
+  ${line === thisLine ? "border: 3px solid green;" : ""}
+
+  box-sizing: border-box;
   width: 4rem;
-  padding: 3px 0;
+  height: 1.5rem;
+  margin: 0.25rem;
+  background-color: plum;
   cursor: pointer;
-  /* box-sizing: content-box; */
+  line-height: 1.5rem;
+  text-align: center;
+  box-shadow: 0 0.25rem 0.25rem rgba(0, 0, 0, 0.2);
 `;
 
 export const clearStyle = css`
   width: 4rem;
-  border: 1px solid black;
   border-radius: 5px;
   padding: 3px 0;
   cursor: pointer;
+  background-color: plum;
+  box-shadow: 0 0.25rem 0.25rem rgba(0, 0, 0, 0.2);
+  margin-bottom: 0.5rem;
 `;
 
-export const toggleStyle = css`
+export const toggleStyle = (mode: string, thisMode: string) => css`
+  position: relative;
   width: 4rem;
   height: 4rem;
-  border: 1px solid black;
+  box-sizing: border-box;
+  ${mode === thisMode ? "border: 3px solid green;" : ""}
   border-radius: 5px;
   cursor: pointer;
-
+  background-color: plum;
   > img {
-    width: 90%;
-    height: 90%;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 3rem;
+    height: 3rem;
   }
+  box-shadow: 0 0.25rem 0.25rem rgba(0, 0, 0, 0.2);
 `;
+
+export const lineWidthStyle = css``;
 
 export const selectedColorStyle = (color: string) => css`
   width: 4rem;
   height: 4rem;
-  border: 1px solid black;
   border-radius: 5px;
 
   background-color: ${color};
@@ -67,13 +91,14 @@ export const colorGridStyle = css`
   grid-template-columns: 1fr 1fr;
   align-items: center;
   justify-items: center;
+  row-gap: 0.25rem;
+  column-gap: 0.25rem;
   cursor: pointer;
 `;
 
 export const colorStyle = (color: string) => css`
   width: 2rem;
   height: 2rem;
-  border: 1px solid white;
   border-radius: 5px;
 
   background-color: ${color};

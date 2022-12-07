@@ -9,14 +9,7 @@ import { socketState } from "../../../store/socket";
 import { debounce } from "lodash";
 
 import pencilIcon from "../../../assets/icons/catch-mind-pencil.png";
-import paintIcon from "../../../assets/icons/catch-mind-paint.png";
 import eraserIcon from "../../../assets/icons/catch-mind-eraser.png";
-
-const modeToIcon = {
-  pencil: pencilIcon as string,
-  paint: paintIcon as string,
-  eraser: eraserIcon as string,
-};
 
 enum Color {
   WHITE = "white",
@@ -35,13 +28,9 @@ enum Color {
   DARKBLUE = "darkblue",
 }
 
-const THIN = 1;
-const NORMAL = 4;
-const THICK = 7;
-
 const WAIT_TIME = 5;
-const DRAW_TIME = 60;
-const RESULT_TIME = 5;
+const DRAW_TIME = 120;
+const RESULT_TIME = 15;
 
 enum CatchMindState {
   WAIT,
@@ -51,26 +40,29 @@ enum CatchMindState {
 
 const COLOR_LIST = [
   "BLACK",
-  "WHITE",
   "RED",
+  "ORANGE",
   "YELLOW",
   "GREEN",
+  "BLUE",
+  "DARKBLUE",
   "PURPLE",
   "GRAY",
-  "ORANGE",
-  "BLUE",
   "SKYBLUE",
   "PINK",
   "BROWN",
-  "GOLD",
-  "DARKBLUE",
 ];
+
+const THIN = 1;
+const NORMAL = 5;
+const THICK = 9;
 
 export default function CatchMind() {
   const socket = useRecoilValue(socketState);
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [mode, setMode] = useState<string>("pencil");
+  const [mode, setMode] = useState<"pencil" | "eraser">("pencil");
+  const [line, setLine] = useState<"THIN" | "NORMAL" | "THICK">("NORMAL");
   const [isDrawing, setIsDrawing] = useState(false);
   const [currentColor, setCurrentColor] = useState<string>("black");
   const [currentLineWidth, setCurrentLineWidth] = useState<Number>(2);
@@ -95,6 +87,13 @@ export default function CatchMind() {
   const getContextObject = useCallback(() => {
     const ctx = canvasRef.current?.getContext("2d");
     return ctx as CanvasRenderingContext2D;
+  }, []);
+
+  const fillCanvas = useCallback(() => {
+    const ctx = getContextObject();
+    ctx.fillStyle = currentColorRef.current;
+    ctx.fillRect(0, 0, canvasRef.current!.width, canvasRef.current!.height);
+    ctx.beginPath();
   }, []);
 
   const clearCanvas = useCallback(() => {
@@ -159,11 +158,22 @@ export default function CatchMind() {
     [drawerId]
   );
 
-  const handleLineWidth = useCallback((width: number) => {
-    console.log(width);
+  const handleLineWidth = useCallback((line: "THIN" | "NORMAL" | "THICK") => {
+    setLine(line);
+
     const ctx = getContextObject();
     ctx.beginPath();
-    ctx.lineWidth = width;
+    switch (line) {
+      case "THIN":
+        ctx.lineWidth = THIN;
+        break;
+      case "NORMAL":
+        ctx.lineWidth = NORMAL;
+        break;
+      case "THICK":
+        ctx.lineWidth = THICK;
+        break;
+    }
     ctx.closePath();
   }, []);
 
@@ -302,6 +312,18 @@ export default function CatchMind() {
     ctx.fillStyle = currentColor;
   }, [currentColor]);
 
+  useEffect(() => {
+    const ctx = getContextObject();
+    if (mode === "pencil") {
+      ctx.beginPath();
+      ctx.strokeStyle = currentColorRef.current;
+    }
+    if (mode === "eraser") {
+      ctx.beginPath();
+      ctx.strokeStyle = Color.WHITE;
+    }
+  }, [mode]);
+
   return (
     <div css={style.gameWrapperStyle}>
       <div css={style.gameViewStyle}>
@@ -326,23 +348,31 @@ export default function CatchMind() {
       </div>
 
       <div css={style.paletteStyle}>
-        <div css={style.toggleStyle}>
-          <img src={modeToIcon["pencil"]} />
+        <div css={style.toolStyle}>
+          <div css={style.toggleStyle(mode, "pencil")} onClick={() => setMode("pencil")}>
+            <img src={pencilIcon} alt="pencil" />
+          </div>
+
+          <div css={style.toggleStyle(mode, "eraser")} onClick={() => setMode("eraser")}>
+            <img src={eraserIcon} alt="eraser" />
+          </div>
         </div>
 
-        <div>
-          <div onClick={() => handleLineWidth(THIN)} css={style.buttonStyle}>
+        <div css={style.lineWidthStyle}>
+          <div onClick={() => handleLineWidth("THIN")} css={style.buttonStyle(line, "THIN")}>
             얇게
           </div>
-          <div onClick={() => handleLineWidth(NORMAL)} css={style.buttonStyle}>
+          <div onClick={() => handleLineWidth("NORMAL")} css={style.buttonStyle(line, "NORMAL")}>
             보통
           </div>
-          <div onClick={() => handleLineWidth(THICK)} css={style.buttonStyle}>
+          <div onClick={() => handleLineWidth("THICK")} css={style.buttonStyle(line, "THICK")}>
             굵게
           </div>
         </div>
 
-        <div css={style.clearStyle}>clear</div>
+        <div css={style.clearStyle} onClick={clearCanvas}>
+          clear
+        </div>
 
         <div css={style.selectedColorStyle(currentColor)}></div>
 
