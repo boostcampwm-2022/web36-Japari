@@ -2,13 +2,13 @@
 import React, { useEffect, useState } from "react";
 import * as style from "./styles";
 import { Page } from "../../components/Page";
-import { camList } from "../dummy";
 import InGameCamList from "../../components/InGameCamList";
 import Chatting from "../../components/Chatting";
+import Game from "../../components/Game";
 import { User } from "@dto";
 import { getGameRoomInfo } from "../../api/gameRoom";
-import { useLocation, useNavigate } from "react-router-dom";
-import { StreamInfo, useCams } from "../../hooks/useCams";
+import { useLocation } from "react-router-dom";
+import { useCams } from "../../hooks/useCams";
 
 const PlayingPage: React.FC = () => {
   const [participants, setParticipants] = useState<User[]>([]);
@@ -32,7 +32,10 @@ const PlayingPage: React.FC = () => {
           audioStream={audioStream}
         />
         <div css={style.GameAndChatContainerStyle}>
-          <div css={style.GameContainerStyle}>게임</div>
+          <div css={style.GameContainerStyle}>
+            {/* <Game gameId={location.state.gameId} /> */}
+            <Game gameId={1} />
+          </div>
           <Chatting />
         </div>
         <InGameCamList

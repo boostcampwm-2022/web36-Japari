@@ -3,7 +3,7 @@ import Input from "../../Input";
 import Button from "../../Button";
 import Select from "../../Select";
 import * as style from "./styles";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRecoilValue } from "recoil";
 import { socketState } from "../../../store/socket";
 
@@ -25,8 +25,13 @@ const RoomSetting = ({ closeModal }: RoomSettingProps) => {
     const data = { gameId, title, isPrivate, maximumPeople, password };
 
     socket.emit("game-room/create", data);
-    closeModal();
   };
+
+  useEffect(() => {
+    socket.on("game-room/create-success", () => {
+      closeModal();
+    });
+  }, [socket]);
 
   return (
     <>

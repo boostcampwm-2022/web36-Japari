@@ -9,7 +9,7 @@ import {
 } from "@nestjs/websockets";
 import { Server, Socket } from "socket.io";
 import { SERVER_SOCKET_PORT } from "src/constants/config";
-import { RedisTableName } from "src/constants/redis-table-name";
+import { RedisTableName } from "src/constants/enum";
 import { redisRecordToObject } from "util/convert";
 import { RedisService } from "../redis/redis.service";
 

@@ -19,9 +19,11 @@ const LobbyPage: React.FC = () => {
 
   const [gameRooms, setGameRooms] = useState<Room[]>([]);
   const [nicknameModalOpen, setNicknameModalOpen] = useState<boolean>(false);
+  const [nicknameChangeModalOpen, setNicknameChangeModalOpen] = useState<boolean>(false);
 
   const closeModal = () => {
     setNicknameModalOpen(false);
+    setNicknameChangeModalOpen(false);
   };
 
   useEffect(() => {
@@ -59,10 +61,11 @@ const LobbyPage: React.FC = () => {
           <RoomList rooms={gameRooms} />
         </div>
         <div css={style.RowContentContainerStyle}>
-          <Profile user={user} />
+          <Profile user={user} editable={true} setNicknameChangeModalOpen={setNicknameChangeModalOpen} />
           <Chatting />
         </div>
       </div>
+      {nicknameChangeModalOpen && <Modal ModalType="닉네임 설정" closeModal={closeModal} />}
       {nicknameModalOpen && <Modal ModalType="닉네임 설정" closeModal={closeModal} />}
     </Page>
   );

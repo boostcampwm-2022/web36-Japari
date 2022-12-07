@@ -12,6 +12,10 @@ import { isLogin } from "../../api/auth";
 import { useNavigate } from "react-router-dom";
 
 const LandingPage: React.FC = () => {
+  const handleGoogleLogin = () => {
+    window.location.href = process.env.REACT_APP_OAUTH_GOOGLE_AUTH_SERVER!;
+  };
+
   const handleGithubLogin = () => {
     window.location.href = process.env.REACT_APP_OAUTH_GITHUB_AUTH_SERVER!;
   };
@@ -36,9 +40,9 @@ const LandingPage: React.FC = () => {
           <img css={style.landingImageStyle} src={LandingImage} alt="LandingImage" />
         </div>
         <div css={style.logoContainerStyle}>
-          <img css={style.logoStyle} src={NaverLogo} alt="NaverLogo" />
-          <img css={style.logoStyle} src={KakaoLogo} alt="KakaoLogo" />
-          <img css={style.logoStyle} src={GoogleLogo} alt="GoogleLogo" />
+          {/* <img css={style.logoStyle} src={NaverLogo} alt="NaverLogo" /> */}
+          {/* <img css={style.logoStyle} src={KakaoLogo} alt="KakaoLogo" /> */}
+          <img css={style.logoStyle} src={GoogleLogo} alt="GoogleLogo" onClick={handleGoogleLogin} />
           <img css={style.logoStyle} src={GithubLogo} alt="GithubLogo" onClick={handleGithubLogin} />
         </div>
       </div>

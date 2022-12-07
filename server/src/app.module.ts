@@ -11,6 +11,7 @@ import { JwtModule } from "./modules/auth/jwt/jwt.module";
 import { UserModule } from "./modules/user/user.module";
 import { GameRoomModule } from "./modules/game-room/game-room.module";
 import { MediaModule } from "./modules/media/media.module";
+import { PlayModule } from "./modules/play/play.module";
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { MediaModule } from "./modules/media/media.module";
     UserModule,
     GameRoomModule,
     MediaModule,
+    PlayModule,
   ],
 
   controllers: [AppController],
