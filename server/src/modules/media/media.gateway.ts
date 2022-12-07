@@ -11,7 +11,7 @@ import {
 } from "@nestjs/websockets";
 import { Server, Socket } from "socket.io";
 import { SocketBadRequestFilter } from "src/exception-filters/websocket.filter";
-import { SERVER_SOCKET_PORT } from "src/constants/config";
+import { SERVER_SOCKET_PORT, WEBRTC_HOST } from "src/constants/config";
 import { worker } from "src/main";
 import {
   Consumer,
@@ -131,8 +131,8 @@ export class MediaGateway implements OnGatewayInit, OnGatewayConnection, OnGatew
         const webRtcTransport_options: WebRtcTransportOptions = {
           listenIps: [
             {
-              ip: "127.0.0.1", // replace with relevant IP address
-              announcedIp: "0.0.0.0",
+              ip: "0.0.0.0",
+              announcedIp: WEBRTC_HOST || "127.0.0.1",
             },
           ],
           enableUdp: true,
