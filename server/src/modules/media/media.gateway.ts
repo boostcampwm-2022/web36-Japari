@@ -29,7 +29,7 @@ import {
   WebRtcTransportOptions,
 } from "mediasoup/node/lib/types";
 import { RedisService } from "../redis/redis.service";
-import { RedisTableName } from "src/constants/redis-table-name";
+import { RedisTableName } from "src/constants/enum";
 
 const mediaCodecs: RtpCodecCapability[] = [
   {
@@ -257,6 +257,7 @@ export class MediaGateway implements OnGatewayInit, OnGatewayConnection, OnGatew
     @MessageBody()
     { dtlsParameters, serverConsumerTransportId }: { dtlsParameters: DtlsParameters; serverConsumerTransportId: string }
   ) {
+    console.log(serverConsumerTransportId, this.transports);
     const consumerTransport = this.transports.find(
       transportData => transportData.consumer && transportData.transport.id == serverConsumerTransportId
     ).transport;
