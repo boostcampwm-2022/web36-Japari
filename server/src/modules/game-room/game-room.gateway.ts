@@ -20,8 +20,9 @@ import { SocketBadRequestFilter, SocketExceptionFilter } from "src/exception-fil
 import { SocketException } from "src/constants/exception";
 import { RedisService } from "../redis/redis.service";
 import { SERVER_SOCKET_PORT } from "src/constants/config";
+import { RoomSettingValidationExceptionFilter } from "./game-room.filter";
 
-@UseFilters(new SocketBadRequestFilter("game-room/error"))
+@UseFilters(new RoomSettingValidationExceptionFilter("game-room/error"))
 @UseFilters(SocketExceptionFilter)
 @WebSocketGateway(SERVER_SOCKET_PORT, { transports: ["websocket"], namespace: "/" })
 export class GameRoomGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {

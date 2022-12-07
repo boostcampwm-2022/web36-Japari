@@ -74,7 +74,7 @@ const WaitingPage: React.FC = () => {
           )}
         </div>
         <div css={style.RowContentContainerStyle}>
-          <Profile user={user} />
+          <Profile user={user} editable={false} />
           <Chatting />
         </div>
       </div>

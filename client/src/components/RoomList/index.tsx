@@ -47,11 +47,11 @@ const RoomList = ({ rooms }: RoomListProps) => {
       navigate(`/waiting/${data.roomId}`);
     });
     socket.on("game-room/password-failed", data => {
-      alert(data);
+      alert("비밀번호가 틀렸습니다.");
     });
 
-    socket.on("game-room/error", data => {
-      alert(data);
+    socket.on("game-room/error", errorMessage => {
+      alert(errorMessage);
     });
 
     return () => {

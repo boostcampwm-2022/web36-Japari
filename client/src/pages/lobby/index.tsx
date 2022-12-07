@@ -61,7 +61,7 @@ const LobbyPage: React.FC = () => {
           <RoomList rooms={gameRooms} />
         </div>
         <div css={style.RowContentContainerStyle}>
-          <Profile user={user} setNicknameChangeModalOpen={setNicknameChangeModalOpen} />
+          <Profile user={user} editable={true} setNicknameChangeModalOpen={setNicknameChangeModalOpen} />
           <Chatting />
         </div>
       </div>
