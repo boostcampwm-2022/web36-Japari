@@ -10,6 +10,7 @@ import { debounce } from "lodash";
 
 import pencilIcon from "../../../assets/icons/catch-mind-pencil.png";
 import eraserIcon from "../../../assets/icons/catch-mind-eraser.png";
+import { useNavigate, useLocation } from "react-router-dom";
 
 enum Color {
   WHITE = "white",
@@ -29,8 +30,8 @@ enum Color {
 }
 
 const WAIT_TIME = 5;
-const DRAW_TIME = 120;
-const RESULT_TIME = 15;
+const DRAW_TIME = 120; // 120
+const RESULT_TIME = 15; //15
 
 enum CatchMindState {
   WAIT,
@@ -58,6 +59,9 @@ const NORMAL = 5;
 const THICK = 9;
 
 export default function CatchMind() {
+  const navigate = useNavigate();
+  const path = useLocation().pathname.split("/").slice(1)[1];
+
   const socket = useRecoilValue(socketState);
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -304,6 +308,12 @@ export default function CatchMind() {
       socket.off("catch-mind/image");
     };
   }, [socket, round]);
+
+  useEffect(() => {
+    socket.on("catch-mind/end", () => {
+      navigate(`/waiting/${path}`);
+    });
+  });
 
   useEffect(() => {
     const ctx = getContextObject();

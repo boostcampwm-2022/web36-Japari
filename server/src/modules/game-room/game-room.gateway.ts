@@ -123,6 +123,8 @@ export class GameRoomGateway implements OnGatewayInit, OnGatewayConnection, OnGa
   @SubscribeMessage("game-room/join")
   async join(@ConnectedSocket() socket, @MessageBody("roomId") roomId: string) {
     const room = await this.redis.getFrom(RedisTableName.GAME_ROOMS, roomId);
+    const { userId } = await this.redis.getFrom(RedisTableName.SOCKET_ID_TO_USER_INFO, socket.id);
+    const alreadyJoined = room.participants.map(user => user.userId).includes(userId);
 
     // 잘못된 room id 접근
     if (!room) {
@@ -142,10 +144,11 @@ export class GameRoomGateway implements OnGatewayInit, OnGatewayConnection, OnGa
     socket.leave("lobby");
 
     // 게임 방 정보 갱신
-    const user = await this.redis.getFrom(RedisTableName.SOCKET_ID_TO_USER_INFO, socket.id);
-    room.participants.push({ ...user, socketId: socket.id });
-    await this.redis.setTo(RedisTableName.GAME_ROOMS, roomId, room);
-
+    if (!alreadyJoined) {
+      const user = await this.redis.getFrom(RedisTableName.SOCKET_ID_TO_USER_INFO, socket.id);
+      room.participants.push({ ...user, socketId: socket.id });
+      await this.redis.setTo(RedisTableName.GAME_ROOMS, roomId, room);
+    }
     // 유저가 들어왔다는 소식을 참여한 유저와 기존에 방에 있던 모든 유저에게 전달
     this.server.to(roomId).emit("game-room/info", {
       roomId,
@@ -168,6 +171,20 @@ export class GameRoomGateway implements OnGatewayInit, OnGatewayConnection, OnGa
     await this.redis.setTo(RedisTableName.GAME_ROOMS, roomId, room);
     if (room.participants.length === 0) {
       this.redis.hdel(RedisTableName.GAME_ROOMS, roomId);
+    }
+
+    // 유저를 PlayData에서 제거
+    const playData = await this.redis.getFrom(RedisTableName.PLAY_DATA, roomId);
+
+    if (playData) {
+      delete playData.scores[String(user.userId)];
+      delete playData.totalScores[String(user.userId)];
+
+      if (Object.keys(playData.scores).length === 0) {
+        await this.redis.hdel(RedisTableName.PLAY_DATA, roomId);
+      } else {
+        await this.redis.setTo(RedisTableName.PLAY_DATA, roomId, playData);
+      }
     }
 
     // 유저를 로비로 보낸다

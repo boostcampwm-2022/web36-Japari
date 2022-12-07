@@ -25,6 +25,7 @@ const WaitingRoomInfo = ({ roomRecord, camList }: WaitingRoomInfoProps) => {
 
   const handleRootOutButton = () => {
     navigate("/lobby");
+    socket.emit("game-room/exit");
   };
 
   const handleGameStartButton = () => {
