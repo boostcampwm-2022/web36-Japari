@@ -3,22 +3,29 @@ import { JwtService } from "./jwt/jwt.service";
 import { Request, Response } from "express";
 import { PrismaService } from "src/modules/prisma/prisma.service";
 import { GithubService } from "./github.service";
+import { GoogleService } from "./google.service";
 
 @Injectable()
 export class AuthService {
-  constructor(private prisma: PrismaService, private jwt: JwtService, private githubService: GithubService) {}
+  constructor(
+    private prisma: PrismaService,
+    private jwt: JwtService,
+    private github: GithubService,
+    private google: GoogleService
+  ) {}
 
   async login(site: string, code: string, res: Response) {
     let email: string;
     switch (site) {
       case "github":
-        email = await this.githubService.getGithubEmail(code);
+        email = await this.github.getGithubEmail(code);
         break;
       case "kakao":
         return;
       case "naver":
         return;
       case "google":
+        email = await this.google.getGoogleEmail(code);
         return;
       default:
         throw new BadRequestException(`${site} 로그인 기능은 제공하지 않습니다.`);
