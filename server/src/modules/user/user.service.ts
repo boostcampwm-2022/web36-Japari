@@ -1,5 +1,7 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
+import { RedisTableName } from "src/constants/redis-table-name";
 import { PrismaService } from "src/modules/prisma/prisma.service";
+import { RedisService } from "../redis/redis.service";
 
 const getUserOption = {
   userId: true,
@@ -11,7 +13,7 @@ const getUserOption = {
 
 @Injectable()
 export class UserService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService, private redis: RedisService) {}
 
   async findUser(id: number) {
     const userInfo = await this.prisma.user.findUnique({
@@ -27,6 +29,10 @@ export class UserService {
   }
 
   async updateUserNickname(userId: number, nickname: string) {
+    const userInfo = JSON.parse(await this.redis.hget(RedisTableName.ONLINE_USERS, String(userId)));
+    userInfo.nickname = nickname;
+    await this.redis.hset(RedisTableName.ONLINE_USERS, userId, JSON.stringify(userInfo));
+    await this.redis.hset(RedisTableName.SOCKET_ID_TO_USER_INFO, userInfo.socketId, JSON.stringify(userInfo));
     return this.prisma.user.update({
       where: { userId },
       data: { nickname },
