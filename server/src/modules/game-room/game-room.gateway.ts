@@ -16,7 +16,7 @@ import { PrismaService } from "../prisma/prisma.service";
 import { v4 as uuid } from "uuid";
 import { RoomSettingDto } from "./dto/room-setting.dto";
 import { RoomCredentialDto } from "./dto/room-credential.dto";
-import { SocketBadRequestFilter, SocketExceptionFilter } from "src/exception-filters/websocket.filter";
+import { SocketExceptionFilter } from "src/exception-filters/websocket.filter";
 import { SocketException } from "src/constants/exception";
 import { RedisService } from "../redis/redis.service";
 import { SERVER_SOCKET_PORT } from "src/constants/config";
@@ -61,6 +61,10 @@ export class GameRoomGateway implements OnGatewayInit, OnGatewayConnection, OnGa
   @SubscribeMessage("game-room/create")
   async create(@ConnectedSocket() socket: Socket, @MessageBody() data: RoomSettingDto) {
     const { title, gameId, maximumPeople, isPrivate, password } = data;
+
+    if (isPrivate && !(password.length >= 1 && password.length <= 20)) {
+      throw new SocketException("game-room/error", "비밀번호는 1자 이상 20자 이하여야만 합니다.");
+    }
 
     // 입력으로 들어오지 않은 방 정보 추가
     const roomId = uuid();

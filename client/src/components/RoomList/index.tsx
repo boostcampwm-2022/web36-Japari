@@ -26,7 +26,9 @@ export interface RoomListProps {
 const RoomList = ({ rooms }: RoomListProps) => {
   const socket = useRecoilValue(socketState);
   const navigate = useNavigate();
+  const [isPublicOnly, setIsPublicOnly] = useState<boolean>(false);
   const [gameType, setGameType] = useState<number>(0);
+  const [filteredRooms, setFilteredRooms] = useState<Room[]>([]);
   const [createRoomModalOpen, setCreateRoomModalOpen] = useState<boolean>(false);
   const [passwordModalOpen, setPasswordModalOpen] = useState<boolean>(false);
 
@@ -38,6 +40,22 @@ const RoomList = ({ rooms }: RoomListProps) => {
 
     navigate(`/waiting/${roomId}`);
   };
+
+  useEffect(() => {
+    setFilteredRooms(
+      rooms
+        .filter(room => {
+          if (!isPublicOnly) return true;
+          if (!room.isPrivate) return true;
+          return false;
+        })
+        .filter(room => {
+          if (gameType === 0) return true;
+          if (room.gameId === gameType) return true;
+          return false;
+        })
+    );
+  }, [rooms, gameType, isPublicOnly]);
 
   useEffect(() => {
     socket.on("game-room/create-success", data => {
@@ -62,12 +80,14 @@ const RoomList = ({ rooms }: RoomListProps) => {
     };
   }, [navigate, socket]);
 
+  useEffect(() => {}, [rooms, isPublicOnly, gameType]);
+
   return (
     <div css={style.containerStyle}>
       <div css={style.headerStyle}>
         <div css={style.filterStyle}>
           <div css={style.checkBoxStyle}>
-            <CheckBox />
+            <CheckBox onChange={() => setIsPublicOnly(!isPublicOnly)} />
             <span>공개 방만 보기</span>
           </div>
           <Select selectType="게임 필터" setValue={setGameType} />
@@ -77,7 +97,7 @@ const RoomList = ({ rooms }: RoomListProps) => {
       </div>
 
       <div css={style.roomListStyle}>
-        {rooms.map(room => (
+        {filteredRooms.map(room => (
           <Fragment key={room.roomId}>
             <RoomRecord {...room} onClickRecord={() => onClickRecord(room.roomId, room.isPrivate)} />
             {passwordModalOpen && (
