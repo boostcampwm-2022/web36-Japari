@@ -8,12 +8,9 @@ import { Transport, TransportOptions } from "mediasoup-client/lib/Transport";
 import { Fragment, useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { useRecoilValue, useRecoilState } from "recoil";
-import { socketState } from "../../store/socket";
-import { userState } from "../../store/user";
-import { audioState, videoState, streamState } from "./../../store/media";
-import Audio from "../Audio";
-import Cam from "../Cam";
-import * as style from "./styles";
+import { socketState } from "../store/socket";
+import { userState } from "../store/user";
+import { audioState, videoState, streamState } from "../store/media";
 
 type ConsumerTransport = {
   consumerTransport: Transport;
@@ -22,21 +19,24 @@ type ConsumerTransport = {
   consumer: Consumer;
 };
 
-const Camtest = () => {
+export type StreamInfo = {
+  userInfo: User;
+  remoteProducerId: string;
+  mediaStream: MediaStream;
+};
+
+export const useCams = () => {
   const [localStream, setLocalStream] = useRecoilState(streamState);
   const audio = useRecoilValue(audioState);
   const video = useRecoilValue(videoState);
   const socket = useRecoilValue(socketState);
   const user = useRecoilValue(userState);
 
-  const [remoteAudioStream, setRemoteAudioStream] = useState<Map<string, MediaStream>>(new Map());
-  const [remoteVideoStream, setRemoteVideoStream] = useState<Map<string, MediaStream>>(new Map());
+  const [audioStream, setAudioStream] = useState<Map<string, StreamInfo>>(new Map());
+  const [videoStream, setVideoStream] = useState<Map<string, StreamInfo>>(new Map());
 
   const location = useLocation();
   const roomId = location.pathname.split("/").slice(-1)[0];
-
-  const [audios, setAudios] = useState<string[]>([]);
-  const [cams, setCams] = useState<{ userInfo: User; remoteProducerId: string }[]>([]);
 
   let device: Device;
   let params = {
@@ -85,6 +85,11 @@ const Camtest = () => {
 
   const streamSuccess = (stream: MediaStream) => {
     setLocalStream(stream);
+    setVideoStream(current => {
+      const newStreamMap = new Map(current);
+      if (user) newStreamMap.set(user.email, { userInfo: user, remoteProducerId: "", mediaStream: stream });
+      return newStreamMap;
+    });
 
     stream.getAudioTracks()[0].enabled = audio;
     stream.getVideoTracks()[0].enabled = video;
@@ -163,7 +168,7 @@ const Camtest = () => {
   };
 
   const getProducers = () => {
-    socket.emit("media/getProducers", (producerList: { producerId: string; userInfo: User }[]) => {
+    socket.emit("media/getProducers", async (producerList: { producerId: string; userInfo: User }[]) => {
       producerList.forEach(producerData => {
         signalNewConsumerTransport(producerData.producerId, producerData.userInfo);
       });
@@ -245,22 +250,12 @@ const Camtest = () => {
     );
   };
 
-  const addCam = (remoteProducerId: string, userInfo: User, newMediaStream: MediaStream) => {
-    setRemoteVideoStream(current => new Map(current).set(remoteProducerId, newMediaStream));
-
-    setCams(current => [
-      ...current,
-      {
-        userInfo,
-        remoteProducerId,
-      },
-    ]);
+  const addCam = (remoteProducerId: string, userInfo: User, mediaStream: MediaStream) => {
+    setVideoStream(current => new Map(current).set(userInfo.email, { userInfo, remoteProducerId, mediaStream }));
   };
 
-  const addAudio = (remoteProducerId: string, userInfo: User, newMediaStream: MediaStream) => {
-    setRemoteAudioStream(current => new Map(current).set(remoteProducerId, newMediaStream));
-
-    setAudios(current => [...current, remoteProducerId]);
+  const addAudio = (remoteProducerId: string, userInfo: User, mediaStream: MediaStream) => {
+    setAudioStream(current => new Map(current).set(userInfo.email, { userInfo, remoteProducerId, mediaStream }));
   };
 
   useEffect(() => {
@@ -274,57 +269,32 @@ const Camtest = () => {
       producerToClose?.consumer.close();
 
       setConsumerTransports(current => current.filter(transportData => transportData.producerId !== remoteProducerId));
-      setCams(current => current.filter(cam => cam.remoteProducerId !== remoteProducerId));
-      setAudios(current => current.filter(audio => audio !== remoteProducerId));
-      setRemoteVideoStream(current => {
-        const newRemoteStream = new Map(current);
-        newRemoteStream.delete(remoteProducerId);
-        return newRemoteStream;
+      setVideoStream(current => {
+        const newStreamMap = new Map(current);
+        for (const [key, value] of Array.from(newStreamMap.entries())) {
+          if (value.remoteProducerId === remoteProducerId) newStreamMap.delete(key);
+        }
+        return newStreamMap;
       });
-      setRemoteAudioStream(current => {
-        const newRemoteAudioStream = new Map(current);
-        newRemoteAudioStream.delete(remoteProducerId);
-        return newRemoteAudioStream;
+      setAudioStream(current => {
+        const newStreamMap = new Map(current);
+        for (const [key, value] of Array.from(newStreamMap.entries())) {
+          if (value.remoteProducerId === remoteProducerId) newStreamMap.delete(key);
+        }
+        return newStreamMap;
       });
     });
     return () => {
+      setVideoStream(current => {
+        const newStreamMap = new Map(current);
+        if (user) newStreamMap.delete(user.email);
+        return newStreamMap;
+      });
       socket.off("media/new-producer");
       socket.off("media/producer-closed");
       socket.emit("media/disconnect");
     };
   }, []);
 
-  return (
-    <div css={style.CamsContainerStyle}>
-      {user && (
-        <Cam
-          mediaStream={localStream}
-          isVideoOn={true}
-          isAudioOn={true}
-          profile={user.profileImage}
-          nickname={user.nickname}
-        />
-      )}
-      {cams.map((cam, idx) => {
-        return (
-          <Fragment key={cam.remoteProducerId}>
-            <Cam
-              mediaStream={remoteVideoStream.get(cam.remoteProducerId) ?? null}
-              isVideoOn={true}
-              isAudioOn={true}
-              profile={cam.userInfo.profileImage}
-              nickname={cam.userInfo.nickname}
-            />
-          </Fragment>
-        );
-      })}
-      <div>
-        {audios.map(audio => {
-          return <Audio key={audio} mediaStream={remoteAudioStream.get(audio) ?? null} />;
-        })}
-      </div>
-    </div>
-  );
+  return { videoStream, audioStream };
 };
-
-export default Camtest;

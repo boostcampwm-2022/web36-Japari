@@ -65,6 +65,7 @@ const WaitingPage: React.FC = () => {
                 currentPeople: room.participants.length,
                 gameId: Number(room.gameId),
               }}
+              participants={room.participants}
             />
           )}
         </div>
