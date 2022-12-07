@@ -1,11 +1,11 @@
 /** @jsxImportSource @emotion/react */
 import { User } from "@dto";
 import { Device } from "mediasoup-client";
-import { Consumer, ConsumerOptions } from "mediasoup-client/lib/Consumer";
+import { Consumer } from "mediasoup-client/lib/Consumer";
 import { ProducerOptions } from "mediasoup-client/lib/Producer";
 import { MediaKind, RtpCapabilities, RtpParameters } from "mediasoup-client/lib/RtpParameters";
 import { Transport, TransportOptions } from "mediasoup-client/lib/Transport";
-import { Fragment, useEffect, useRef, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { useRecoilValue, useRecoilState } from "recoil";
 import { socketState } from "../../store/socket";
@@ -37,8 +37,6 @@ const Camtest = () => {
 
   const [audios, setAudios] = useState<string[]>([]);
   const [cams, setCams] = useState<{ userInfo: User; remoteProducerId: string }[]>([]);
-  // const localVideoRef = useRef<HTMLVideoElement | null>(null);
-  // const remoteVideoRef = useRef<HTMLVideoElement[]>([]);
 
   let device: Device;
   let params = {
@@ -68,7 +66,6 @@ const Camtest = () => {
   let producerTransport: Transport;
 
   let consumingTransports: string[] = [];
-  // const [consumingTransports, setConsumingTransports] = useState<string[]>([]);
   const [consumerTransports, setConsumerTransports] = useState<ConsumerTransport[]>([]);
 
   const getLocalStream = () => {
@@ -156,25 +153,13 @@ const Camtest = () => {
     let audioProducer = await producerTransport.produce(audioParams);
     let videoProducer = await producerTransport.produce(videoParams);
 
-    audioProducer.on("trackended", () => {
-      console.log("audio track ended");
-      // close audio track
-    });
+    audioProducer.on("trackended", () => {});
 
-    audioProducer.on("transportclose", () => {
-      console.log("audio transport ended");
-      // close audio track
-    });
+    audioProducer.on("transportclose", () => {});
 
-    videoProducer.on("trackended", () => {
-      console.log("video track ended");
-      // close video track
-    });
+    videoProducer.on("trackended", () => {});
 
-    videoProducer.on("transportclose", () => {
-      console.log("video transport ended");
-      // close video track
-    });
+    videoProducer.on("transportclose", () => {});
   };
 
   const getProducers = () => {
@@ -187,7 +172,6 @@ const Camtest = () => {
 
   const signalNewConsumerTransport = async (remoteProducerId: string, userInfo: User) => {
     if (consumingTransports.includes(remoteProducerId)) return;
-    // setConsumingTransports(current => [...current, remoteProducerId]);
     consumingTransports.push(remoteProducerId);
 
     await socket.emit("media/createWebRtcTransport", { consumer: true }, (transportOptions: TransportOptions) => {

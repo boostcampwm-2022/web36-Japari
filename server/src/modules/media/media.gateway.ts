@@ -127,7 +127,6 @@ export class MediaGateway implements OnGatewayInit, OnGatewayConnection, OnGatew
   createWebRtcTransport = async (router: Router) => {
     return new Promise(async (resolve, reject) => {
       try {
-        // https://mediasoup.org/documentation/v3/mediasoup/api/#WebRtcTransportOptions
         const webRtcTransport_options: WebRtcTransportOptions = {
           listenIps: [
             {
