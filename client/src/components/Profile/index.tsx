@@ -7,12 +7,17 @@ import Spinner from "../Loader/Spinner";
 
 export interface ProfileProps {
   user: User | null;
+  setNicknameChangeModalOpen?: any;
 }
 
-const Profile = ({ user }: ProfileProps) => {
+const Profile = ({ user, setNicknameChangeModalOpen }: ProfileProps) => {
   return (
     <div css={style.ProfileContainerStyle}>
-      {user ? <ProfileContent user={user} editable={true} /> : <Spinner color="#bbbbbb" trackColor="transparent" />}
+      {user ? (
+        <ProfileContent user={user} editable={true} setNicknameChangeModalOpen={setNicknameChangeModalOpen} />
+      ) : (
+        <Spinner color="#bbbbbb" trackColor="transparent" />
+      )}
     </div>
   );
 };
