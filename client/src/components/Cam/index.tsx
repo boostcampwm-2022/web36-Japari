@@ -24,14 +24,13 @@ const Cam = ({ mediaStream, isVideoOn, isAudioOn, profile, nickname, scoreRank }
 
   useEffect(() => {
     if (!videoRef.current) return;
-    console.log(nickname, videoRef.current, mediaStream);
     videoRef.current.srcObject = mediaStream;
   }, [mediaStream]);
 
   return (
     <div css={style.camContainerStyle}>
       <div css={style.camWrapperStyle}>
-        <video ref={videoRef} autoPlay playsInline muted={nickname === user?.nickname}></video>
+        <video ref={videoRef} autoPlay playsInline muted></video>
         {!isVideoOn && <Profile profile={profile} />}
       </div>
       <span css={style.camNickNameStyle}>{nickname}</span>

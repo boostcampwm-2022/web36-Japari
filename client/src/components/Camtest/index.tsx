@@ -11,6 +11,7 @@ import { useRecoilValue, useRecoilState } from "recoil";
 import { socketState } from "../../store/socket";
 import { userState } from "../../store/user";
 import { audioState, videoState, streamState } from "./../../store/media";
+import Audio from "../Audio";
 import Cam from "../Cam";
 import * as style from "./styles";
 
@@ -28,15 +29,18 @@ const Camtest = () => {
   const socket = useRecoilValue(socketState);
   const user = useRecoilValue(userState);
 
-  const [remoteStream, setRemoteStream] = useState<Map<string, MediaStream>>(new Map());
+  const [remoteAudioStream, setRemoteAudioStream] = useState<Map<string, MediaStream>>(new Map());
+  const [remoteVideoStream, setRemoteVideoStream] = useState<Map<string, MediaStream>>(new Map());
 
   const location = useLocation();
   const roomId = location.pathname.split("/").slice(-1)[0];
 
-  const [cams, setCams] = useState<any[]>([]);
+  const [audios, setAudios] = useState<string[]>([]);
+  const [cams, setCams] = useState<{ userInfo: User; remoteProducerId: string }[]>([]);
   // const localVideoRef = useRef<HTMLVideoElement | null>(null);
   // const remoteVideoRef = useRef<HTMLVideoElement[]>([]);
 
+  let device: Device;
   let params = {
     encodings: [
       {
@@ -61,8 +65,10 @@ const Camtest = () => {
   };
   let audioParams: ProducerOptions;
   let videoParams: ProducerOptions = params;
-  let rtpCapabilites: RtpCapabilities;
-  const [device, setDevice] = useState<Device>(new Device());
+  let producerTransport: Transport;
+
+  let consumingTransports: string[] = [];
+  // const [consumingTransports, setConsumingTransports] = useState<string[]>([]);
   const [consumerTransports, setConsumerTransports] = useState<ConsumerTransport[]>([]);
 
   const getLocalStream = () => {
@@ -94,15 +100,16 @@ const Camtest = () => {
 
   const joinRoom = () => {
     socket.emit("media/joinRoom", { roomId }, (data: { rtpCapabilities: RtpCapabilities }) => {
-      rtpCapabilites = data.rtpCapabilities;
-      createDevice();
+      createDevice(data.rtpCapabilities);
     });
   };
 
-  const createDevice = async () => {
+  const createDevice = async (rtpCapabilities: RtpCapabilities) => {
     try {
+      device = new Device();
+
       await device.load({
-        routerRtpCapabilities: rtpCapabilites,
+        routerRtpCapabilities: rtpCapabilities,
       });
       createSendTransport();
     } catch (err) {
@@ -112,12 +119,12 @@ const Camtest = () => {
 
   const createSendTransport = async () => {
     socket.emit("media/createWebRtcTransport", { consumer: false }, (transportOptions: TransportOptions) => {
-      const producerTransport = device.createSendTransport(transportOptions);
-      handleCreateProducerTransport(producerTransport);
+      producerTransport = device.createSendTransport(transportOptions);
+      handleCreateProducerTransport();
     });
   };
 
-  const handleCreateProducerTransport = (producerTransport: Transport) => {
+  const handleCreateProducerTransport = () => {
     producerTransport.on("connect", ({ dtlsParameters }, cb, eb) => {
       try {
         socket.emit("media/transport-connect", { dtlsParameters });
@@ -132,11 +139,9 @@ const Camtest = () => {
         socket.emit(
           "media/transport-produce",
           { kind: parameters.kind, rtpParameters: parameters.rtpParameters, appData: parameters.appData },
-          ({ duplicated, id, producersExist }: { duplicated: boolean; id: string; producersExist: boolean }) => {
-            if (!duplicated) {
-              cb({ id });
-              if (producersExist) getProducers();
-            }
+          ({ id, producersExist }: { id: string; producersExist: boolean }) => {
+            cb({ id });
+            if (producersExist) getProducers();
           }
         );
       } catch (error: any) {
@@ -144,12 +149,32 @@ const Camtest = () => {
       }
     });
 
-    connectSendTransport(producerTransport);
+    connectSendTransport();
   };
 
-  const connectSendTransport = async (producerTransport: Transport) => {
+  const connectSendTransport = async () => {
     let audioProducer = await producerTransport.produce(audioParams);
     let videoProducer = await producerTransport.produce(videoParams);
+
+    audioProducer.on("trackended", () => {
+      console.log("audio track ended");
+      // close audio track
+    });
+
+    audioProducer.on("transportclose", () => {
+      console.log("audio transport ended");
+      // close audio track
+    });
+
+    videoProducer.on("trackended", () => {
+      console.log("video track ended");
+      // close video track
+    });
+
+    videoProducer.on("transportclose", () => {
+      console.log("video transport ended");
+      // close video track
+    });
   };
 
   const getProducers = () => {
@@ -161,7 +186,11 @@ const Camtest = () => {
   };
 
   const signalNewConsumerTransport = async (remoteProducerId: string, userInfo: User) => {
-    socket.emit("media/createWebRtcTransport", { consumer: true }, (transportOptions: TransportOptions) => {
+    if (consumingTransports.includes(remoteProducerId)) return;
+    // setConsumingTransports(current => [...current, remoteProducerId]);
+    consumingTransports.push(remoteProducerId);
+
+    await socket.emit("media/createWebRtcTransport", { consumer: true }, (transportOptions: TransportOptions) => {
       try {
         let consumerTransport = device.createRecvTransport(transportOptions);
         consumerTransport.on("connect", ({ dtlsParameters }, cb, eb) => {
@@ -203,7 +232,12 @@ const Camtest = () => {
         rtpParameters: RtpParameters;
         serverConsumerId: string;
       }) => {
-        const consumer = await consumerTransport.consume(params);
+        const consumer = await consumerTransport.consume({
+          id: params.id,
+          producerId: params.producerId,
+          kind: params.kind,
+          rtpParameters: params.rtpParameters,
+        });
 
         setConsumerTransports((current: ConsumerTransport[]) => [
           ...current,
@@ -216,15 +250,19 @@ const Camtest = () => {
         ]);
 
         const { track } = consumer;
-        addCam(remoteProducerId, userInfo, track);
+        if (params.kind === "video") {
+          addCam(remoteProducerId, userInfo, new MediaStream([track]));
+        } else {
+          addAudio(remoteProducerId, userInfo, new MediaStream([track]));
+        }
 
         socket.emit("media/consumer-resume", { serverConsumerId: params.serverConsumerId });
       }
     );
   };
 
-  const addCam = (remoteProducerId: string, userInfo: User, track: MediaStreamTrack) => {
-    setRemoteStream(current => new Map(current).set(remoteProducerId, new MediaStream([track])));
+  const addCam = (remoteProducerId: string, userInfo: User, newMediaStream: MediaStream) => {
+    setRemoteVideoStream(current => new Map(current).set(remoteProducerId, newMediaStream));
 
     setCams(current => [
       ...current,
@@ -233,6 +271,12 @@ const Camtest = () => {
         remoteProducerId,
       },
     ]);
+  };
+
+  const addAudio = (remoteProducerId: string, userInfo: User, newMediaStream: MediaStream) => {
+    setRemoteAudioStream(current => new Map(current).set(remoteProducerId, newMediaStream));
+
+    setAudios(current => [...current, remoteProducerId]);
   };
 
   useEffect(() => {
@@ -247,10 +291,16 @@ const Camtest = () => {
 
       setConsumerTransports(current => current.filter(transportData => transportData.producerId !== remoteProducerId));
       setCams(current => current.filter(cam => cam.remoteProducerId !== remoteProducerId));
-      setRemoteStream(current => {
+      setAudios(current => current.filter(audio => audio !== remoteProducerId));
+      setRemoteVideoStream(current => {
         const newRemoteStream = new Map(current);
         newRemoteStream.delete(remoteProducerId);
         return newRemoteStream;
+      });
+      setRemoteAudioStream(current => {
+        const newRemoteAudioStream = new Map(current);
+        newRemoteAudioStream.delete(remoteProducerId);
+        return newRemoteAudioStream;
       });
     });
     return () => {
@@ -272,11 +322,10 @@ const Camtest = () => {
         />
       )}
       {cams.map((cam, idx) => {
-        console.log(cam.userInfo);
         return (
-          <Fragment key={idx}>
+          <Fragment key={cam.remoteProducerId}>
             <Cam
-              mediaStream={remoteStream.get(cam.remoteProducerId) ?? null}
+              mediaStream={remoteVideoStream.get(cam.remoteProducerId) ?? null}
               isVideoOn={true}
               isAudioOn={true}
               profile={cam.userInfo.profileImage}
@@ -285,6 +334,11 @@ const Camtest = () => {
           </Fragment>
         );
       })}
+      <div>
+        {audios.map(audio => {
+          return <Audio key={audio} mediaStream={remoteAudioStream.get(audio) ?? null} />;
+        })}
+      </div>
     </div>
   );
 };

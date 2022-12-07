@@ -32,7 +32,6 @@ import { RedisService } from "../redis/redis.service";
 import { RedisTableName } from "src/constants/redis-table-name";
 
 const mediaCodecs: RtpCodecCapability[] = [
-  { kind: "audio", mimeType: "audio/opus", clockRate: 48000, channels: 2 },
   {
     kind: "video",
     mimeType: "video/VP8",
@@ -41,6 +40,7 @@ const mediaCodecs: RtpCodecCapability[] = [
       "x-google-start-bitrate": 1000,
     },
   },
+  { kind: "audio", mimeType: "audio/opus", clockRate: 48000, channels: 2 },
 ];
 
 @UseFilters(new SocketBadRequestFilter("media/error"))
@@ -223,9 +223,6 @@ export class MediaGateway implements OnGatewayInit, OnGatewayConnection, OnGatew
     });
 
     const { roomId } = this.peers[socket.id];
-    if (this.producers.some(producerData => producerData.socketId === socket.id)) {
-      return { duplicated: true };
-    }
 
     this.addProducer(producer, roomId, socket.id);
 
