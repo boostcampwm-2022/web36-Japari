@@ -26,7 +26,7 @@ export class AuthService {
         return;
       case "google":
         email = await this.google.getGoogleEmail(code);
-        return;
+        break;
       default:
         throw new BadRequestException(`${site} 로그인 기능은 제공하지 않습니다.`);
     }

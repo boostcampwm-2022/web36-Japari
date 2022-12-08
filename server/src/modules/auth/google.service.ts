@@ -54,11 +54,9 @@ export class GoogleService {
 
     try {
       const res = await this.httpService.get(OAUTH_GOOGLE_EMAIL_API, googleUserAPIConfig).toPromise();
-      console.log(res);
-      const email = res.data[0].email;
+      const email = res.data.email;
       return email;
     } catch (err) {
-      console.log("err", err);
       throw new UnauthorizedException();
     }
   }
