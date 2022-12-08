@@ -79,12 +79,26 @@ export class CatchMindGateway implements OnGatewayInit, OnGatewayConnection, OnG
     socket.to(roomId).emit("catch-mind/image", { round, imageSrc });
   }
 
+  @SubscribeMessage("play-room/enter")
+  async enter(@ConnectedSocket() socket: Socket, @MessageBody() roomId: string) {
+    const room = await this.redis.getFrom(RedisTableName.GAME_ROOMS, roomId);
+    if (!room) return { room, ids: [] };
+
+    const ids = room.participants.map(participant => participant.userId);
+
+    return { room, ids };
+  }
+
   @SubscribeMessage("play-room/exit")
   async exit(@ConnectedSocket() socket: Socket) {
     const user = await this.redis.getFrom(RedisTableName.SOCKET_ID_TO_USER_INFO, socket.id);
     if (!user || user.roomId === "lobby") return;
 
     const { roomId } = user;
+
+    const playData = await this.redis.getFrom(RedisTableName.PLAY_DATA, roomId);
+    if (!playData) return;
+    // 게임이 끝나 로비로 돌아가는 경우는 무시
 
     const room = await this.redis.getFrom(RedisTableName.GAME_ROOMS, roomId);
 
@@ -99,7 +113,6 @@ export class CatchMindGateway implements OnGatewayInit, OnGatewayConnection, OnG
 
     // 유저를 PlayData에서 제거
 
-    const playData = await this.redis.getFrom(RedisTableName.PLAY_DATA, roomId);
     if (playData) {
       delete playData.scores[String(user.userId)];
       delete playData.totalScores[String(user.userId)];

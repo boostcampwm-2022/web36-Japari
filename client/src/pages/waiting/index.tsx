@@ -13,7 +13,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import useSocketConnect from "../../hooks/useSocketConnect";
 import useSetUser from "../../hooks/useSetUser";
 
-type GameRoom = {
+export type GameRoom = {
   title: string;
   gameId: number;
   maximumPeople: number;

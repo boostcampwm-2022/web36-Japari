@@ -244,7 +244,6 @@ export default function CatchMind() {
       const ctx = getContextObject();
       writeCenter(`정답 공개`, { color: "black", dx: 0, dy: -90 });
       writeCenter(`${data.answer}`, { color: "red", size: "75px", dx: 0, dy: 30 });
-      console.log(data.answer.length);
       ctx.fillStyle = currentColorRef.current;
 
       setTime(RESULT_TIME);
