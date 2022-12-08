@@ -13,6 +13,8 @@ import { getLoggedInUser } from "../../api/user";
 import { socketState } from "../../store/socket";
 import { getGameRoomInfo } from "../../api/gameRoom";
 import { useLocation, useNavigate } from "react-router-dom";
+import useSocketConnect from "../../hooks/useSocketConnect";
+import useSetUser from "../../hooks/useSetUser";
 
 type GameRoom = {
   title: string;
@@ -33,28 +35,29 @@ const WaitingPage: React.FC = () => {
   const location = useLocation();
   const roomId = location.pathname.split("/").slice(-1)[0];
 
-  useEffect(() => {
-    if (!user) {
-      getLoggedInUser().then(res => {
-        setUser(res);
-      });
-      return;
-    }
-  }, [user, setUser]);
+  useSocketConnect();
+  useSetUser();
 
   useEffect(() => {
     socket.on("game-room/info", data => {
       setRoom(data);
     });
-    socket.emit("game-room/join", { roomId });
 
     socket.on("game-room/join-failed", data => {
       navigate("/lobby");
     });
+
     return () => {
       socket.off("game-room/info");
+      socket.off("game-room/join-failed");
+      socket.emit("game-room/exit");
     };
-  }, [roomId, socket]);
+  }, [socket]);
+
+  useEffect(() => {
+    console.log(socket);
+    socket.emit("game-room/join", { roomId });
+  }, [socket.connected]);
 
   return (
     <Page>

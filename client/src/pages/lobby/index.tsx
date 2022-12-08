@@ -12,6 +12,8 @@ import { userState } from "../../store/user";
 import { getLoggedInUser } from "../../api/user";
 import Modal from "../../components/Modal";
 import { socketState } from "../../store/socket";
+import useSocketConnect from "../../hooks/useSocketConnect";
+import useSetUser from "../../hooks/useSetUser";
 
 const LobbyPage: React.FC = () => {
   const socket = useRecoilValue(socketState);
@@ -26,23 +28,13 @@ const LobbyPage: React.FC = () => {
     setNicknameChangeModalOpen(false);
   };
 
-  useEffect(() => {
-    if (!user) return;
-    socket.io.opts.query = {
-      "user-id": user.userId,
-    };
-    socket.connect();
-  }, [user, socket]);
+  useSocketConnect();
+  useSetUser();
 
   useEffect(() => {
-    if (!user) {
-      getLoggedInUser().then(res => {
-        setUser(res);
-      });
-      return;
-    }
+    if (!user) return;
     if (!user.nickname) setNicknameModalOpen(true);
-  }, [user, setUser]);
+  }, [user]);
 
   useEffect(() => {
     socket.on("game-room/list", data => {
