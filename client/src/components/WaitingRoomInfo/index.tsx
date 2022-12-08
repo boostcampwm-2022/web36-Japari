@@ -31,20 +31,22 @@ const WaitingRoomInfo = ({ roomRecord, participants }: WaitingRoomInfoProps) => 
 
   const handleRootOutButton = () => {
     navigate("/lobby");
-    socket.emit("game-room/exit");
+    socket.emit("wait-room/exit");
   };
 
   const handleGameStartButton = () => {
-    // socket.emit('start_game', {gameRoomId: roomRecord.gameRoomId})
-
-    navigate(`/playing/${roomRecord.roomId}`, { state: { gameId: roomRecord.gameId } });
+    socket.emit("catch-mind/start");
+    navigate(`/playing/${roomRecord.roomId}`, { state: { gameId: roomRecord.gameId, participants: participants } });
     // socket.on('start_game') 시 naviagte가 되도록 변경될 여지 있음
   };
 
   useEffect(() => {
     socket.on("play/start", () => {
-      navigate(`/playing/${roomRecord.roomId}`, { state: { gameId: roomRecord.gameId } });
+      navigate(`/playing/${roomRecord.roomId}`, { state: { gameId: roomRecord.gameId, participants: participants } });
     });
+    return () => {
+      socket.off("play/start");
+    };
   }, [socket]);
 
   return (
@@ -60,12 +62,14 @@ const WaitingRoomInfo = ({ roomRecord, participants }: WaitingRoomInfoProps) => 
 
             return (
               <div key={participant.userId}>
-                {videoStreamInfo && (
+                {videoStreamInfo ? (
                   <Cam
                     mediaStream={videoStreamInfo.mediaStream ?? null}
                     isVideoOn={true}
                     userInfo={videoStreamInfo.userInfo}
                   />
+                ) : (
+                  <Cam mediaStream={null} isVideoOn={false} userInfo={participant} />
                 )}
                 {audioStreamInfo && user?.userId !== audioStreamInfo.userInfo.userId && (
                   <Audio mediaStream={audioStreamInfo.mediaStream ?? null} />

@@ -27,6 +27,7 @@ class RedisModuleWithoutConfig {
 
     const updateTo = async (tableName: RedisTableName, key: string, value: any) => {
       const oldValue = JSON.parse(await client.hget(tableName, key));
+      if (!oldValue) return;
       return client.hset(tableName, key, JSON.stringify(Object.assign(oldValue, value)));
     };
 

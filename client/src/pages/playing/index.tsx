@@ -6,21 +6,27 @@ import InGameCamList from "../../components/InGameCamList";
 import Chatting from "../../components/Chatting";
 import Game from "../../components/Game";
 import { User } from "@dto";
-import { getGameRoomInfo } from "../../api/gameRoom";
 import { useLocation } from "react-router-dom";
 import { useCams } from "../../hooks/useCams";
+import { useRecoilValue } from "recoil";
+import { socketState } from "../../store/socket";
 
 const PlayingPage: React.FC = () => {
+  const socket = useRecoilValue(socketState);
   const [participants, setParticipants] = useState<User[]>([]);
   const location = useLocation();
-  const roomId = location.pathname.split("/").slice(-1)[0];
 
   const { videoStream, audioStream } = useCams();
 
   useEffect(() => {
-    getGameRoomInfo(roomId).then(res => {
-      setParticipants(res.participants);
+    setParticipants(location.state.participants);
+    socket.on("game-room/info", data => {
+      setParticipants(data.participants);
     });
+    return () => {
+      socket.emit("play-room/exit");
+      socket.off("game-room/info");
+    };
   }, []);
 
   return (

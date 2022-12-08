@@ -12,17 +12,22 @@ import {
 import { Server, Socket } from "socket.io";
 import { CatchMindState, RedisTableName } from "src/constants/enum";
 import { PrismaService } from "../prisma/prisma.service";
-// import { RoomSettingDto } from "./dto/room-setting.dto";
-// import { RoomCredentialDto } from "./dto/room-credential.dto";
 import { SocketBadRequestFilter, SocketExceptionFilter } from "src/exception-filters/websocket.filter";
-import { SocketException } from "src/constants/exception";
 import { RedisService } from "../redis/redis.service";
 import { SERVER_SOCKET_PORT } from "src/constants/config";
-import { RoomCredentialDto } from "../game-room/dto/room-credential.dto";
-import { RoomSettingDto } from "../game-room/dto/room-setting.dto";
+
 import { CatchMindService } from "./catch-mind.service";
-import { randFromArray, randInt } from "util/random";
-import { ChatDto } from "../chat/chat.dto";
+import { randFromArray } from "util/random";
+
+export interface CatchMindRecord {
+  gameId: number;
+  answer: string;
+  round: number;
+  state: CatchMindState;
+  drawerIndex: number;
+  scores: Record<string, number>;
+  totalScores: Record<string, number>;
+}
 
 @UseFilters(new SocketBadRequestFilter("catch-mind/error"))
 @UseFilters(SocketExceptionFilter)
@@ -51,7 +56,8 @@ export class CatchMindGateway implements OnGatewayInit, OnGatewayConnection, OnG
     const room = await this.redis.getFrom(RedisTableName.GAME_ROOMS, roomId);
     const wordList = await this.prisma.catchMindWordList.findMany();
     const answer: string = randFromArray(wordList).word;
-    const drawerId: number = randFromArray(room.participants).userId;
+    const drawerIndex = 0;
+
     const scores = room.participants.reduce((acc, cur) => {
       return { ...acc, [cur.userId]: 0 };
     }, {});
@@ -62,10 +68,10 @@ export class CatchMindGateway implements OnGatewayInit, OnGatewayConnection, OnG
       round: 1,
       answer,
       state: CatchMindState.WAIT,
-      drawerId,
+      drawerIndex,
       scores,
       totalScores,
-    };
+    } as CatchMindRecord;
     await this.redis.setTo(RedisTableName.PLAY_DATA, roomId, newRecord);
 
     // 방에 라운드가 시작 됐음을 알린다
@@ -77,6 +83,51 @@ export class CatchMindGateway implements OnGatewayInit, OnGatewayConnection, OnG
     const { round, imageSrc } = data;
     const { roomId } = await this.redis.getFrom(RedisTableName.SOCKET_ID_TO_USER_INFO, socket.id);
     socket.to(roomId).emit("catch-mind/image", { round, imageSrc });
+  }
+
+  @SubscribeMessage("play-room/exit")
+  async exit(@ConnectedSocket() socket: Socket) {
+    const user = await this.redis.getFrom(RedisTableName.SOCKET_ID_TO_USER_INFO, socket.id);
+    if (!user || user.roomId === "lobby") return;
+
+    const { roomId } = user;
+
+    const room = await this.redis.getFrom(RedisTableName.GAME_ROOMS, roomId);
+
+    // 유저를 방에서 제거
+    const { email } = await this.redis.getFrom(RedisTableName.SOCKET_ID_TO_USER_INFO, socket.id);
+    room.participants = room.participants.filter(user => user.email !== email);
+    socket.leave(roomId);
+    await this.redis.setTo(RedisTableName.GAME_ROOMS, roomId, room);
+    if (room.participants.length === 0) {
+      this.redis.hdel(RedisTableName.GAME_ROOMS, roomId);
+    }
+
+    // 유저를 PlayData에서 제거
+
+    const playData = await this.redis.getFrom(RedisTableName.PLAY_DATA, roomId);
+    if (playData) {
+      delete playData.scores[String(user.userId)];
+      delete playData.totalScores[String(user.userId)];
+
+      if (Object.keys(playData.scores).length === 0) {
+        await this.redis.hdel(RedisTableName.PLAY_DATA, roomId);
+      } else {
+        await this.redis.setTo(RedisTableName.PLAY_DATA, roomId, playData);
+      }
+    }
+
+    // 유저를 로비로 보낸다
+    socket.join("lobby");
+    const userInfo = await this.redis.getFrom(RedisTableName.SOCKET_ID_TO_USER_INFO, socket.id);
+    userInfo.roomId = "lobby";
+    await this.redis.setTo(RedisTableName.SOCKET_ID_TO_USER_INFO, socket.id, userInfo);
+
+    // 유저가 나갔다는 소식을 방에 남게 될 모든 유저에게 전달
+    socket.to(roomId).emit("game-room/info", {
+      roomId,
+      ...room,
+    });
   }
 
   async handleConnection(@ConnectedSocket() socket: Socket) {}
