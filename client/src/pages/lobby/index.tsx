@@ -7,9 +7,8 @@ import UserList from "../../components/UserList";
 import Chatting from "../../components/Chatting";
 import RoomList, { Room } from "../../components/RoomList";
 
-import { useRecoilState, useRecoilValue } from "recoil";
+import { useRecoilValue } from "recoil";
 import { userState } from "../../store/user";
-import { getLoggedInUser } from "../../api/user";
 import Modal from "../../components/Modal";
 import { socketState } from "../../store/socket";
 import useSocketConnect from "../../hooks/useSocketConnect";
@@ -17,7 +16,7 @@ import useSetUser from "../../hooks/useSetUser";
 
 const LobbyPage: React.FC = () => {
   const socket = useRecoilValue(socketState);
-  const [user, setUser] = useRecoilState(userState);
+  const user = useRecoilValue(userState);
 
   const [gameRooms, setGameRooms] = useState<Room[]>([]);
   const [nicknameModalOpen, setNicknameModalOpen] = useState<boolean>(false);

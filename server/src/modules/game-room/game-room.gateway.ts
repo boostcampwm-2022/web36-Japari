@@ -128,13 +128,14 @@ export class GameRoomGateway implements OnGatewayInit, OnGatewayConnection, OnGa
   @SubscribeMessage("game-room/join")
   async join(@ConnectedSocket() socket, @MessageBody("roomId") roomId: string) {
     const room = await this.redis.getFrom(RedisTableName.GAME_ROOMS, roomId);
-    const { userId } = await this.redis.getFrom(RedisTableName.SOCKET_ID_TO_USER_INFO, socket.id);
-    const alreadyJoined = room.participants.map(user => user.userId).includes(userId);
 
     // 잘못된 room id 접근
     if (!room) {
       throw new SocketException("game-room/join-failed", "잘못된 room id 입니다.");
     }
+
+    const { userId } = await this.redis.getFrom(RedisTableName.SOCKET_ID_TO_USER_INFO, socket.id);
+    const alreadyJoined = room.participants.map(user => user.userId).includes(userId);
 
     // 방 정원 초과
     if (room.participants.length + 1 > room.maximumPeople) {

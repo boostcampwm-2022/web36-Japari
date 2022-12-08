@@ -5,16 +5,14 @@ import { Page } from "../../components/Page";
 import Profile from "../../components/Profile";
 import UserList from "../../components/UserList";
 import Chatting from "../../components/Chatting";
-import * as dummy from "../dummy";
 import WaitingRoomInfo from "../../components/WaitingRoomInfo";
-import { useRecoilState, useRecoilValue } from "recoil";
+import { useRecoilValue } from "recoil";
 import { userState } from "../../store/user";
-import { getLoggedInUser } from "../../api/user";
 import { socketState } from "../../store/socket";
-import { getGameRoomInfo } from "../../api/gameRoom";
 import { useLocation, useNavigate } from "react-router-dom";
 import useSocketConnect from "../../hooks/useSocketConnect";
 import useSetUser from "../../hooks/useSetUser";
+import { io } from "socket.io-client";
 
 type GameRoom = {
   title: string;
@@ -29,7 +27,7 @@ type GameRoom = {
 const WaitingPage: React.FC = () => {
   const navigate = useNavigate();
   const socket = useRecoilValue(socketState);
-  const [user, setUser] = useRecoilState(userState);
+  const user = useRecoilValue(userState);
   const [room, setRoom] = useState<GameRoom | null>(null);
 
   const location = useLocation();
@@ -42,22 +40,21 @@ const WaitingPage: React.FC = () => {
     socket.on("game-room/info", data => {
       setRoom(data);
     });
-
     socket.on("game-room/join-failed", data => {
       navigate("/lobby");
     });
+    socket.on("fully connected", () => {
+      socket.emit("game-room/join", { roomId });
+    });
+    socket.emit("game-room/join", { roomId });
 
     return () => {
+      socket.off("fully connected");
       socket.off("game-room/info");
       socket.off("game-room/join-failed");
       socket.emit("game-room/exit");
     };
   }, [socket]);
-
-  useEffect(() => {
-    console.log(socket);
-    socket.emit("game-room/join", { roomId });
-  }, [socket.connected]);
 
   return (
     <Page>

@@ -9,6 +9,7 @@ function useSocketConnect() {
 
   useEffect(() => {
     if (!user) return;
+    if (socket.connected) return;
     socket.io.opts.query = {
       "user-id": user.userId,
     };
