@@ -5,7 +5,6 @@ import { Page } from "../../components/Page";
 import Profile from "../../components/Profile";
 import UserList from "../../components/UserList";
 import Chatting from "../../components/Chatting";
-import * as dummy from "../dummy";
 import WaitingRoomInfo from "../../components/WaitingRoomInfo";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { userState } from "../../store/user";

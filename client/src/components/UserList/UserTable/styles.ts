@@ -1,17 +1,4 @@
-import { css, Theme } from "@emotion/react";
-
-export const TableContainerStyle = (theme: Theme) => css`
-  position: relative;
-
-  width: inherit;
-  border-radius: 0.75rem;
-  flex-grow: 1;
-  padding: 1.5rem 0.5rem 2rem 0.5rem;
-  box-sizing: border-box;
-  box-shadow: 0 0.25rem 0.25rem rgba(0, 0, 0, 0.2);
-
-  background-color: ${theme.colors.secondary};
-`;
+import { css } from "@emotion/react";
 
 export const TableRankContainerStyle = css`
   position: absolute;
@@ -26,6 +13,7 @@ export const TableStyle = css`
   padding: 0 1.5rem 0 1.5rem;
   box-sizing: border-box;
   height: 100%;
+  width: 100%;
 `;
 
 export const TableRankStyle = css`
