@@ -36,13 +36,11 @@ const WaitingRoomInfo = ({ roomRecord, participants }: WaitingRoomInfoProps) => 
 
   const handleGameStartButton = () => {
     socket.emit("catch-mind/start");
-    navigate(`/playing/${roomRecord.roomId}`, { state: { gameId: roomRecord.gameId, participants: participants } });
-    // socket.on('start_game') 시 naviagte가 되도록 변경될 여지 있음
   };
 
   useEffect(() => {
     socket.on("play/start", () => {
-      navigate(`/playing/${roomRecord.roomId}`, { state: { gameId: roomRecord.gameId, participants: participants } });
+      navigate(`/playing/${roomRecord.roomId}`, { state: { gameId: roomRecord.gameId } });
     });
     return () => {
       socket.off("play/start");

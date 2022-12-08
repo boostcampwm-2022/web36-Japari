@@ -44,9 +44,6 @@ export class CatchMindGateway implements OnGatewayInit, OnGatewayConnection, OnG
     const playData = await this.redis.getFrom(RedisTableName.PLAY_DATA, roomId);
     if (playData) return;
 
-    // 룸 내의 다른 인원들이 전부 게임을 시작하게 만든다.
-    socket.to(roomId).emit("play/start");
-
     // PLAY_DATA 테이블의 roomId 레코드를 초기화한다.
     const room = await this.redis.getFrom(RedisTableName.GAME_ROOMS, roomId);
     const wordList = await this.prisma.catchMindWordList.findMany();
@@ -68,8 +65,12 @@ export class CatchMindGateway implements OnGatewayInit, OnGatewayConnection, OnG
     };
     await this.redis.setTo(RedisTableName.PLAY_DATA, roomId, newRecord);
 
+    // 룸 내의 모든 인원들이 전부 게임을 시작하게 만든다.
+    this.server.to(roomId).emit("play/start");
+
     // 방에 라운드가 시작 됐음을 알린다
     this.catchMindService.notifyRoundStart(this.server, roomId, room.participants, newRecord);
+    return;
   }
 
   @SubscribeMessage("catch-mind/image")
