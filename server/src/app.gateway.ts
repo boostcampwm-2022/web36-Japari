@@ -60,7 +60,6 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
   }
 
   async handleDisconnect(@ConnectedSocket() socket: Socket) {
-    console.log("i called!");
     this.logger.warn(`socket ${socket.id} disconnected`);
 
     // Redis 테이블 갱신

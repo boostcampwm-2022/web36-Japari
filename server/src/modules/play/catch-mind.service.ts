@@ -5,34 +5,36 @@ import { CatchMindState, RedisTableName } from "src/constants/enum";
 import { randFromArray } from "util/random";
 import { PrismaService } from "../prisma/prisma.service";
 import { RedisService } from "../redis/redis.service";
+import { CatchMindRecord } from "./catch-mind.gateway";
 
 const WAIT_TIME = 5;
 const DRAW_TIME = 120; //120
-const RESULT_TIME = 15; //15
+const RESULT_TIME = 10; //15
 
 @Injectable()
 export class CatchMindService {
   private logger = new Logger("Catch Mind Service");
   constructor(private redis: RedisService, private prisma: PrismaService) {}
 
-  async notifyRoundStart(server: Server, roomId: string, participants: any[], record: any) {
+  async notifyRoundStart(server: Server, roomId: string, participants: any[], record: CatchMindRecord) {
     await this.redis.setTo(RedisTableName.PLAY_DATA, roomId, { ...record, state: CatchMindState.WAIT });
-    const { drawerId, round, scores, totalScores, answer } = record;
+    const { drawerIndex, round, scores, totalScores, answer } = record;
+    const drawerId: number = Number(Object.keys(scores)[drawerIndex]);
 
-    participants.forEach(({ userId, socketId }) => {
-      const resp = {
-        round,
-        drawerId,
-        scores,
-        totalScores,
-      };
+    const resp = {
+      round,
+      drawerId,
+      scores,
+      totalScores,
+    };
 
+    participants.forEach(({ userId, socketId }: { userId: number; socketId: string }) => {
       if (userId != drawerId) {
         server.to(socketId).emit("catch-mind/round-start", resp);
         return;
       }
 
-      // 그릴 사람에게는 정답도 알려준다.
+      // drawer에게는 정답도 알려준다.
       server.to(socketId).emit("catch-mind/round-start", { ...resp, answer });
     });
 
@@ -56,8 +58,9 @@ export class CatchMindService {
   }
 
   async notifyResultState(server: Server, roomId: string) {
-    const record = await this.redis.getFrom(RedisTableName.PLAY_DATA, roomId);
+    const record: CatchMindRecord = await this.redis.getFrom(RedisTableName.PLAY_DATA, roomId);
     const { round, answer, scores, totalScores } = record;
+    let { drawerIndex } = record;
 
     // totalScores를 갱신한다.
     Object.entries(scores).forEach(([userId, score]) => {
@@ -87,8 +90,11 @@ export class CatchMindService {
         await this.prisma.user.update({ where: { userId }, data: { score: score + (addScore as number) } });
       });
       // 2. 게임 종료
-      await this.redis.hdel(RedisTableName.PLAY_DATA, roomId);
-      server.to(roomId).emit("catch-mind/end");
+      // 15초 뒤 round start
+      setTimeout(async () => {
+        await this.redis.hdel(RedisTableName.PLAY_DATA, roomId);
+        server.to(roomId).emit("catch-mind/end");
+      }, RESULT_TIME * 1000);
       return;
     }
 
@@ -99,11 +105,11 @@ export class CatchMindService {
 
     // 게임 로직이 진행중인데 방이 사라진 경우
     if (!room) {
-      await this.redis.hdel(RedisTableName.PLAY_DATA, roomId);
+      this.redis.hdel(RedisTableName.PLAY_DATA, roomId);
       return;
     }
 
-    const drawerId: number = randFromArray(room.participants).userId;
+    drawerIndex = (drawerIndex + 1) % Object.keys(scores).length;
     Object.keys(scores).forEach(userId => {
       scores[userId] = 0;
     });
@@ -112,12 +118,12 @@ export class CatchMindService {
       gameId: 1,
       round: round + 1,
       answer: newAnswer,
-      drawerId,
+      drawerIndex,
       scores,
       totalScores,
       state: CatchMindState.RESULT,
     };
-    await this.redis.setTo(RedisTableName.PLAY_DATA, roomId, newRecord);
+    this.redis.setTo(RedisTableName.PLAY_DATA, roomId, newRecord);
 
     // 15초 뒤 round start
     setTimeout(() => {
@@ -133,11 +139,12 @@ export class CatchMindService {
 
   async judge(socket: Socket, server: Server, message: string, sendTime: string) {
     const { roomId } = await this.redis.getFrom(RedisTableName.SOCKET_ID_TO_USER_INFO, socket.id);
-    const playData = await this.redis.getFrom(RedisTableName.PLAY_DATA, roomId);
+    const { drawerIndex, scores, answer }: CatchMindRecord = await this.redis.getFrom(RedisTableName.PLAY_DATA, roomId);
     const { userId, nickname } = await this.redis.getFrom(RedisTableName.SOCKET_ID_TO_USER_INFO, socket.id);
+    const drawerId = Number(Object.keys(scores)[drawerIndex]);
 
     // 그림을 그리는 사람이나 정답을 맞춘 사람의 채팅은 허용하지 않는다.
-    if (playData.drawerId === userId || playData.scores[String(userId)] > 0) {
+    if (drawerId === userId || scores[String(userId)] > 0) {
       socket.emit("chat/room", {
         sender: "시스템",
         message: `현재 ${nickname}님의 채팅은 다른 사람들에게 보이지 않습니다.`,
@@ -147,7 +154,7 @@ export class CatchMindService {
     }
 
     // 오답일 경우 일반 채팅으로 처리한다.
-    if (message !== playData.answer) {
+    if (message !== answer) {
       socket.to(roomId).emit("chat/room", {
         sender: nickname,
         message,
@@ -163,7 +170,7 @@ export class CatchMindService {
     // ex) 7명 중 1등을 할 경우 9점 획득
     // ex) 7명 중 7등을 할 경우 1점 획득
 
-    const nonDrawersScores = Object.entries(playData.scores).filter(([userId]) => Number(userId) !== playData.drawerId);
+    const nonDrawersScores = Object.entries(scores).filter(([userId]) => Number(userId) !== drawerId);
 
     const nonDrawersCount = nonDrawersScores.length;
     const firstPrize = nonDrawersCount + 3; // 1등이 받을 점수
@@ -171,9 +178,9 @@ export class CatchMindService {
     const score = Math.floor((firstPrize * (nonDrawersCount - qualifiersCount)) / nonDrawersCount);
 
     // 2. 맞춘 사람과 그린 사람의 scores를 갱신한다.
-    playData.scores[String(userId)] += score;
-    playData.scores[String(playData.drawerId)] += 1;
-    await this.redis.setTo(RedisTableName.PLAY_DATA, roomId, playData);
+    scores[String(userId)] += score;
+    scores[String(drawerId)] += 1;
+    await this.redis.updateTo(RedisTableName.PLAY_DATA, roomId, { scores });
 
     // 3. 방 전체에 정답자가 생겼다는 사실을 알린다.
     server.to(roomId).emit("chat/room", {

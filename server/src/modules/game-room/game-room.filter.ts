@@ -10,7 +10,6 @@ export class RoomSettingValidationExceptionFilter implements ExceptionFilter<Bad
     const socket = ctx.getClient();
 
     const httpErrorMessage = (exception.getResponse() as any).message[0];
-    console.log(httpErrorMessage);
 
     let errorMessage;
     if (/^title/.test(httpErrorMessage)) {
