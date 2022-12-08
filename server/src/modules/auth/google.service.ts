@@ -7,6 +7,7 @@ import {
   OAUTH_GOOGLE_EMAIL_API,
   OAUTH_GOOGLE_REDIRECT_URI,
 } from "src/constants/config";
+import { lastValueFrom } from "rxjs";
 
 @Injectable()
 export class GoogleService {
@@ -34,9 +35,9 @@ export class GoogleService {
     };
 
     try {
-      const res = await this.httpService
-        .post(OAUTH_GOOGLE_ACCESS_TOKEN_API, accesstokenAPIData, accesstokenAPIConfig)
-        .toPromise();
+      const res = await lastValueFrom(
+        this.httpService.post(OAUTH_GOOGLE_ACCESS_TOKEN_API, accesstokenAPIData, accesstokenAPIConfig)
+      );
       const { access_token: accessToken } = res.data;
       return accessToken;
     } catch (err) {
@@ -53,7 +54,7 @@ export class GoogleService {
     };
 
     try {
-      const res = await this.httpService.get(OAUTH_GOOGLE_EMAIL_API, googleUserAPIConfig).toPromise();
+      const res = await lastValueFrom(this.httpService.get(OAUTH_GOOGLE_EMAIL_API, googleUserAPIConfig));
       const email = res.data.email;
       return email;
     } catch (err) {
