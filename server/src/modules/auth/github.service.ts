@@ -6,6 +6,7 @@ import {
   OAUTH_GITHUB_ACCESS_TOKEN_API,
   OAUTH_GITHUB_EMAIL_API,
 } from "src/constants/config";
+import { lastValueFrom } from "rxjs";
 
 @Injectable()
 export class GithubService {
@@ -31,9 +32,9 @@ export class GithubService {
     };
 
     try {
-      const res = await this.httpService
-        .post(OAUTH_GITHUB_ACCESS_TOKEN_API, accesstokenAPIData, accesstokenAPIConfig)
-        .toPromise();
+      const res = await lastValueFrom(
+        this.httpService.post(OAUTH_GITHUB_ACCESS_TOKEN_API, accesstokenAPIData, accesstokenAPIConfig)
+      );
       const { access_token: accessToken } = res.data;
       return accessToken;
     } catch (err) {
@@ -50,7 +51,7 @@ export class GithubService {
     };
 
     try {
-      const res = await this.httpService.get(OAUTH_GITHUB_EMAIL_API, githubUserAPIConfig).toPromise();
+      const res = await lastValueFrom(this.httpService.get(OAUTH_GITHUB_EMAIL_API, githubUserAPIConfig));
       const email = res.data[0].email;
       return email;
     } catch (err) {
