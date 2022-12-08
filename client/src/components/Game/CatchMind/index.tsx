@@ -33,7 +33,7 @@ enum Color {
 
 const WAIT_TIME = 5;
 const DRAW_TIME = 120; // 120
-const RESULT_TIME = 15; //15
+const RESULT_TIME = 10; //15
 
 enum CatchMindState {
   WAIT,
@@ -245,7 +245,6 @@ export default function CatchMind() {
       const ctx = getContextObject();
       writeCenter(`정답 공개`, { color: "black", dx: 0, dy: -90 });
       writeCenter(`${data.answer}`, { color: "red", size: "75px", dx: 0, dy: 30 });
-      console.log(data.answer.length);
       ctx.fillStyle = currentColorRef.current;
 
       setTime(RESULT_TIME);

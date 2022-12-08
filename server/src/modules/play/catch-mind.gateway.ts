@@ -12,17 +12,22 @@ import {
 import { Server, Socket } from "socket.io";
 import { CatchMindState, RedisTableName } from "src/constants/enum";
 import { PrismaService } from "../prisma/prisma.service";
-// import { RoomSettingDto } from "./dto/room-setting.dto";
-// import { RoomCredentialDto } from "./dto/room-credential.dto";
 import { SocketBadRequestFilter, SocketExceptionFilter } from "src/exception-filters/websocket.filter";
-import { SocketException } from "src/constants/exception";
 import { RedisService } from "../redis/redis.service";
 import { SERVER_SOCKET_PORT } from "src/constants/config";
-import { RoomCredentialDto } from "../game-room/dto/room-credential.dto";
-import { RoomSettingDto } from "../game-room/dto/room-setting.dto";
+
 import { CatchMindService } from "./catch-mind.service";
-import { randFromArray, randInt } from "util/random";
-import { ChatDto } from "../chat/chat.dto";
+import { randFromArray } from "util/random";
+
+export interface CatchMindRecord {
+  gameId: number;
+  answer: string;
+  round: number;
+  state: CatchMindState;
+  drawerIndex: number;
+  scores: Record<string, number>;
+  totalScores: Record<string, number>;
+}
 
 @UseFilters(new SocketBadRequestFilter("catch-mind/error"))
 @UseFilters(SocketExceptionFilter)
@@ -51,7 +56,8 @@ export class CatchMindGateway implements OnGatewayInit, OnGatewayConnection, OnG
     const room = await this.redis.getFrom(RedisTableName.GAME_ROOMS, roomId);
     const wordList = await this.prisma.catchMindWordList.findMany();
     const answer: string = randFromArray(wordList).word;
-    const drawerId: number = randFromArray(room.participants).userId;
+    const drawerIndex = 0;
+
     const scores = room.participants.reduce((acc, cur) => {
       return { ...acc, [cur.userId]: 0 };
     }, {});
@@ -62,10 +68,10 @@ export class CatchMindGateway implements OnGatewayInit, OnGatewayConnection, OnG
       round: 1,
       answer,
       state: CatchMindState.WAIT,
-      drawerId,
+      drawerIndex,
       scores,
       totalScores,
-    };
+    } as CatchMindRecord;
     await this.redis.setTo(RedisTableName.PLAY_DATA, roomId, newRecord);
 
     // 방에 라운드가 시작 됐음을 알린다
