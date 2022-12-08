@@ -20,6 +20,7 @@ env:
   REDIRECT_URI: ${{ secrets.REDIRECT_URI }}
   SERVER_PORT: ${{ secrets.SERVER_PORT }}
   SERVER_SOCKET_PORT: ${{ secrets.SERVER_SOCKET_PORT }}
+  WEBRTC_HOST: ${{ secrets.WEBRTC_HOST }}
 
 jobs:
   deploy:
@@ -34,20 +35,20 @@ jobs:
       - name: client 모듈 설치
         working-directory: ./client
         run: npm install
-        
+
       - name: client 환경변수 파일 생성
         working-directory: ./client
         run: |
           echo REACT_APP_OAUTH_GITHUB_AUTH_SERVER=$REACT_APP_OAUTH_GITHUB_AUTH_SERVER > .env
           echo REACT_APP_SOCKET_SERVER_URL=$REACT_APP_SOCKET_SERVER_URL >> .env
-        
+
       - name: client 빌드
         working-directory: ./client
         run: |
           npm run build
           rm -rf /var/www/build
           cp -rf ./build /var/www/
-      
+
       - name: server 모듈 설치
         working-directory: ./server
         run: npm install
@@ -67,6 +68,7 @@ jobs:
           echo SERVER_PORT=$SERVER_PORT >> .env
           echo SERVER_SOCKET_PORT=$SERVER_SOCKET_PORT >> .env
           echo REDIRECT_URI=$REDIRECT_URI >> .env
+          echo WEBRTC_HOST=$WEBRTC_HOST >> .env
 
       - name: pm2 프로세스 재실행
         working-directory: ./server

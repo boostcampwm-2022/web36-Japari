@@ -1,63 +1,59 @@
-// https://www.youtube.com/watch?v=vGkInLFL0kg&list=PLnrGn4P6C4P5J2rSSyiAyxZegws4SS8ey&index=4&ab_channel=JacoboCode
+import { DynamicModule, Logger, Module } from "@nestjs/common";
 
-import { DynamicModule, FactoryProvider, Logger, Module, ModuleMetadata } from "@nestjs/common";
-import { ConfigModule, ConfigService } from "@nestjs/config";
-
-import IORedis, { RedisOptions } from "ioredis";
-
-type RedisModuleOptions = {
-  connectionOptions: RedisOptions;
-};
-
-type RedisRegisterAsyncParam = {
-  useFactory: (...args: any[]) => Promise<RedisModuleOptions> | RedisModuleOptions;
-} & Pick<ModuleMetadata, "imports"> &
-  Pick<FactoryProvider, "inject">;
+import Redis from "ioredis";
+import { async } from "rxjs";
+import { REDIS_HOST, REDIS_PORT, REDIS_PASSWORD } from "src/constants/config";
+import { RedisTableName } from "src/constants/enum";
+import { RedisService } from "./redis.service";
 
 @Module({})
 class RedisModuleWithoutConfig {
-  static async registerAsync({ imports, useFactory, inject }: RedisRegisterAsyncParam): Promise<DynamicModule> {
-    const redisProvider = {
-      provide: "RedisProvider",
-      useFactory: async (...args) => {
-        const logger = new Logger("Redis Module");
+  static register(): DynamicModule {
+    const logger = new Logger("Redis Module");
 
-        const { connectionOptions } = await useFactory(...args);
+    const client = new Redis({
+      host: REDIS_HOST,
+      port: REDIS_PORT,
+      password: REDIS_PASSWORD,
+    });
 
-        const client = new IORedis(connectionOptions);
+    const getFrom = async (tableName: RedisTableName, key: string) => {
+      return JSON.parse(await client.hget(tableName, key));
+    };
 
-        client.on("connect", () => {
-          logger.verbose("redis connected");
-        });
+    const setTo = async (tableName: RedisTableName, key: string, value: any) => {
+      return client.hset(tableName, key, JSON.stringify(value));
+    };
 
-        client.on("error", err => {
-          logger.error(err);
-        });
+    const updateTo = async (tableName: RedisTableName, key: string, value: any) => {
+      const oldValue = JSON.parse(await client.hget(tableName, key));
+      return client.hset(tableName, key, JSON.stringify(Object.assign(oldValue, value)));
+    };
 
-        return client;
-      },
-      inject,
+    client.on("connect", () => {
+      logger.verbose("redis connected");
+    });
+
+    client.on("error", err => {
+      logger.error(err);
+    });
+
+    const InternalRedisService = {
+      provide: RedisService,
+      useValue: Object.assign(client, {
+        getFrom,
+        setTo,
+        updateTo,
+      }),
     };
 
     return {
       module: RedisModuleWithoutConfig,
-      imports,
-      providers: [redisProvider],
-      exports: [redisProvider],
+      imports: [],
+      providers: [InternalRedisService],
+      exports: [InternalRedisService],
     };
   }
 }
 
-export const RedisModule = RedisModuleWithoutConfig.registerAsync({
-  imports: [ConfigModule],
-  useFactory: async (config: ConfigService) => {
-    return {
-      connectionOptions: {
-        host: config.get("REDIS_HOST"),
-        port: config.get("REDIS_PORT"),
-        password: config.get("REDIS_PASSWORD"),
-      },
-    };
-  },
-  inject: [ConfigService],
-});
+export const RedisModule = RedisModuleWithoutConfig.register();

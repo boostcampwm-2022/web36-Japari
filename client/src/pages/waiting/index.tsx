@@ -12,7 +12,7 @@ import { userState } from "../../store/user";
 import { getLoggedInUser } from "../../api/user";
 import { socketState } from "../../store/socket";
 import { getGameRoomInfo } from "../../api/gameRoom";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 type GameRoom = {
   title: string;
@@ -25,6 +25,7 @@ type GameRoom = {
 };
 
 const WaitingPage: React.FC = () => {
+  const navigate = useNavigate();
   const socket = useRecoilValue(socketState);
   const [user, setUser] = useRecoilState(userState);
   const [room, setRoom] = useState<GameRoom | null>(null);
@@ -46,8 +47,11 @@ const WaitingPage: React.FC = () => {
       setRoom(data);
     });
     socket.emit("game-room/join", { roomId });
+
+    socket.on("game-room/join-failed", data => {
+      navigate("/lobby");
+    });
     return () => {
-      socket.emit("game-room/exit");
       socket.off("game-room/info");
     };
   }, [roomId, socket]);
@@ -65,12 +69,12 @@ const WaitingPage: React.FC = () => {
                 currentPeople: room.participants.length,
                 gameId: Number(room.gameId),
               }}
-              camList={dummy.camList}
+              participants={room.participants}
             />
           )}
         </div>
         <div css={style.RowContentContainerStyle}>
-          <Profile user={user} />
+          <Profile user={user} editable={false} />
           <Chatting />
         </div>
       </div>

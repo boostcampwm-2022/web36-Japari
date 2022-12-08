@@ -1,5 +1,4 @@
-import { Inject, Logger } from "@nestjs/common";
-import { JwtService } from "@nestjs/jwt";
+import { Logger } from "@nestjs/common";
 import {
   ConnectedSocket,
   OnGatewayConnection,
@@ -8,18 +7,18 @@ import {
   WebSocketGateway,
   WebSocketServer,
 } from "@nestjs/websockets";
-import Redis from "ioredis";
 import { Server, Socket } from "socket.io";
 import { SERVER_SOCKET_PORT } from "src/constants/config";
-import { RedisTableName } from "src/constants/redis-table-name";
+import { RedisTableName } from "src/constants/enum";
 import { redisRecordToObject } from "util/convert";
+import { RedisService } from "../redis/redis.service";
 
 @WebSocketGateway(SERVER_SOCKET_PORT, { transports: ["websocket"], namespace: "/" })
 export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer() public server: Server;
   private logger = new Logger("Chat Gateway");
 
-  constructor(@Inject("RedisProvider") private redis: Redis) {}
+  constructor(private redis: RedisService) {}
 
   afterInit(server: Server) {
     // 매 초마다 모든 유저들에게 접속 중인 유저 정보 전송

@@ -1,26 +1,46 @@
 /** @jsxImportSource @emotion/react */
 import Cam, { CamProps } from "../Cam";
 import * as style from "./styles";
-import { css } from "@emotion/react";
+import { User } from "@dto";
+import { StreamInfo } from "../../hooks/useCams";
+import Audio from "../Audio";
+import { useRecoilValue } from "recoil";
+import { userState } from "../../store/user";
 
 export interface InGameCamListProps {
-  camList: CamProps[];
+  participants: User[];
+  videoStream: Map<string, StreamInfo>;
+  audioStream: Map<string, StreamInfo>;
 }
 
 export interface ProfileProps {
   profile: string;
 }
 
-const InGameCamList = ({ camList }: InGameCamListProps) => {
-  // [camList, setCamList] = useState<Cam[]>([]);
+const InGameCamList = ({ participants, videoStream, audioStream }: InGameCamListProps) => {
+  const user = useRecoilValue(userState);
 
   return (
     <div css={style.inGameCamListStyle}>
-      {camList.map((cam, index) => (
-        <div key={index} css={style.camWrapperStyle}>
-          <Cam {...cam} />
-        </div>
-      ))}
+      {participants.map(participant => {
+        const videoStreamInfo = videoStream.get(participant.email);
+        const audioStreamInfo = audioStream.get(participant.email);
+
+        return (
+          <div key={participant.userId}>
+            {videoStreamInfo && (
+              <Cam
+                mediaStream={videoStreamInfo.mediaStream ?? null}
+                isVideoOn={true}
+                userInfo={videoStreamInfo.userInfo}
+              />
+            )}
+            {audioStreamInfo && user?.userId !== audioStreamInfo.userInfo.userId && (
+              <Audio mediaStream={audioStreamInfo.mediaStream ?? null} />
+            )}
+          </div>
+        );
+      })}
     </div>
   );
 };

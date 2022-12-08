@@ -28,8 +28,9 @@ const Select = ({ selectType, width, setValue }: SelectProps) => {
               width: ${width};
             `}
             onChange={e => setValue(Number(e.target.value))}
+            defaultValue={0}
           >
-            <option>모든 게임</option>
+            <option value={0}>모든 게임</option>
             <option value={1}>캐치 마인드</option>
             <option value={2}>배틀십</option>
           </select>
@@ -45,8 +46,11 @@ const Select = ({ selectType, width, setValue }: SelectProps) => {
               width: ${width};
             `}
             onChange={e => setValue(Number(e.target.value))}
+            defaultValue={0}
           >
-            <option>게임을 선택해 주세요.</option>
+            <option value={0} disabled>
+              게임을 선택해 주세요.
+            </option>
             <option value={1}>캐치 마인드</option>
             <option value={2}>배틀십</option>
           </select>
@@ -62,8 +66,11 @@ const Select = ({ selectType, width, setValue }: SelectProps) => {
               width: ${width};
             `}
             onChange={e => setValue(Number(e.target.value))}
+            defaultValue={0}
           >
-            <option>인원을 선택해 주세요.</option>
+            <option disabled value={0}>
+              인원을 선택해 주세요.
+            </option>
             <option value={4}>4명</option>
             <option value={8}>8명</option>
           </select>

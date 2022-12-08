@@ -1,11 +1,12 @@
-import { ArgumentsHost, BadRequestException, Catch, WsExceptionFilter } from "@nestjs/common";
-import { WebsocketException } from "src/constants/exception";
+import { ArgumentsHost, BadRequestException, Catch } from "@nestjs/common";
+import { SocketException } from "src/constants/exception";
 
 @Catch(BadRequestException)
-export class WebsocketBadRequestFilter implements WsExceptionFilter {
+export class SocketBadRequestFilter {
   constructor(private eventName: string) {}
 
   catch(exception: BadRequestException, host: ArgumentsHost) {
+    if (host.getType() !== "ws") throw exception;
     const ctx = host.switchToWs();
     const socket = ctx.getClient();
     socket.emit(this.eventName, (exception.getResponse() as any).message[0]);
@@ -13,10 +14,9 @@ export class WebsocketBadRequestFilter implements WsExceptionFilter {
 }
 
 @Catch()
-export class WebsocketExceptionFilter implements WsExceptionFilter {
-  catch(exception: WebsocketException, host: ArgumentsHost) {
-    if (host.getType() !== "ws") return;
-
+export class SocketExceptionFilter {
+  catch(exception: SocketException, host: ArgumentsHost) {
+    if (host.getType() !== "ws") throw exception;
     const ctx = host.switchToWs();
     const socket = ctx.getClient();
     socket.emit(exception.eventName, exception.message);

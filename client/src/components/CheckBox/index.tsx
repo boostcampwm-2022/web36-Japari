@@ -1,8 +1,12 @@
 /** @jsxImportSource @emotion/react */
 import * as style from "./styles";
 
-const CheckBox = () => {
-  return <input css={style.checkBoxStyle} type="checkbox" />;
+interface CheckBoxProps {
+  onChange: any;
+}
+
+const CheckBox = ({ onChange }: CheckBoxProps) => {
+  return <input css={style.checkBoxStyle} type="checkbox" onChange={onChange} />;
 };
 
 export default CheckBox;
