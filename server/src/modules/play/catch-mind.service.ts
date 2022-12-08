@@ -8,8 +8,8 @@ import { RedisService } from "../redis/redis.service";
 import { CatchMindRecord } from "./catch-mind.gateway";
 
 const WAIT_TIME = 5;
-const DRAW_TIME = 5; //120
-const RESULT_TIME = 5; //15
+const DRAW_TIME = 120; //120
+const RESULT_TIME = 10; //15
 
 @Injectable()
 export class CatchMindService {
