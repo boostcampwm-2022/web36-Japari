@@ -257,7 +257,6 @@ export class MediaGateway implements OnGatewayInit, OnGatewayConnection, OnGatew
     @MessageBody()
     { dtlsParameters, serverConsumerTransportId }: { dtlsParameters: DtlsParameters; serverConsumerTransportId: string }
   ) {
-    console.log(serverConsumerTransportId, this.transports);
     const consumerTransport = this.transports.find(
       transportData => transportData.consumer && transportData.transport.id == serverConsumerTransportId
     ).transport;
