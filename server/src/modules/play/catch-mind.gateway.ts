@@ -75,7 +75,10 @@ export class CatchMindGateway implements OnGatewayInit, OnGatewayConnection, OnG
     this.server.to(roomId).emit("play/start");
 
     // 방에 라운드가 시작 됐음을 알린다
-    this.catchMindService.notifyRoundStart(this.server, roomId, room.participants, newRecord);
+    // 유저들이 모두 인게임 페이지에 입장 후 round를 시작하도록 setTimeout 처리. 추후 더 일관성을 보장할 수 있는 로직으로 수정 필요.
+    setTimeout(() => {
+      this.catchMindService.notifyRoundStart(this.server, roomId, room.participants, newRecord);
+    }, 500);
     return;
   }
 
