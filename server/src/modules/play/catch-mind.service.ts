@@ -7,8 +7,8 @@ import { PrismaService } from "../prisma/prisma.service";
 import { RedisService } from "../redis/redis.service";
 
 const WAIT_TIME = 5;
-const DRAW_TIME = 5; //120
-const RESULT_TIME = 10; //15
+const DRAW_TIME = 120; //120
+const RESULT_TIME = 15; //15
 
 @Injectable()
 export class CatchMindService {
