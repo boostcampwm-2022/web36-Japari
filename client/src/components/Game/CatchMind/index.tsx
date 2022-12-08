@@ -195,7 +195,6 @@ export default function CatchMind() {
   }, []);
 
   useEffect(() => {
-    socket.emit("catch-mind/start");
     socket.on("catch-mind/round-start", data => {
       stateRef.current = CatchMindState.WAIT;
 

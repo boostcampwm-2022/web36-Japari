@@ -12,7 +12,6 @@ import { socketState } from "../../store/socket";
 import { useLocation, useNavigate } from "react-router-dom";
 import useSocketConnect from "../../hooks/useSocketConnect";
 import useSetUser from "../../hooks/useSetUser";
-import { io } from "socket.io-client";
 
 type GameRoom = {
   title: string;
@@ -52,7 +51,7 @@ const WaitingPage: React.FC = () => {
       socket.off("fully connected");
       socket.off("game-room/info");
       socket.off("game-room/join-failed");
-      socket.emit("game-room/exit");
+      socket.emit("wait-room/exit");
     };
   }, [socket]);
 
