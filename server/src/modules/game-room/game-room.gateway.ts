@@ -34,9 +34,14 @@ export class GameRoomGateway implements OnGatewayInit, OnGatewayConnection, OnGa
   afterInit(server: Server) {
     // 매초마다 로비에 있는 유저들에게 방 목록을 전송
     setInterval(async () => {
-      const records = await this.redis.hgetall(RedisTableName.GAME_ROOMS);
+      const gameRoomsRecords = await this.redis.hgetall(RedisTableName.GAME_ROOMS);
+      const playDataRecords = await this.redis.hgetall(RedisTableName.PLAY_DATA);
 
-      const gameRooms = redisRecordToObject(records);
+      const gameRooms = redisRecordToObject(gameRoomsRecords);
+      const playData = redisRecordToObject(playDataRecords);
+
+      Object.keys(playData).forEach(key => delete gameRooms[key]);
+
       let data = [];
       for (let roomId in gameRooms) {
         const { title, gameId, participants, maximumPeople, isPrivate } = gameRooms[roomId];
