@@ -85,6 +85,51 @@ export class CatchMindGateway implements OnGatewayInit, OnGatewayConnection, OnG
     socket.to(roomId).emit("catch-mind/image", { round, imageSrc });
   }
 
+  @SubscribeMessage("play-room/exit")
+  async exit(@ConnectedSocket() socket: Socket) {
+    const user = await this.redis.getFrom(RedisTableName.SOCKET_ID_TO_USER_INFO, socket.id);
+    if (!user || user.roomId === "lobby") return;
+
+    const { roomId } = user;
+
+    const room = await this.redis.getFrom(RedisTableName.GAME_ROOMS, roomId);
+
+    // 유저를 방에서 제거
+    const { email } = await this.redis.getFrom(RedisTableName.SOCKET_ID_TO_USER_INFO, socket.id);
+    room.participants = room.participants.filter(user => user.email !== email);
+    socket.leave(roomId);
+    await this.redis.setTo(RedisTableName.GAME_ROOMS, roomId, room);
+    if (room.participants.length === 0) {
+      this.redis.hdel(RedisTableName.GAME_ROOMS, roomId);
+    }
+
+    // 유저를 PlayData에서 제거
+
+    const playData = await this.redis.getFrom(RedisTableName.PLAY_DATA, roomId);
+    if (playData) {
+      delete playData.scores[String(user.userId)];
+      delete playData.totalScores[String(user.userId)];
+
+      if (Object.keys(playData.scores).length === 0) {
+        await this.redis.hdel(RedisTableName.PLAY_DATA, roomId);
+      } else {
+        await this.redis.setTo(RedisTableName.PLAY_DATA, roomId, playData);
+      }
+    }
+
+    // 유저를 로비로 보낸다
+    socket.join("lobby");
+    const userInfo = await this.redis.getFrom(RedisTableName.SOCKET_ID_TO_USER_INFO, socket.id);
+    userInfo.roomId = "lobby";
+    await this.redis.setTo(RedisTableName.SOCKET_ID_TO_USER_INFO, socket.id, userInfo);
+
+    // 유저가 나갔다는 소식을 방에 남게 될 모든 유저에게 전달
+    socket.to(roomId).emit("game-room/info", {
+      roomId,
+      ...room,
+    });
+  }
+
   async handleConnection(@ConnectedSocket() socket: Socket) {}
 
   handleDisconnect(@ConnectedSocket() socket: Socket) {}

@@ -133,13 +133,14 @@ export class GameRoomGateway implements OnGatewayInit, OnGatewayConnection, OnGa
   @SubscribeMessage("game-room/join")
   async join(@ConnectedSocket() socket, @MessageBody("roomId") roomId: string) {
     const room = await this.redis.getFrom(RedisTableName.GAME_ROOMS, roomId);
-    const { userId } = await this.redis.getFrom(RedisTableName.SOCKET_ID_TO_USER_INFO, socket.id);
-    const alreadyJoined = room.participants.map(user => user.userId).includes(userId);
 
     // 잘못된 room id 접근
     if (!room) {
       throw new SocketException("game-room/join-failed", "잘못된 room id 입니다.");
     }
+
+    const { userId } = await this.redis.getFrom(RedisTableName.SOCKET_ID_TO_USER_INFO, socket.id);
+    const alreadyJoined = room.participants.map(user => user.userId).includes(userId);
 
     // 방 정원 초과
     if (room.participants.length + 1 > room.maximumPeople) {
@@ -166,12 +167,16 @@ export class GameRoomGateway implements OnGatewayInit, OnGatewayConnection, OnGa
     });
   }
 
-  @SubscribeMessage("game-room/exit")
+  @SubscribeMessage("wait-room/exit")
   async exit(@ConnectedSocket() socket: Socket) {
     const user = await this.redis.getFrom(RedisTableName.SOCKET_ID_TO_USER_INFO, socket.id);
     if (!user || user.roomId === "lobby") return;
 
     const { roomId } = user;
+    const playData = await this.redis.getFrom(RedisTableName.PLAY_DATA, roomId);
+    if (playData) return;
+    // play 중이면 취소 (playing 페이지로 넘어간 경우)
+
     const room = await this.redis.getFrom(RedisTableName.GAME_ROOMS, roomId);
 
     // 유저를 방에서 제거
@@ -181,20 +186,6 @@ export class GameRoomGateway implements OnGatewayInit, OnGatewayConnection, OnGa
     await this.redis.setTo(RedisTableName.GAME_ROOMS, roomId, room);
     if (room.participants.length === 0) {
       this.redis.hdel(RedisTableName.GAME_ROOMS, roomId);
-    }
-
-    // 유저를 PlayData에서 제거
-    const playData = await this.redis.getFrom(RedisTableName.PLAY_DATA, roomId);
-
-    if (playData) {
-      delete playData.scores[String(user.userId)];
-      delete playData.totalScores[String(user.userId)];
-
-      if (Object.keys(playData.scores).length === 0) {
-        await this.redis.hdel(RedisTableName.PLAY_DATA, roomId);
-      } else {
-        await this.redis.setTo(RedisTableName.PLAY_DATA, roomId, playData);
-      }
     }
 
     // 유저를 로비로 보낸다
