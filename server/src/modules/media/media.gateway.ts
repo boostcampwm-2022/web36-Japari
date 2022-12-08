@@ -38,6 +38,8 @@ const mediaCodecs: RtpCodecCapability[] = [
     clockRate: 90000,
     parameters: {
       "x-google-start-bitrate": 1000,
+      rtcMinPort: 20000,
+      rtcMaxPort: 30000,
     },
   },
   { kind: "audio", mimeType: "audio/opus", clockRate: 48000, channels: 2 },
