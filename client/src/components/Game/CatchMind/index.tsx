@@ -93,13 +93,6 @@ export default function CatchMind() {
     return ctx as CanvasRenderingContext2D;
   }, []);
 
-  const fillCanvas = useCallback(() => {
-    const ctx = getContextObject();
-    ctx.fillStyle = currentColorRef.current;
-    ctx.fillRect(0, 0, canvasRef.current!.width, canvasRef.current!.height);
-    ctx.beginPath();
-  }, []);
-
   const clearCanvas = useCallback(() => {
     const ctx = getContextObject();
     ctx.fillStyle = Color.WHITE;
