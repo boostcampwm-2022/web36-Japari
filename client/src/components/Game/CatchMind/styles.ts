@@ -145,8 +145,8 @@ export const timerStyle = css`
   gap: 1rem;
 `;
 
-export const answerStyle = css`
-  color: tomato;
+export const answerStyle = (isAnswer: boolean) => css`
+  color: ${isAnswer ? "tomato" : "darkslateblue"};
   font-weight: bold;
 `;
 

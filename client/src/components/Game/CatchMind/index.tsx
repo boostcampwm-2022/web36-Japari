@@ -2,7 +2,6 @@
 import React, { useRef, useState, useEffect, useCallback } from "react";
 import * as style from "./styles";
 import timerImage from "../../../assets/icons/timer.png";
-import { User } from "@dto";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { userState } from "../../../store/user";
 import { socketState } from "../../../store/socket";
@@ -11,6 +10,7 @@ import { debounce } from "lodash";
 import pencilIcon from "../../../assets/icons/catch-mind-pencil.png";
 import eraserIcon from "../../../assets/icons/catch-mind-eraser.png";
 import { useNavigate, useLocation } from "react-router-dom";
+import { User } from "@dto";
 
 const DEFAULT_FONT = "50px LINESeedKR bold";
 
@@ -60,7 +60,11 @@ const THIN = 1;
 const NORMAL = 5;
 const THICK = 9;
 
-export default function CatchMind() {
+interface CatchMindProps {
+  participants: User[];
+}
+
+export default function CatchMind({ participants }: CatchMindProps) {
   const navigate = useNavigate();
   const path = useLocation().pathname.split("/").slice(1)[1];
 
@@ -71,13 +75,12 @@ export default function CatchMind() {
   const [line, setLine] = useState<"THIN" | "NORMAL" | "THICK">("NORMAL");
   const [isDrawing, setIsDrawing] = useState(false);
   const [currentColor, setCurrentColor] = useState<string>("black");
-  const [currentLineWidth, setCurrentLineWidth] = useState<Number>(2);
   const currentColorRef = useRef<string>("black");
 
-  const [user, setUser] = useRecoilState(userState);
+  const [user] = useRecoilState(userState);
   const [time, setTime] = useState<number>(WAIT_TIME);
   const timeRef = useRef<number | null>(null);
-  const [answer, setAnswer] = useState<string>("");
+  const [infoText, setInfoText] = useState<string>("");
   const [round, setRound] = useState<number>(1);
   const roundRef = useRef<number>(1);
   const stateRef = useRef<number>(0);
@@ -198,7 +201,7 @@ export default function CatchMind() {
     socket.on("catch-mind/round-start", data => {
       stateRef.current = CatchMindState.WAIT;
 
-      if (data.answer) setAnswer(answer);
+      if (data.answer) setInfoText(infoText);
       setRound(data.round);
       setDrawerId(data.drawerId);
 
@@ -206,9 +209,11 @@ export default function CatchMind() {
       writeCenter(`Round ${data.round} 준비`);
 
       if (data.answer) {
-        setAnswer(data.answer);
+        setInfoText(data.answer);
       } else {
-        setAnswer("");
+        console.log(drawerId);
+        const drawerName = participants.filter(user => user.userId === data.drawerId)[0].nickname;
+        setInfoText(`${drawerName} 님의 그림`);
       }
       setTime(WAIT_TIME);
     });
@@ -348,8 +353,8 @@ export default function CatchMind() {
             <span>{time}</span>
           </div>
 
-          <div css={style.answerStyle}>
-            <span>{answer}</span>
+          <div css={style.answerStyle(drawerId === user?.userId)}>
+            <span>{infoText}</span>
           </div>
 
           <div css={style.roundStyle}>
