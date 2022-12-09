@@ -49,9 +49,6 @@ export class CatchMindGateway implements OnGatewayInit, OnGatewayConnection, OnG
     const playData = await this.redis.getFrom(RedisTableName.PLAY_DATA, roomId);
     if (playData) return;
 
-    // 룸 내의 다른 인원들이 전부 게임을 시작하게 만든다.
-    socket.to(roomId).emit("play/start");
-
     // PLAY_DATA 테이블의 roomId 레코드를 초기화한다.
     const room = await this.redis.getFrom(RedisTableName.GAME_ROOMS, roomId);
     const wordList = await this.prisma.catchMindWordList.findMany();
@@ -74,8 +71,15 @@ export class CatchMindGateway implements OnGatewayInit, OnGatewayConnection, OnG
     } as CatchMindRecord;
     await this.redis.setTo(RedisTableName.PLAY_DATA, roomId, newRecord);
 
+    // 룸 내의 모든 인원들이 전부 게임을 시작하게 만든다.
+    this.server.to(roomId).emit("play/start");
+
     // 방에 라운드가 시작 됐음을 알린다
-    this.catchMindService.notifyRoundStart(this.server, roomId, room.participants, newRecord);
+    // 유저들이 모두 인게임 페이지에 입장 후 round를 시작하도록 setTimeout 처리. 추후 더 일관성을 보장할 수 있는 로직으로 수정 필요.
+    setTimeout(() => {
+      this.catchMindService.notifyRoundStart(this.server, roomId, room.participants, newRecord);
+    }, 500);
+    return;
   }
 
   @SubscribeMessage("catch-mind/image")
@@ -85,12 +89,26 @@ export class CatchMindGateway implements OnGatewayInit, OnGatewayConnection, OnG
     socket.to(roomId).emit("catch-mind/image", { round, imageSrc });
   }
 
+  @SubscribeMessage("play-room/enter")
+  async enter(@ConnectedSocket() socket: Socket, @MessageBody() roomId: string) {
+    const room = await this.redis.getFrom(RedisTableName.GAME_ROOMS, roomId);
+    if (!room) return { room, ids: [] };
+
+    const ids = room.participants.map(participant => participant.userId);
+
+    return { room, ids };
+  }
+
   @SubscribeMessage("play-room/exit")
   async exit(@ConnectedSocket() socket: Socket) {
     const user = await this.redis.getFrom(RedisTableName.SOCKET_ID_TO_USER_INFO, socket.id);
     if (!user || user.roomId === "lobby") return;
 
     const { roomId } = user;
+
+    const playData = await this.redis.getFrom(RedisTableName.PLAY_DATA, roomId);
+    if (!playData) return;
+    // 게임이 끝나 로비로 돌아가는 경우는 무시
 
     const room = await this.redis.getFrom(RedisTableName.GAME_ROOMS, roomId);
 
@@ -105,7 +123,6 @@ export class CatchMindGateway implements OnGatewayInit, OnGatewayConnection, OnG
 
     // 유저를 PlayData에서 제거
 
-    const playData = await this.redis.getFrom(RedisTableName.PLAY_DATA, roomId);
     if (playData) {
       delete playData.scores[String(user.userId)];
       delete playData.totalScores[String(user.userId)];
