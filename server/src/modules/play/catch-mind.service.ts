@@ -46,21 +46,27 @@ export class CatchMindService {
 
   async notifyDrawState(server: Server, roomId: string) {
     await this.redis.updateTo(RedisTableName.PLAY_DATA, roomId, { state: CatchMindState.DRAW });
-    const { round } = await this.redis.getFrom(RedisTableName.PLAY_DATA, roomId);
+    const record = await this.redis.getFrom(RedisTableName.PLAY_DATA, roomId);
+    if (!record) return;
+    const { round } = record;
     server.to(roomId).emit("catch-mind/draw-start", { round });
 
     // 120초 뒤 result state start
     setTimeout(async () => {
-      const playData = await this.redis.getFrom(RedisTableName.PLAY_DATA, roomId);
-      if (!playData || playData.state !== CatchMindState.DRAW) return;
-      this.notifyResultState(server, roomId);
+      this.notifyResultState(server, roomId, round);
     }, DRAW_TIME * 1000);
   }
 
-  async notifyResultState(server: Server, roomId: string) {
+  async notifyResultState(server: Server, roomId: string, callTime: number) {
     const record: CatchMindRecord = await this.redis.getFrom(RedisTableName.PLAY_DATA, roomId);
-    const { round, answer, scores, totalScores } = record;
+    if (!record) return;
+    const { round, state, answer, scores, totalScores } = record;
     let { drawerIndex } = record;
+
+    // A. notifyResultState 함수를 예약한 시점(라운드)이 현재 시점(라운드)과 일치하지 않는다.
+    // B. 현재 'DRAW' 단계가 아니다.
+    // A 또는 B가 성립한다면 모든 사람이 정답을 맞춰 notifyResultState가 호출 됐으나 120초 setTimeout에 의해 예약된 함수가 지금 실행된 것이므로 무시한다.
+    if (round !== callTime || state !== CatchMindState.DRAW) return;
 
     // totalScores를 갱신한다.
     Object.entries(scores).forEach(([userId, score]) => {
@@ -139,7 +145,10 @@ export class CatchMindService {
 
   async judge(socket: Socket, server: Server, message: string, sendTime: string) {
     const { roomId } = await this.redis.getFrom(RedisTableName.SOCKET_ID_TO_USER_INFO, socket.id);
-    const { drawerIndex, scores, answer }: CatchMindRecord = await this.redis.getFrom(RedisTableName.PLAY_DATA, roomId);
+    const { drawerIndex, scores, answer, round }: CatchMindRecord = await this.redis.getFrom(
+      RedisTableName.PLAY_DATA,
+      roomId
+    );
     const { userId, nickname } = await this.redis.getFrom(RedisTableName.SOCKET_ID_TO_USER_INFO, socket.id);
     const drawerId = Number(Object.keys(scores)[drawerIndex]);
 
@@ -197,7 +206,7 @@ export class CatchMindService {
         sendTime,
       });
 
-      this.notifyResultState(server, roomId);
+      this.notifyResultState(server, roomId, round);
     }
   }
 }
