@@ -109,6 +109,10 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 
       if (room) {
         room.participants = room.participants.filter(user => user.userId !== userIdToRemove);
+        this.server.to(roomId).emit("game-room/info", {
+          ...room,
+          participants: room.participants,
+        });
         if (room.participants.length === 0) {
           await this.redis.hdel(RedisTableName.GAME_ROOMS, roomId);
         } else {

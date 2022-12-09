@@ -10,7 +10,10 @@ import * as mediasoup from "mediasoup";
 export let worker: mediasoup.types.Worker;
 
 const createWorker = async () => {
-  worker = await mediasoup.createWorker();
+  worker = await mediasoup.createWorker({
+    rtcMinPort: 20000,
+    rtcMaxPort: 30000,
+  });
 
   worker.on("died", err => {
     console.error("worker has died");
