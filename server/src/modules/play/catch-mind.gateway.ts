@@ -18,9 +18,11 @@ import { SERVER_SOCKET_PORT } from "src/constants/config";
 
 import { CatchMindService } from "./catch-mind.service";
 import { randFromArray } from "util/random";
+import { v4 as uuid } from "uuid";
 
 export interface CatchMindRecord {
   gameId: number;
+  playId: string;
   answer: string;
   round: number;
   state: CatchMindState;
@@ -60,15 +62,16 @@ export class CatchMindGateway implements OnGatewayInit, OnGatewayConnection, OnG
     }, {});
     const totalScores = { ...scores };
 
-    const newRecord = {
+    const newRecord: CatchMindRecord = {
       gameId: 1,
+      playId: uuid(),
       round: 1,
       answer,
       state: CatchMindState.WAIT,
       drawerIndex,
       scores,
       totalScores,
-    } as CatchMindRecord;
+    };
     await this.redis.setTo(RedisTableName.PLAY_DATA, roomId, newRecord);
 
     // 룸 내의 모든 인원들이 전부 게임을 시작하게 만든다.
@@ -80,6 +83,7 @@ export class CatchMindGateway implements OnGatewayInit, OnGatewayConnection, OnG
     setTimeout(() => {
       this.catchMindService.notifyRoundStart(this.server, roomId, room.participants, newRecord);
     }, 500);
+
     return;
   }
 
