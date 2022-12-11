@@ -28,12 +28,14 @@ const InGameCamList = ({ participants, videoStream, audioStream }: InGameCamList
 
         return (
           <div key={participant.userId}>
-            {videoStreamInfo && (
+            {videoStreamInfo ? (
               <Cam
                 mediaStream={videoStreamInfo.mediaStream ?? null}
                 isVideoOn={true}
                 userInfo={videoStreamInfo.userInfo}
               />
+            ) : (
+              <Cam mediaStream={null} isVideoOn={false} userInfo={participant} />
             )}
             {audioStreamInfo && user?.userId !== audioStreamInfo.userInfo.userId && (
               <Audio mediaStream={audioStreamInfo.mediaStream ?? null} />

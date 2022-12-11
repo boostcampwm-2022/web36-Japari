@@ -2,50 +2,46 @@
 import React, { useEffect, useState } from "react";
 import * as style from "./styles";
 import { Page } from "../../components/Page";
-import InGameCamList from "../../components/InGameCamList";
-import Chatting from "../../components/Chatting";
-import Game from "../../components/Game";
-import { User } from "@dto";
-import { getGameRoomInfo } from "../../api/gameRoom";
-import { useLocation } from "react-router-dom";
-import { useCams } from "../../hooks/useCams";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useRecoilValue } from "recoil";
+import { socketState } from "../../store/socket";
+import { userState } from "../../store/user";
+import useSocketConnect from "../../hooks/useSocketConnect";
+import { GameRoom } from "../waiting";
+import useSetUser from "../../hooks/useSetUser";
+import InGameComponent from "../../components/InGameComponent";
 
 const PlayingPage: React.FC = () => {
-  const [participants, setParticipants] = useState<User[]>([]);
+  const navigate = useNavigate();
+  const socket = useRecoilValue(socketState);
+  const user = useRecoilValue(userState);
+  const [room, setRoom] = useState<GameRoom | null>(null);
+
   const location = useLocation();
   const roomId = location.pathname.split("/").slice(-1)[0];
 
-  const { videoStream, audioStream } = useCams();
+  useSocketConnect();
+  useSetUser();
 
   useEffect(() => {
-    getGameRoomInfo(roomId).then(res => {
-      setParticipants(res.participants);
+    if (!user) return;
+    socket.emit("play-room/enter", roomId, ({ room, ids }: { room: GameRoom; ids: number[] }) => {
+      if (ids.includes(user.userId)) {
+        setRoom(room);
+      } else {
+        navigate("/lobby");
+      }
     });
-  }, []);
+    socket.on("game-room/info", data => {
+      setRoom(data);
+    });
+    return () => {
+      socket.emit("play-room/exit");
+      socket.off("game-room/info");
+    };
+  }, [user, socket]);
 
-  return (
-    <Page>
-      <div css={style.PlayingContentContainerStyle}>
-        <InGameCamList
-          participants={participants.filter((userInfo: User, idx: number) => idx % 2 === 0)}
-          videoStream={videoStream}
-          audioStream={audioStream}
-        />
-        <div css={style.GameAndChatContainerStyle}>
-          <div css={style.GameContainerStyle}>
-            {/* <Game gameId={location.state.gameId} /> */}
-            <Game gameId={1} />
-          </div>
-          <Chatting />
-        </div>
-        <InGameCamList
-          participants={participants.filter((userInfo: User, idx: number) => idx % 2 === 1)}
-          videoStream={videoStream}
-          audioStream={audioStream}
-        />
-      </div>
-    </Page>
-  );
+  return <Page>{room && <InGameComponent room={room} />}</Page>;
 };
 
 export default PlayingPage;

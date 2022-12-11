@@ -13,6 +13,8 @@ import pencilIcon from "../../../assets/icons/catch-mind-pencil.png";
 import eraserIcon from "../../../assets/icons/catch-mind-eraser.png";
 import { useNavigate, useLocation } from "react-router-dom";
 
+const DEFAULT_FONT = "50px LINESeedKR bold";
+
 enum Color {
   WHITE = "white",
   BLACK = "black",
@@ -32,7 +34,7 @@ enum Color {
 
 const WAIT_TIME = 5;
 const DRAW_TIME = 120; // 120
-const RESULT_TIME = 15; //15
+const RESULT_TIME = 10; //15
 
 enum CatchMindState {
   WAIT,
@@ -103,22 +105,33 @@ export default function CatchMind() {
     ctx.beginPath();
   }, []);
 
-  const writeCenter = useCallback((text: string, dx?: number, dy?: number) => {
-    const canvas = canvasRef.current as HTMLCanvasElement;
-    const ctx = getContextObject();
-    const metrics = ctx.measureText(text);
-    const width = metrics.width;
-    const height = metrics.actualBoundingBoxDescent - metrics.actualBoundingBoxAscent;
+  const writeCenter = useCallback(
+    (text: string, option?: { color?: string; size?: string; dx?: number; dy?: number }) => {
+      const canvas = canvasRef.current as HTMLCanvasElement;
+      const ctx = getContextObject();
+      ctx.beginPath();
+      // 옵션 적용
+      ctx.fillStyle = option?.color ?? "black";
+      if (option?.size) {
+        ctx.font = option.size + " LINESeedKR";
+      }
 
-    const x = canvas.width / 2 - width / 2;
-    const y = canvas.height / 2 - height / 2;
+      const metrics = ctx.measureText(text);
+      const width = metrics.width;
+      const height = metrics.actualBoundingBoxDescent - metrics.actualBoundingBoxAscent;
 
-    ctx.beginPath();
-    ctx.fillStyle = "black";
-    ctx.fillText(text, x + (dx ?? 0), y + (dy ?? 0));
-    ctx.fillStyle = currentColorRef.current;
-    ctx.beginPath();
-  }, []);
+      const x = canvas.width / 2 - width / 2;
+      const y = canvas.height / 2 - height / 2;
+
+      ctx.fillText(text, x + (option?.dx ?? 0), y + (option?.dy ?? 0));
+
+      // 옵션 reset
+      ctx.font = DEFAULT_FONT;
+      ctx.fillStyle = currentColorRef.current;
+      ctx.beginPath();
+    },
+    []
+  );
 
   const handleDebounce = useCallback(
     debounce(imageSrc => {
@@ -177,7 +190,6 @@ export default function CatchMind() {
   }, []);
 
   useEffect(() => {
-    socket.emit("catch-mind/start");
     socket.on("catch-mind/round-start", data => {
       stateRef.current = CatchMindState.WAIT;
 
@@ -225,16 +237,9 @@ export default function CatchMind() {
 
       clearCanvas();
       const ctx = getContextObject();
-      ctx.font = "30px LINESeedKR";
-      writeCenter(`Round ${data.round} 결과`, 0, -120);
-      writeCenter(`닉네임 / 라운드 / 게임`, 0, -60);
-      ctx.font = "20px LINESeedKR";
-      data.scoreInfo.forEach(({ nickname, score, totalScore }: any, index: number) => {
-        writeCenter(`${nickname} / ${score} / ${totalScore}`, 0, -10 + index * 30);
-      });
-      ctx.font = "40px LINESeedKR";
-
-      setAnswer(data.answer);
+      writeCenter(`정답 공개`, { color: "black", dx: 0, dy: -90 });
+      writeCenter(`${data.answer}`, { color: "red", size: "75px", dx: 0, dy: 30 });
+      ctx.fillStyle = currentColorRef.current;
 
       setTime(RESULT_TIME);
     });
@@ -283,7 +288,7 @@ export default function CatchMind() {
     canvas.height = 510;
 
     const ctx = getContextObject();
-    ctx.font = "40px LINESeedKR bold";
+    ctx.font = DEFAULT_FONT;
     ctx.strokeStyle = "black";
     ctx.lineWidth = 2;
   }, []);
