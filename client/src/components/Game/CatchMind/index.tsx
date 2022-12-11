@@ -6,6 +6,7 @@ import { User } from "@dto";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { userState } from "../../../store/user";
 import { socketState } from "../../../store/socket";
+import { currentScoreState } from "../../../store/catchmind";
 import { debounce } from "lodash";
 
 import pencilIcon from "../../../assets/icons/catch-mind-pencil.png";
@@ -72,6 +73,7 @@ export default function CatchMind() {
   const [currentLineWidth, setCurrentLineWidth] = useState<Number>(2);
   const currentColorRef = useRef<string>("black");
 
+  const [currentScore, setCurrentScore] = useRecoilState(currentScoreState);
   const [user, setUser] = useRecoilState(userState);
   const [time, setTime] = useState<number>(WAIT_TIME);
   const timeRef = useRef<number | null>(null);

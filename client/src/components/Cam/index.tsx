@@ -39,7 +39,7 @@ const Cam = ({ mediaStream, isVideoOn, userInfo }: CamProps) => {
 const Profile = ({ profile }: ProfileProps) => {
   return (
     <div css={style.profileStyle}>
-      <img src={profile} />
+      <img src={profile} alt="profile" />
     </div>
   );
 };
