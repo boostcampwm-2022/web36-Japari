@@ -72,7 +72,6 @@ export default function CatchMind() {
   const [line, setLine] = useState<"THIN" | "NORMAL" | "THICK">("NORMAL");
   const [isDrawing, setIsDrawing] = useState(false);
   const [currentColor, setCurrentColor] = useState<string>("black");
-  const [currentLineWidth, setCurrentLineWidth] = useState<Number>(2);
   const currentColorRef = useRef<string>("black");
 
   const [currentScore, setCurrentScore] = useRecoilState(currentScoreState);
@@ -234,7 +233,7 @@ export default function CatchMind() {
   useEffect(() => {
     socket.on("catch-mind/result", data => {
       stateRef.current = CatchMindState.RESULT;
-
+      setCurrentScore(data);
       clearCanvas();
       const ctx = getContextObject();
       writeCenter(`정답 공개`, { color: "black", dx: 0, dy: -90 });

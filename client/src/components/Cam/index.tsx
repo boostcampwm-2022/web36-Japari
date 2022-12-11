@@ -4,6 +4,7 @@ import { useRecoilValue } from "recoil";
 import { userState } from "../../store/user";
 import { User } from "@dto";
 import * as style from "./styles";
+import { useLocation } from "react-router-dom";
 
 export interface CamProps {
   mediaStream: MediaStream | null;
@@ -18,6 +19,7 @@ export interface ProfileProps {
 const Cam = ({ mediaStream, isVideoOn, userInfo }: CamProps) => {
   const user = useRecoilValue(userState);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const path = useLocation().pathname.split("/")[1];
 
   useEffect(() => {
     if (!videoRef.current) return;
@@ -31,7 +33,11 @@ const Cam = ({ mediaStream, isVideoOn, userInfo }: CamProps) => {
         {!isVideoOn && <Profile profile={userInfo.profileImage} />}
       </div>
       <span css={style.camNickNameStyle}>{userInfo.nickname}</span>
-      <span css={style.camScoreStyle}>{userInfo.score}</span>
+      {path === "waiting" ? (
+        <span css={style.camScoreStyle}>{userInfo.score}</span>
+      ) : (
+        <span css={style.camScoreStyle}>{userInfo.score}</span>
+      )}
     </div>
   );
 };
