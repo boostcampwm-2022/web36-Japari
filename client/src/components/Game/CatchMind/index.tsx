@@ -74,7 +74,7 @@ export default function CatchMind() {
   const [currentColor, setCurrentColor] = useState<string>("black");
   const currentColorRef = useRef<string>("black");
 
-  const [currentScore, setCurrentScore] = useRecoilState(currentScoreState);
+  const [, setCurrentScore] = useRecoilState(currentScoreState);
   const [user, setUser] = useRecoilState(userState);
   const [time, setTime] = useState<number>(WAIT_TIME);
   const timeRef = useRef<number | null>(null);

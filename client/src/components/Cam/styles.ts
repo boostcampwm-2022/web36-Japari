@@ -17,7 +17,7 @@ export const camNickNameStyle = css`
 `;
 
 export const camScoreStyle = css`
-  color: gray;
+  color: green;
   font-size: 16px;
 `;
 

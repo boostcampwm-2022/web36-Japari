@@ -1,7 +1,8 @@
 /** @jsxImportSource @emotion/react */
-import { useEffect, useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import { useRecoilValue } from "recoil";
 import { userState } from "../../store/user";
+import { currentScoreState } from "../../store/catchmind";
 import { User } from "@dto";
 import * as style from "./styles";
 import { useLocation } from "react-router-dom";
@@ -16,10 +17,16 @@ export interface ProfileProps {
   profile: string;
 }
 
+interface ScoreProps {
+  nickname: string;
+  score: number;
+}
+
 const Cam = ({ mediaStream, isVideoOn, userInfo }: CamProps) => {
   const user = useRecoilValue(userState);
   const videoRef = useRef<HTMLVideoElement>(null);
   const path = useLocation().pathname.split("/")[1];
+  const currentScore = useRecoilValue<any>(currentScoreState);
 
   useEffect(() => {
     if (!videoRef.current) return;
@@ -36,7 +43,15 @@ const Cam = ({ mediaStream, isVideoOn, userInfo }: CamProps) => {
       {path === "waiting" ? (
         <span css={style.camScoreStyle}>{userInfo.score}</span>
       ) : (
-        <span css={style.camScoreStyle}>{userInfo.score}</span>
+        currentScore.scoreInfo.map((cur: ScoreProps, idx: number) => {
+          if (cur.nickname === userInfo.nickname)
+            return (
+              <span css={style.camScoreStyle} key={idx}>
+                {cur.score}
+              </span>
+            );
+          return <React.Fragment key={idx}></React.Fragment>;
+        })
       )}
     </div>
   );
