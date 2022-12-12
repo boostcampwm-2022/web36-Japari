@@ -17,6 +17,7 @@ export class CatchMindService {
 
   async notifyRoundStart(server: Server, roomId: string) {
     const record = await this.redis.getFrom(RedisTableName.PLAY_DATA, roomId);
+    if (!record) return;
     await this.redis.setTo(RedisTableName.PLAY_DATA, roomId, { ...record, state: CatchMindState.WAIT });
     const room: CatchMindGameRoom = await this.redis.getFrom(RedisTableName.GAME_ROOMS, roomId);
     if (!room) return;
