@@ -40,8 +40,10 @@ export class GameRoomGateway implements OnGatewayInit, OnGatewayConnection, OnGa
       const gameRooms = redisRecordToObject(gameRoomsRecords);
       const playData = redisRecordToObject(playDataRecords);
 
+      // 게임중인 방은 목록에서 제외
       Object.keys(playData).forEach(key => delete gameRooms[key]);
 
+      // 방 정보를 data에 담아서 전송
       let data = [];
       for (let roomId in gameRooms) {
         const { title, gameId, participants, maximumPeople, isPrivate } = gameRooms[roomId];
@@ -129,14 +131,20 @@ export class GameRoomGateway implements OnGatewayInit, OnGatewayConnection, OnGa
     });
   }
 
+  // 방에 입장
   @UsePipes(ValidationPipe)
   @SubscribeMessage("game-room/join")
   async join(@ConnectedSocket() socket, @MessageBody("roomId") roomId: string) {
     const room = await this.redis.getFrom(RedisTableName.GAME_ROOMS, roomId);
-
     // 잘못된 room id 접근
     if (!room) {
       throw new SocketException("game-room/join-failed", "잘못된 room id 입니다.");
+    }
+
+    const playData = await this.redis.getFrom(RedisTableName.PLAY_DATA, roomId);
+    // 이미 시작한 게임 방 접근
+    if (playData) {
+      throw new SocketException("game-room/join-failed", "이미 시작한 게임 방입니다.");
     }
 
     const { userId } = await this.redis.getFrom(RedisTableName.SOCKET_ID_TO_USER_INFO, socket.id);
@@ -160,6 +168,7 @@ export class GameRoomGateway implements OnGatewayInit, OnGatewayConnection, OnGa
       room.participants.push({ ...user, socketId: socket.id });
       await this.redis.setTo(RedisTableName.GAME_ROOMS, roomId, room);
     }
+
     // 유저가 들어왔다는 소식을 참여한 유저와 기존에 방에 있던 모든 유저에게 전달
     this.server.to(roomId).emit("game-room/info", {
       roomId,
