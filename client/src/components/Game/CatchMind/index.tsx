@@ -5,6 +5,7 @@ import timerImage from "../../../assets/icons/timer.png";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { userState } from "../../../store/user";
 import { socketState } from "../../../store/socket";
+import { currentScoreState } from "../../../store/catchmind";
 import { debounce } from "lodash";
 
 import pencilIcon from "../../../assets/icons/catch-mind-pencil.png";
@@ -78,6 +79,7 @@ export default function CatchMind({ participants }: CatchMindProps) {
   const [currentColor, setCurrentColor] = useState<string>("black");
   const currentColorRef = useRef<string>("black");
 
+  const [, setCurrentScore] = useRecoilState(currentScoreState);
   const [user] = useRecoilState(userState);
   const [time, setTime] = useState<number>(WAIT_TIME);
   const timeRef = useRef<number | null>(null);
@@ -97,13 +99,6 @@ export default function CatchMind({ participants }: CatchMindProps) {
   const getContextObject = useCallback(() => {
     const ctx = canvasRef.current?.getContext("2d");
     return ctx as CanvasRenderingContext2D;
-  }, []);
-
-  const fillCanvas = useCallback(() => {
-    const ctx = getContextObject();
-    ctx.fillStyle = currentColorRef.current;
-    ctx.fillRect(0, 0, canvasRef.current!.width, canvasRef.current!.height);
-    ctx.beginPath();
   }, []);
 
   const clearCanvas = useCallback(() => {
@@ -265,7 +260,7 @@ export default function CatchMind({ participants }: CatchMindProps) {
   useEffect(() => {
     socket.on("catch-mind/result", data => {
       stateRef.current = CatchMindState.RESULT;
-
+      setCurrentScore(data);
       clearCanvas();
       const ctx = getContextObject();
       writeCenter(`정답 공개`, { color: "black", dx: 0, dy: -90 });
@@ -342,9 +337,10 @@ export default function CatchMind({ participants }: CatchMindProps) {
 
   useEffect(() => {
     socket.on("catch-mind/end", () => {
+      setCurrentScore(null);
       navigate(`/waiting/${path}`);
     });
-  });
+  }, []);
 
   useEffect(() => {
     const ctx = getContextObject();

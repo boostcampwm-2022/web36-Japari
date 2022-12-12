@@ -109,7 +109,7 @@ export class CatchMindService {
     }
 
     const scoreInfo = users.map(({ userId, nickname }) => {
-      return { nickname, score: scores[String(userId)], totalScore: totalScores[String(userId)] };
+      return { nickname, score: scores[String(userId)], totalScore: totalScores[String(userId)], userId };
     });
 
     server.to(roomId).emit("catch-mind/result", { round, answer, scoreInfo });
