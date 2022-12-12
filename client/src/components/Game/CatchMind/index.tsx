@@ -2,7 +2,6 @@
 import React, { useRef, useState, useEffect, useCallback } from "react";
 import * as style from "./styles";
 import timerImage from "../../../assets/icons/timer.png";
-import { User } from "@dto";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { userState } from "../../../store/user";
 import { socketState } from "../../../store/socket";
@@ -10,7 +9,9 @@ import { debounce } from "lodash";
 
 import pencilIcon from "../../../assets/icons/catch-mind-pencil.png";
 import eraserIcon from "../../../assets/icons/catch-mind-eraser.png";
+import paletteLockIcon from "../../../assets/icons/palette-lock.png";
 import { useNavigate, useLocation } from "react-router-dom";
+import { User } from "@dto";
 
 const DEFAULT_FONT = "50px LINESeedKR bold";
 
@@ -60,7 +61,11 @@ const THIN = 1;
 const NORMAL = 5;
 const THICK = 9;
 
-export default function CatchMind() {
+interface CatchMindProps {
+  participants: User[];
+}
+
+export default function CatchMind({ participants }: CatchMindProps) {
   const navigate = useNavigate();
   const path = useLocation().pathname.split("/").slice(1)[1];
 
@@ -71,13 +76,12 @@ export default function CatchMind() {
   const [line, setLine] = useState<"THIN" | "NORMAL" | "THICK">("NORMAL");
   const [isDrawing, setIsDrawing] = useState(false);
   const [currentColor, setCurrentColor] = useState<string>("black");
-  const [currentLineWidth, setCurrentLineWidth] = useState<Number>(2);
   const currentColorRef = useRef<string>("black");
 
-  const [user, setUser] = useRecoilState(userState);
+  const [user] = useRecoilState(userState);
   const [time, setTime] = useState<number>(WAIT_TIME);
   const timeRef = useRef<number | null>(null);
-  const [answer, setAnswer] = useState<string>("");
+  const [infoText, setInfoText] = useState<string>("");
   const [round, setRound] = useState<number>(1);
   const roundRef = useRef<number>(1);
   const stateRef = useRef<number>(0);
@@ -167,15 +171,22 @@ export default function CatchMind() {
     [isDrawing]
   );
 
-  const handleSelectColor = useCallback(
-    (color: string) => {
-      if (user?.userId !== drawerId || stateRef.current !== CatchMindState.DRAW) return;
-      setCurrentColor(color);
-    },
-    [drawerId]
-  );
+  // event handlers
+  const handlePencilMode = useCallback(() => {
+    if (drawerId !== user?.userId) return;
+    if (stateRef.current !== CatchMindState.DRAW) return;
+    setMode("pencil");
+  }, [drawerId, user]);
+
+  const handleEraserMode = useCallback(() => {
+    if (drawerId !== user?.userId) return;
+    if (stateRef.current !== CatchMindState.DRAW) return;
+    setMode("eraser");
+  }, [drawerId, user]);
 
   const handleLineWidth = useCallback((line: "THIN" | "NORMAL" | "THICK") => {
+    if (drawerId !== user?.userId) return;
+    if (stateRef.current !== CatchMindState.DRAW) return;
     setLine(line);
 
     const ctx = getContextObject();
@@ -194,11 +205,25 @@ export default function CatchMind() {
     ctx.closePath();
   }, []);
 
+  const handleClear = useCallback(() => {
+    if (drawerId !== user?.userId) return;
+    if (stateRef.current !== CatchMindState.DRAW) return;
+    clearCanvas();
+  }, [drawerId, user]);
+
+  const handleSelectColor = useCallback(
+    (color: string) => {
+      if (user?.userId !== drawerId || stateRef.current !== CatchMindState.DRAW) return;
+      setCurrentColor(color);
+    },
+    [drawerId]
+  );
+
   useEffect(() => {
     socket.on("catch-mind/round-start", data => {
       stateRef.current = CatchMindState.WAIT;
 
-      if (data.answer) setAnswer(answer);
+      if (data.answer) setInfoText(infoText);
       setRound(data.round);
       setDrawerId(data.drawerId);
 
@@ -206,9 +231,10 @@ export default function CatchMind() {
       writeCenter(`Round ${data.round} 준비`);
 
       if (data.answer) {
-        setAnswer(data.answer);
+        setInfoText(data.answer);
       } else {
-        setAnswer("");
+        const drawerName = participants.filter(user => user.userId === data.drawerId)[0].nickname;
+        setInfoText(`${drawerName} 님의 그림`);
       }
       setTime(WAIT_TIME);
     });
@@ -348,8 +374,8 @@ export default function CatchMind() {
             <span>{time}</span>
           </div>
 
-          <div css={style.answerStyle}>
-            <span>{answer}</span>
+          <div css={style.answerStyle(drawerId === user?.userId)}>
+            <span>{infoText}</span>
           </div>
 
           <div css={style.roundStyle}>
@@ -363,12 +389,17 @@ export default function CatchMind() {
       </div>
 
       <div css={style.paletteStyle}>
+        {drawerId !== user?.userId && (
+          <div css={style.palleteLockStyle}>
+            <img src={paletteLockIcon} alt="palette-lock-icon" />
+          </div>
+        )}
         <div css={style.toolStyle}>
-          <div css={style.toggleStyle(mode, "pencil")} onClick={() => setMode("pencil")}>
+          <div css={style.toggleStyle(mode, "pencil")} onClick={handlePencilMode}>
             <img src={pencilIcon} alt="pencil" />
           </div>
 
-          <div css={style.toggleStyle(mode, "eraser")} onClick={() => setMode("eraser")}>
+          <div css={style.toggleStyle(mode, "eraser")} onClick={handleEraserMode}>
             <img src={eraserIcon} alt="eraser" />
           </div>
         </div>
@@ -385,7 +416,7 @@ export default function CatchMind() {
           </div>
         </div>
 
-        <div css={style.clearStyle} onClick={clearCanvas}>
+        <div css={style.clearStyle} onClick={handleClear}>
           clear
         </div>
 
