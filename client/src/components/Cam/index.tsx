@@ -20,6 +20,8 @@ export interface ProfileProps {
 interface ScoreProps {
   nickname: string;
   score: number;
+  totalScore: number;
+  userId: number;
 }
 
 const Cam = ({ mediaStream, isVideoOn, userInfo }: CamProps) => {
@@ -44,10 +46,10 @@ const Cam = ({ mediaStream, isVideoOn, userInfo }: CamProps) => {
         <span css={style.camScoreStyle}>{userInfo.score}</span>
       ) : currentScore ? (
         currentScore.scoreInfo.map((cur: ScoreProps, idx: number) => {
-          if (cur.nickname === userInfo.nickname)
+          if (cur.userId === userInfo.userId)
             return (
               <span css={style.camScoreStyle} key={idx}>
-                {cur.score}
+                {cur.totalScore}
               </span>
             );
           return <React.Fragment key={idx}></React.Fragment>;

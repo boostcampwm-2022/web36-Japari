@@ -8,7 +8,7 @@ import { RedisService } from "../redis/redis.service";
 import { CatchMindRecord } from "./catch-mind.gateway";
 
 const WAIT_TIME = 5;
-const DRAW_TIME = 120; //120
+const DRAW_TIME = 10; //120
 const RESULT_TIME = 10; //15
 
 interface CatchMindGameRoom {
@@ -109,7 +109,7 @@ export class CatchMindService {
     }
 
     const scoreInfo = users.map(({ userId, nickname }) => {
-      return { nickname, score: scores[String(userId)], totalScore: totalScores[String(userId)] };
+      return { nickname, score: scores[String(userId)], totalScore: totalScores[String(userId)], userId };
     });
 
     server.to(roomId).emit("catch-mind/result", { round, answer, scoreInfo });
