@@ -337,9 +337,10 @@ export default function CatchMind({ participants }: CatchMindProps) {
 
   useEffect(() => {
     socket.on("catch-mind/end", () => {
+      setCurrentScore(null);
       navigate(`/waiting/${path}`);
     });
-  });
+  }, []);
 
   useEffect(() => {
     const ctx = getContextObject();

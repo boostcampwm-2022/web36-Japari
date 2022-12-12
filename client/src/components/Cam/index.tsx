@@ -42,7 +42,7 @@ const Cam = ({ mediaStream, isVideoOn, userInfo }: CamProps) => {
       <span css={style.camNickNameStyle}>{userInfo.nickname}</span>
       {path === "waiting" ? (
         <span css={style.camScoreStyle}>{userInfo.score}</span>
-      ) : (
+      ) : currentScore ? (
         currentScore.scoreInfo.map((cur: ScoreProps, idx: number) => {
           if (cur.nickname === userInfo.nickname)
             return (
@@ -52,6 +52,8 @@ const Cam = ({ mediaStream, isVideoOn, userInfo }: CamProps) => {
             );
           return <React.Fragment key={idx}></React.Fragment>;
         })
+      ) : (
+        <span css={style.camScoreStyle}>0</span>
       )}
     </div>
   );
