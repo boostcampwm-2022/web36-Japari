@@ -73,6 +73,7 @@ export default function CatchMind({ participants }: CatchMindProps) {
   const socket = useRecoilValue(socketState);
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const ctxRef = useRef<CanvasRenderingContext2D | null>(null);
   const [mode, setMode] = useState<"pencil" | "eraser">("pencil");
   const [line, setLine] = useState<"THIN" | "NORMAL" | "THICK">("NORMAL");
   const [isDrawing, setIsDrawing] = useState(false);
@@ -103,10 +104,11 @@ export default function CatchMind({ participants }: CatchMindProps) {
 
   const clearCanvas = useCallback(() => {
     const ctx = getContextObject();
-    ctx.fillStyle = Color.WHITE;
-    ctx.fillRect(0, 0, canvasRef.current!.width, canvasRef.current!.height);
-    ctx.fillStyle = currentColorRef.current;
-    ctx.beginPath();
+    if (!ctxRef.current) return;
+    ctxRef.current.fillStyle = Color.WHITE;
+    ctxRef.current.fillRect(0, 0, canvasRef.current!.width, canvasRef.current!.height);
+    ctxRef.current.fillStyle = currentColorRef.current;
+    ctxRef.current.beginPath();
   }, []);
 
   const writeCenter = useCallback(
@@ -179,26 +181,29 @@ export default function CatchMind({ participants }: CatchMindProps) {
     setMode("eraser");
   }, [drawerId, user]);
 
-  const handleLineWidth = useCallback((line: "THIN" | "NORMAL" | "THICK") => {
-    if (drawerId !== user?.userId) return;
-    if (stateRef.current !== CatchMindState.DRAW) return;
-    setLine(line);
+  const handleLineWidth = useCallback(
+    (line: "THIN" | "NORMAL" | "THICK") => {
+      if (drawerId !== user?.userId) return;
+      if (stateRef.current !== CatchMindState.DRAW) return;
+      setLine(line);
 
-    const ctx = getContextObject();
-    ctx.beginPath();
-    switch (line) {
-      case "THIN":
-        ctx.lineWidth = THIN;
-        break;
-      case "NORMAL":
-        ctx.lineWidth = NORMAL;
-        break;
-      case "THICK":
-        ctx.lineWidth = THICK;
-        break;
-    }
-    ctx.closePath();
-  }, []);
+      const ctx = getContextObject();
+      ctx.beginPath();
+      switch (line) {
+        case "THIN":
+          ctx.lineWidth = THIN;
+          break;
+        case "NORMAL":
+          ctx.lineWidth = NORMAL;
+          break;
+        case "THICK":
+          ctx.lineWidth = THICK;
+          break;
+      }
+      ctx.closePath();
+    },
+    [drawerId, user]
+  );
 
   const handleClear = useCallback(() => {
     if (drawerId !== user?.userId) return;
@@ -209,6 +214,7 @@ export default function CatchMind({ participants }: CatchMindProps) {
   const handleSelectColor = useCallback(
     (color: string) => {
       if (user?.userId !== drawerId || stateRef.current !== CatchMindState.DRAW) return;
+      setMode("pencil");
       setCurrentColor(color);
     },
     [drawerId]
@@ -322,6 +328,7 @@ export default function CatchMind({ participants }: CatchMindProps) {
     ctx.font = DEFAULT_FONT;
     ctx.strokeStyle = "black";
     ctx.lineWidth = 2;
+    ctxRef.current = ctx;
   }, []);
 
   useEffect(() => {

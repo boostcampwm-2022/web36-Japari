@@ -352,5 +352,7 @@ export class MediaGateway implements OnGatewayInit, OnGatewayConnection, OnGatew
 
   handleConnection(@ConnectedSocket() socket: Socket) {}
 
-  handleDisconnect(@ConnectedSocket() socket: Socket) {}
+  handleDisconnect(@ConnectedSocket() socket: Socket) {
+    this.handleMediaDisconnect(socket);
+  }
 }
