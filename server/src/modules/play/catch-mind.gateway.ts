@@ -19,18 +19,7 @@ import { SERVER_SOCKET_PORT } from "src/constants/config";
 import { CatchMindService } from "./catch-mind.service";
 import { randFromArray } from "util/random";
 import { v4 as uuid } from "uuid";
-
-export interface CatchMindRecord {
-  gameId: number;
-  playId: string;
-  answer: string;
-  round: number;
-  state: CatchMindState;
-  drawerIndex: number;
-  scores: Record<string, number>;
-  totalScores: Record<string, number>;
-  forStart: number[];
-}
+import { CatchMindGameRoom, CatchMindRecord } from "../../@types/catch-mind";
 
 @UseFilters(new SocketBadRequestFilter("catch-mind/error"))
 @UseFilters(SocketExceptionFilter)
@@ -130,11 +119,15 @@ export class CatchMindGateway implements OnGatewayInit, OnGatewayConnection, OnG
 
     const { roomId } = user;
 
-    const playData = await this.redis.getFrom(RedisTableName.PLAY_DATA, roomId);
+    const playData: CatchMindRecord = await this.redis.getFrom(RedisTableName.PLAY_DATA, roomId);
     if (!playData) return;
     // 게임이 끝나 로비로 돌아가는 경우는 무시
 
-    const room = await this.redis.getFrom(RedisTableName.GAME_ROOMS, roomId);
+    const room: CatchMindGameRoom = await this.redis.getFrom(RedisTableName.GAME_ROOMS, roomId);
+    if (!room) return;
+
+    // 유저가 drawer일 경우를 대비한 drawerId 백업
+    const drawerId = room.participants[playData.drawerIndex].userId;
 
     // 유저를 방에서 제거
     const { email } = await this.redis.getFrom(RedisTableName.SOCKET_ID_TO_USER_INFO, socket.id);
@@ -146,7 +139,6 @@ export class CatchMindGateway implements OnGatewayInit, OnGatewayConnection, OnG
     }
 
     // 유저를 PlayData에서 제거
-
     if (playData) {
       delete playData.scores[String(user.userId)];
       delete playData.totalScores[String(user.userId)];
@@ -156,6 +148,12 @@ export class CatchMindGateway implements OnGatewayInit, OnGatewayConnection, OnG
       } else {
         await this.redis.setTo(RedisTableName.PLAY_DATA, roomId, playData);
       }
+    }
+
+    // 유저가 drawer일 경우 방의 라운드 변경
+    if (playData && drawerId === user.userId) {
+      await this.redis.updateTo(RedisTableName.PLAY_DATA, roomId, { state: CatchMindState.DRAW });
+      this.catchMindService.notifyResultState(this.server, roomId, playData.playId, playData.round);
     }
 
     // 유저를 로비로 보낸다
@@ -173,5 +171,5 @@ export class CatchMindGateway implements OnGatewayInit, OnGatewayConnection, OnG
 
   async handleConnection(@ConnectedSocket() socket: Socket) {}
 
-  handleDisconnect(@ConnectedSocket() socket: Socket) {}
+  async handleDisconnect(@ConnectedSocket() socket: Socket) {}
 }
