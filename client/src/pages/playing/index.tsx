@@ -1,6 +1,5 @@
 /** @jsxImportSource @emotion/react */
 import React, { useEffect, useState } from "react";
-import * as style from "./styles";
 import { Page } from "../../components/Page";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useRecoilValue } from "recoil";
@@ -39,7 +38,7 @@ const PlayingPage: React.FC = () => {
       socket.emit("play-room/exit");
       socket.off("game-room/info");
     };
-  }, [user, socket]);
+  }, [user, socket, navigate, roomId]);
 
   return <Page>{room && <InGameComponent room={room} />}</Page>;
 };
