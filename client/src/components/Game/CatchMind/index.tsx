@@ -215,7 +215,12 @@ export default function CatchMind({ participants }: CatchMindProps) {
   );
 
   useEffect(() => {
+    socket.emit("catch-mind/rendered", path);
+  }, [socket]);
+
+  useEffect(() => {
     socket.on("catch-mind/round-start", data => {
+      console.log("round start:", data);
       stateRef.current = CatchMindState.WAIT;
 
       if (data.answer) setInfoText(infoText);

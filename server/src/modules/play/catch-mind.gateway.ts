@@ -29,6 +29,7 @@ export interface CatchMindRecord {
   drawerIndex: number;
   scores: Record<string, number>;
   totalScores: Record<string, number>;
+  forStart: number[];
 }
 
 @UseFilters(new SocketBadRequestFilter("catch-mind/error"))
@@ -37,8 +38,11 @@ export interface CatchMindRecord {
 export class CatchMindGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer() public server: Server;
   private logger = new Logger("Catch Mind Gateway");
+  readyPlayer: Map<string, string[]>;
 
-  constructor(private prisma: PrismaService, private redis: RedisService, private catchMindService: CatchMindService) {}
+  constructor(private prisma: PrismaService, private redis: RedisService, private catchMindService: CatchMindService) {
+    this.readyPlayer = new Map();
+  }
 
   afterInit(server: Server) {
     this.logger.verbose("catch mind gateway initiated");
@@ -49,6 +53,7 @@ export class CatchMindGateway implements OnGatewayInit, OnGatewayConnection, OnG
     // 이미 게임 중일 경우 요청을 무시한다.
     const { roomId } = await this.redis.getFrom(RedisTableName.SOCKET_ID_TO_USER_INFO, socket.id);
     const playData = await this.redis.getFrom(RedisTableName.PLAY_DATA, roomId);
+
     if (playData) return;
 
     // PLAY_DATA 테이블의 roomId 레코드를 초기화한다.
@@ -71,8 +76,11 @@ export class CatchMindGateway implements OnGatewayInit, OnGatewayConnection, OnG
       drawerIndex,
       scores,
       totalScores,
+      forStart: room.participants.map(participant => participant.userId),
     };
     await this.redis.setTo(RedisTableName.PLAY_DATA, roomId, newRecord);
+
+    this.readyPlayer.set(newRecord.playId, []);
 
     // 룸 내의 모든 인원들이 전부 게임을 시작하게 만든다.
     this.server.to(roomId).emit("play/start");
@@ -80,9 +88,9 @@ export class CatchMindGateway implements OnGatewayInit, OnGatewayConnection, OnG
     // 방에 라운드가 시작 됐음을 알린다
     // 유저들이 모두 인게임 페이지에 입장 후 round를 시작하도록 setTimeout 처리. 추후 더 일관성을 보장할 수 있는 로직으로 수정 필요.
 
-    setTimeout(() => {
-      this.catchMindService.notifyRoundStart(this.server, roomId, room.participants, newRecord);
-    }, 500);
+    // setTimeout(() => {
+    //   this.catchMindService.notifyRoundStart(this.server, roomId, room.participants, newRecord);
+    // }, 500);
 
     return;
   }
@@ -98,10 +106,21 @@ export class CatchMindGateway implements OnGatewayInit, OnGatewayConnection, OnG
   async enter(@ConnectedSocket() socket: Socket, @MessageBody() roomId: string) {
     const room = await this.redis.getFrom(RedisTableName.GAME_ROOMS, roomId);
     if (!room) return { room, ids: [] };
-
     const ids = room.participants.map(participant => participant.userId);
 
     return { room, ids };
+  }
+
+  @SubscribeMessage("catch-mind/rendered")
+  async gameRendered(@ConnectedSocket() socket: Socket, @MessageBody() roomId: string) {
+    const room = await this.redis.getFrom(RedisTableName.GAME_ROOMS, roomId);
+
+    const playData = await this.redis.getFrom(RedisTableName.PLAY_DATA, roomId);
+    this.readyPlayer.set(playData.playId, [...this.readyPlayer.get(playData.playId), socket.id]);
+
+    if (this.readyPlayer.get(playData.playId).length === room.participants.length) {
+      this.catchMindService.notifyRoundStart(this.server, roomId, room.participants, playData);
+    }
   }
 
   @SubscribeMessage("play-room/exit")

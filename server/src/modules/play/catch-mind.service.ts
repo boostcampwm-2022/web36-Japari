@@ -144,6 +144,7 @@ export class CatchMindService {
     }
 
     const newDrawerIndex = (drawerIndex + 1) % room.participants.length;
+
     Object.keys(scores).forEach(userId => {
       scores[userId] = 0;
     });
@@ -157,6 +158,7 @@ export class CatchMindService {
       scores,
       totalScores,
       state: CatchMindState.RESULT,
+      forStart: [],
     };
     this.redis.setTo(RedisTableName.PLAY_DATA, roomId, newRecord);
 
@@ -174,12 +176,14 @@ export class CatchMindService {
 
   async judge(socket: Socket, server: Server, message: string, sendTime: string) {
     const { roomId } = await this.redis.getFrom(RedisTableName.SOCKET_ID_TO_USER_INFO, socket.id);
+    const room: CatchMindGameRoom = await this.redis.getFrom(RedisTableName.GAME_ROOMS, roomId);
     const { playId, drawerIndex, scores, answer, round }: CatchMindRecord = await this.redis.getFrom(
       RedisTableName.PLAY_DATA,
       roomId
     );
     const { userId, nickname } = await this.redis.getFrom(RedisTableName.SOCKET_ID_TO_USER_INFO, socket.id);
-    const drawerId = Number(Object.keys(scores)[drawerIndex]);
+
+    const drawerId = room.participants[drawerIndex].userId;
 
     // 그림을 그리는 사람이나 정답을 맞춘 사람의 채팅은 허용하지 않는다.
     if (drawerId === userId || scores[String(userId)] > 0) {
