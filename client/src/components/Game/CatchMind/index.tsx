@@ -319,6 +319,7 @@ export default function CatchMind({ participants }: CatchMindProps) {
   }, [startDrawing, onDrawing, stopDrawing, stateRef.current, drawerId]);
 
   useEffect(() => {
+    setCurrentScore(null);
     if (!canvasRef.current) return;
     const canvas = canvasRef.current;
     canvas.width = 800;
