@@ -391,7 +391,7 @@ export default function CatchMind({ participants }: CatchMindProps) {
       <div css={style.paletteStyle}>
         {drawerId !== user?.userId && (
           <div css={style.palleteLockStyle}>
-            <img src={paletteLockIcon} />
+            <img src={paletteLockIcon} alt="palette-lock-icon" />
           </div>
         )}
         <div css={style.toolStyle}>

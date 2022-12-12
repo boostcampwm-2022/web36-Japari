@@ -15,8 +15,8 @@ export const palleteLockStyle = css`
   border-radius: 5px;
   /* height: 30rem; */
   position: absolute;
-  top: -1.5px;
-  right: -1.5px;
+  top: -0.1rem;
+  right: -0.1rem;
   z-index: 1;
 
   border: 1.5px solid burlywood;
