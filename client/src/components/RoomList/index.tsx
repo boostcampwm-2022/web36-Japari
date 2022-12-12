@@ -31,9 +31,11 @@ const RoomList = ({ rooms }: RoomListProps) => {
   const [filteredRooms, setFilteredRooms] = useState<Room[]>([]);
   const [createRoomModalOpen, setCreateRoomModalOpen] = useState<boolean>(false);
   const [passwordModalOpen, setPasswordModalOpen] = useState<boolean>(false);
+  const [selectedRoomId, setSelectedRoomId] = useState<string>("");
 
   const onClickRecord = (roomId: string, isPrivate: boolean) => {
     if (isPrivate) {
+      setSelectedRoomId(roomId);
       setPasswordModalOpen(true);
       return;
     }
@@ -100,12 +102,12 @@ const RoomList = ({ rooms }: RoomListProps) => {
         {filteredRooms.map(room => (
           <Fragment key={room.roomId}>
             <RoomRecord {...room} onClickRecord={() => onClickRecord(room.roomId, room.isPrivate)} />
-            {passwordModalOpen && (
-              <Modal ModalType="비밀번호 입력" roomId={room.roomId} closeModal={() => setPasswordModalOpen(false)} />
-            )}
           </Fragment>
         ))}
       </div>
+      {passwordModalOpen && (
+        <Modal ModalType="비밀번호 입력" roomId={selectedRoomId} closeModal={() => setPasswordModalOpen(false)} />
+      )}
     </div>
   );
 };
