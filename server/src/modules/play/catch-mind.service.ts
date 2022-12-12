@@ -15,19 +15,33 @@ export class CatchMindService {
   private logger = new Logger("Catch Mind Service");
   constructor(private redis: RedisService, private prisma: PrismaService) {}
 
-  async notifyRoundStart(server: Server, roomId: string, participants: Participant[], record: CatchMindRecord) {
+  async notifyRoundStart(server: Server, roomId: string) {
+    const record = await this.redis.getFrom(RedisTableName.PLAY_DATA, roomId);
     await this.redis.setTo(RedisTableName.PLAY_DATA, roomId, { ...record, state: CatchMindState.WAIT });
+    const room: CatchMindGameRoom = await this.redis.getFrom(RedisTableName.GAME_ROOMS, roomId);
+    if (!room) return;
     const { drawerIndex, round, scores, totalScores, answer, playId } = record;
-    const drawerId = participants[drawerIndex].userId;
+    const drawerId = room.participants[drawerIndex].userId;
+
+    let newScores = {};
+    let newTotalScores = {};
+
+    room.participants.forEach(participant => {
+      const { userId } = participant;
+      newScores[userId] = scores[userId];
+      newTotalScores[userId] = totalScores[userId];
+    });
+
+    await this.redis.updateTo(RedisTableName.PLAY_DATA, roomId, { scores: newScores, totalScores: newTotalScores });
 
     const resp = {
       round,
       drawerId,
-      scores,
-      totalScores,
+      scores: newScores,
+      totalScores: newTotalScores,
     };
 
-    participants.forEach(({ userId, socketId }: { userId: number; socketId: string }) => {
+    room.participants.forEach(({ userId, socketId }: { userId: number; socketId: string }) => {
       if (userId != drawerId) {
         server.to(socketId).emit("catch-mind/round-start", resp);
         return;
@@ -145,7 +159,7 @@ export class CatchMindService {
 
     // 15초 뒤 round start
     setTimeout(() => {
-      this.notifyRoundStart(server, roomId, room.participants, newRecord);
+      this.notifyRoundStart(server, roomId);
     }, RESULT_TIME * 1000);
   }
 

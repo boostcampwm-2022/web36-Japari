@@ -9,6 +9,6 @@ import { CatchMindService } from "./catch-mind.service";
   imports: [RedisModule, PrismaModule],
   controllers: [],
   providers: [CatchMindGateway, CatchMindService],
-  exports: [CatchMindService],
+  exports: [CatchMindGateway, CatchMindService],
 })
 export class PlayModule {}

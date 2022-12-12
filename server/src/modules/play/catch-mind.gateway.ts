@@ -24,7 +24,7 @@ import { CatchMindGameRoom, CatchMindRecord } from "../../@types/catch-mind";
 @UseFilters(new SocketBadRequestFilter("catch-mind/error"))
 @UseFilters(SocketExceptionFilter)
 @WebSocketGateway(SERVER_SOCKET_PORT, { transports: ["websocket"], namespace: "/" })
-export class CatchMindGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
+export class CatchMindGateway implements OnGatewayInit {
   @WebSocketServer() public server: Server;
   private logger = new Logger("Catch Mind Gateway");
   readyPlayer: Map<string, string[]>;
@@ -108,7 +108,7 @@ export class CatchMindGateway implements OnGatewayInit, OnGatewayConnection, OnG
     this.readyPlayer.set(playData.playId, [...this.readyPlayer.get(playData.playId), socket.id]);
 
     if (this.readyPlayer.get(playData.playId).length === room.participants.length) {
-      this.catchMindService.notifyRoundStart(this.server, roomId, room.participants, playData);
+      this.catchMindService.notifyRoundStart(this.server, roomId);
     }
   }
 
@@ -126,11 +126,16 @@ export class CatchMindGateway implements OnGatewayInit, OnGatewayConnection, OnG
     const room: CatchMindGameRoom = await this.redis.getFrom(RedisTableName.GAME_ROOMS, roomId);
     if (!room) return;
 
-    // 유저가 drawer일 경우를 대비한 drawerId 백업
-    const drawerId = room.participants[playData.drawerIndex].userId;
+    // drawerId 백업
+    let drawerIndex = playData.drawerIndex;
+    if (playData.state === CatchMindState.RESULT) {
+      drawerIndex = (drawerIndex - 1) % room.participants.length;
+    }
+    const drawerId = room.participants[drawerIndex].userId;
 
     // 유저를 방에서 제거
-    const { email } = await this.redis.getFrom(RedisTableName.SOCKET_ID_TO_USER_INFO, socket.id);
+    const { email } = user;
+
     room.participants = room.participants.filter(user => user.email !== email);
     socket.leave(roomId);
     await this.redis.setTo(RedisTableName.GAME_ROOMS, roomId, room);
@@ -143,7 +148,7 @@ export class CatchMindGateway implements OnGatewayInit, OnGatewayConnection, OnG
       delete playData.scores[String(user.userId)];
       delete playData.totalScores[String(user.userId)];
 
-      if (Object.keys(playData.scores).length === 0) {
+      if (room.participants.length === 0) {
         await this.redis.hdel(RedisTableName.PLAY_DATA, roomId);
       } else {
         await this.redis.setTo(RedisTableName.PLAY_DATA, roomId, playData);
@@ -152,13 +157,21 @@ export class CatchMindGateway implements OnGatewayInit, OnGatewayConnection, OnG
 
     // 유저가 drawer일 경우 방의 라운드 변경
     if (playData && drawerId === user.userId) {
-      await this.redis.updateTo(RedisTableName.PLAY_DATA, roomId, { state: CatchMindState.DRAW });
-      this.catchMindService.notifyResultState(this.server, roomId, playData.playId, playData.round);
+      if (playData.state === CatchMindState.RESULT) {
+        await this.redis.updateTo(RedisTableName.PLAY_DATA, roomId, { drawerIndex });
+      } else {
+        await this.redis.updateTo(RedisTableName.PLAY_DATA, roomId, {
+          state: CatchMindState.DRAW,
+          drawerIndex: playData.drawerIndex - 1,
+        });
+        this.catchMindService.notifyResultState(this.server, roomId, playData.playId, playData.round);
+      }
     }
 
     // 유저를 로비로 보낸다
     socket.join("lobby");
     const userInfo = await this.redis.getFrom(RedisTableName.SOCKET_ID_TO_USER_INFO, socket.id);
+    if (!userInfo) return;
     userInfo.roomId = "lobby";
     await this.redis.setTo(RedisTableName.SOCKET_ID_TO_USER_INFO, socket.id, userInfo);
 
@@ -168,8 +181,4 @@ export class CatchMindGateway implements OnGatewayInit, OnGatewayConnection, OnG
       ...room,
     });
   }
-
-  async handleConnection(@ConnectedSocket() socket: Socket) {}
-
-  async handleDisconnect(@ConnectedSocket() socket: Socket) {}
 }
