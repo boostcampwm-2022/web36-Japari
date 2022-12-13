@@ -34,6 +34,11 @@ const WaitingRoomInfo = ({ roomRecord, participants }: WaitingRoomInfoProps) => 
   };
 
   const handleGameStartButton = () => {
+    if (roomRecord.minimumPeople >= participants.length) {
+      alert(`최소 인원 ${roomRecord.minimumPeople}명이 모여야 게임을 시작할 수 있습니다.`);
+      return;
+    }
+    console.log(participants, roomRecord);
     socket.emit("catch-mind/start");
   };
 
