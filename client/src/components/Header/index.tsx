@@ -10,7 +10,7 @@ import * as style from "./styles";
 import { useNavigate } from "react-router-dom";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import { soundState } from "../../store/sound";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 export interface HeaderProps {
   headerType: "랜딩" | "로비" | "게임 대기실" | "게임 진행";
@@ -21,6 +21,10 @@ export const Header = ({ headerType }: HeaderProps) => {
 
   const [sound, soundId, isBgmMuted] = useRecoilValue(soundState);
   const setSoundState = useSetRecoilState(soundState);
+
+  const handleClickBgm = () => {
+    window.open("https://richarrest.itch.io/visual-novel-music-pack-tiny-pack", "_blank");
+  };
 
   useEffect(() => {
     if (!isBgmMuted) {
@@ -35,7 +39,7 @@ export const Header = ({ headerType }: HeaderProps) => {
       <div css={style.headerLeftStyle}>
         <Logo logoType="BOTH" />
         <div css={style.audioControllerStyle}>
-          <p>Chat (Menu) - Rest!</p>
+          <p onClick={handleClickBgm}>Chat (Menu) - Rest!</p>
         </div>
         <div css={style.bgmButtonStyle} onClick={() => setSoundState([sound, soundId, !isBgmMuted])}>
           <img src={isBgmMuted ? bgmPlayIcon : bgmPauseIcon} alt="bgm-control-button" />

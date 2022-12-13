@@ -29,6 +29,10 @@ export const audioControllerStyle = css`
     font-size: large;
     color: lightgreen;
     animation: marquee 5s linear infinite;
+
+    &:hover {
+      cursor: pointer;
+    }
   }
 
   @keyframes marquee {
