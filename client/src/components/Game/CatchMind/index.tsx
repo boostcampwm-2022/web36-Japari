@@ -1,5 +1,5 @@
 /** @jsxImportSource @emotion/react */
-import React, { useRef, useState, useEffect, useCallback } from "react";
+import React, { useRef, useState, useEffect, useCallback, useMemo } from "react";
 import * as style from "./styles";
 import timerImage from "../../../assets/icons/timer.png";
 import { useRecoilState, useRecoilValue } from "recoil";
@@ -103,7 +103,6 @@ export default function CatchMind({ participants }: CatchMindProps) {
   }, []);
 
   const clearCanvas = useCallback(() => {
-    const ctx = getContextObject();
     if (!ctxRef.current) return;
     ctxRef.current.fillStyle = Color.WHITE;
     ctxRef.current.fillRect(0, 0, canvasRef.current!.width, canvasRef.current!.height);
@@ -136,14 +135,15 @@ export default function CatchMind({ participants }: CatchMindProps) {
       ctx.fillStyle = currentColorRef.current;
       ctx.beginPath();
     },
-    []
+    [getContextObject]
   );
 
-  const handleDebounce = useCallback(
-    debounce(imageSrc => {
-      socket.emit("catch-mind/image", { round, imageSrc });
-    }, 100),
-    [round]
+  const handleDebounce = useMemo(
+    () =>
+      debounce(imageSrc => {
+        socket.emit("catch-mind/image", { round, imageSrc });
+      }, 100),
+    [socket, round]
   );
 
   const stopDrawing = useCallback(() => {
@@ -165,7 +165,7 @@ export default function CatchMind({ participants }: CatchMindProps) {
       }
       ctx.moveTo(e.offsetX, e.offsetY);
     },
-    [isDrawing]
+    [isDrawing, getContextObject, handleDebounce]
   );
 
   // event handlers
@@ -202,14 +202,14 @@ export default function CatchMind({ participants }: CatchMindProps) {
       }
       ctx.closePath();
     },
-    [drawerId, user]
+    [drawerId, user, getContextObject]
   );
 
   const handleClear = useCallback(() => {
     if (drawerId !== user?.userId) return;
     if (stateRef.current !== CatchMindState.DRAW) return;
     clearCanvas();
-  }, [drawerId, user]);
+  }, [drawerId, user, clearCanvas]);
 
   const handleSelectColor = useCallback(
     (color: string) => {
@@ -217,12 +217,12 @@ export default function CatchMind({ participants }: CatchMindProps) {
       setMode("pencil");
       setCurrentColor(color);
     },
-    [drawerId]
+    [drawerId, user]
   );
 
   useEffect(() => {
     socket.emit("catch-mind/rendered", path);
-  }, [socket]);
+  }, [socket, path]);
 
   useEffect(() => {
     socket.on("catch-mind/round-start", data => {
@@ -247,7 +247,7 @@ export default function CatchMind({ participants }: CatchMindProps) {
     return () => {
       socket.off("catch-mind/round-start");
     };
-  }, [socket]);
+  }, [socket, clearCanvas, infoText, participants, writeCenter]);
 
   useEffect(() => {
     socket.on("catch-mind/draw-start", data => {
@@ -266,7 +266,7 @@ export default function CatchMind({ participants }: CatchMindProps) {
     return () => {
       socket.off("catch-mind/draw-start");
     };
-  }, [socket]);
+  }, [socket, clearCanvas, writeCenter]);
 
   useEffect(() => {
     socket.on("catch-mind/result", data => {
@@ -284,7 +284,7 @@ export default function CatchMind({ participants }: CatchMindProps) {
     return () => {
       socket.off("catch-mind/result");
     };
-  }, [socket]);
+  }, [socket, clearCanvas, getContextObject, writeCenter, setCurrentScore]);
 
   // 타이머
   useEffect(() => {
@@ -316,7 +316,7 @@ export default function CatchMind({ participants }: CatchMindProps) {
       canvas.removeEventListener("mouseup", stopDrawing);
       canvas.removeEventListener("mouseleave", stopDrawing);
     };
-  }, [startDrawing, onDrawing, stopDrawing, stateRef.current, drawerId]);
+  }, [startDrawing, onDrawing, stopDrawing, drawerId, user]);
 
   useEffect(() => {
     setCurrentScore(null);
@@ -330,7 +330,7 @@ export default function CatchMind({ participants }: CatchMindProps) {
     ctx.strokeStyle = "black";
     ctx.lineWidth = 2;
     ctxRef.current = ctx;
-  }, []);
+  }, [getContextObject, setCurrentScore]);
 
   useEffect(() => {
     socket.on("catch-mind/image", data => {
@@ -346,21 +346,21 @@ export default function CatchMind({ participants }: CatchMindProps) {
     return () => {
       socket.off("catch-mind/image");
     };
-  }, [socket]);
+  }, [socket, getContextObject]);
 
   useEffect(() => {
     socket.on("catch-mind/end", () => {
       setCurrentScore(null);
       navigate(`/waiting/${path}`);
     });
-  }, []);
+  }, [navigate, path, setCurrentScore, socket]);
 
   useEffect(() => {
     const ctx = getContextObject();
     ctx.beginPath();
     ctx.strokeStyle = currentColor;
     ctx.fillStyle = currentColor;
-  }, [currentColor]);
+  }, [currentColor, getContextObject]);
 
   useEffect(() => {
     const ctx = getContextObject();
@@ -372,7 +372,7 @@ export default function CatchMind({ participants }: CatchMindProps) {
       ctx.beginPath();
       ctx.strokeStyle = Color.WHITE;
     }
-  }, [mode]);
+  }, [mode, getContextObject]);
 
   return (
     <div css={style.gameWrapperStyle}>
@@ -399,7 +399,7 @@ export default function CatchMind({ participants }: CatchMindProps) {
 
       <div css={style.paletteStyle}>
         {drawerId !== user?.userId && (
-          <div css={style.palleteLockStyle}>
+          <div css={style.paletteLockStyle}>
             <img src={paletteLockIcon} alt="palette-lock-icon" />
           </div>
         )}

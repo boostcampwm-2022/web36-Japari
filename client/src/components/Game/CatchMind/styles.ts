@@ -6,14 +6,13 @@ export const gameWrapperStyle = css`
   gap: 1rem;
 `;
 
-export const palleteLockStyle = css`
+export const paletteLockStyle = css`
   display: flex;
   align-items: center;
   justify-content: center;
   width: 100%;
   height: 100%;
   border-radius: 5px;
-  /* height: 30rem; */
   position: absolute;
   top: -0.1rem;
   right: -0.1rem;
@@ -21,7 +20,6 @@ export const palleteLockStyle = css`
 
   border: 1.5px solid burlywood;
   background-image: url(${palleteCoverTexture});
-  /* background-color: brown; */
 
   > img {
     width: 3rem;
@@ -39,7 +37,6 @@ export const paletteStyle = css`
   align-items: center;
 
   width: 15rem;
-  /* height: 40rem; */
   background-color: burlywood;
   border: 1px solid black;
   border-radius: 5px;

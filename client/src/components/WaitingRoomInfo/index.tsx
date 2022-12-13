@@ -5,7 +5,7 @@ import { useRecoilValue } from "recoil";
 import { socketState } from "../../store/socket";
 import Button from "../Button";
 import Audio from "../Audio";
-import Cam, { CamProps } from "../Cam";
+import Cam from "../Cam";
 import { Room } from "../RoomList";
 import RoomRecord from "../RoomList/RoomRecord";
 import * as style from "./styles";
@@ -25,7 +25,6 @@ export interface ProfileProps {
 const WaitingRoomInfo = ({ roomRecord, participants }: WaitingRoomInfoProps) => {
   const socket = useRecoilValue(socketState);
   const user = useRecoilValue(userState);
-  // [camList, setCamList] = useState<Cam[]>([]);
   const navigate = useNavigate();
   const { videoStream, audioStream } = useCams();
 
@@ -35,7 +34,7 @@ const WaitingRoomInfo = ({ roomRecord, participants }: WaitingRoomInfoProps) => 
   };
 
   const handleGameStartButton = () => {
-    if (roomRecord.minimumPeople >= participants.length) {
+    if (roomRecord.minimumPeople > participants.length) {
       alert(`최소 인원 ${roomRecord.minimumPeople}명이 모여야 게임을 시작할 수 있습니다.`);
       return;
     }
@@ -50,7 +49,7 @@ const WaitingRoomInfo = ({ roomRecord, participants }: WaitingRoomInfoProps) => 
     return () => {
       socket.off("play/start");
     };
-  }, [socket]);
+  }, [socket, navigate, roomRecord]);
 
   return (
     <div css={style.waitingRoomInfoStyle}>

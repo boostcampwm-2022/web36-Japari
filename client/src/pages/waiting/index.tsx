@@ -53,7 +53,7 @@ const WaitingPage: React.FC = () => {
       socket.off("game-room/join-failed");
       socket.emit("wait-room/exit");
     };
-  }, [socket]);
+  }, [socket, navigate, roomId]);
 
   return (
     <Page>
