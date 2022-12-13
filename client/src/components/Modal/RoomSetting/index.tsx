@@ -32,15 +32,6 @@ const RoomSetting = ({ mode, closeModal }: RoomSettingProps) => {
     }
   };
 
-  useEffect(() => {
-    socket.on("game-room/create-success", () => {
-      closeModal();
-    });
-    socket.on("game-room/modify-success", () => {
-      closeModal();
-    });
-  }, [socket, closeModal]);
-
   return (
     <>
       <aside css={style.modalContents}>

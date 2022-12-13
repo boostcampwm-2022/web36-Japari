@@ -62,12 +62,15 @@ const RoomList = ({ rooms }: RoomListProps) => {
 
   useEffect(() => {
     socket.on("game-room/create-success", data => {
+      setCreateRoomModalOpen(false);
       navigate(`/waiting/${data.roomId}`);
     });
     socket.on("game-room/password-success", data => {
+      setPasswordModalOpen(false);
       navigate(`/waiting/${data.roomId}`);
     });
-    socket.on("game-room/password-failed", data => {
+    socket.on("game-room/password-failed", () => {
+      setPasswordModalOpen(false);
       alert("비밀번호가 틀렸습니다.");
     });
 

@@ -59,16 +59,11 @@ const WaitingRoomInfo = ({ roomRecord, participants }: WaitingRoomInfoProps) => 
   }, [socket, navigate, roomRecord]);
 
   useEffect(() => {
-    socket.on("game-room/password-failed", () => {
-      alert("비밀번호가 틀렸습니다.");
-    });
-
     socket.on("game-room/error", errorMessage => {
       alert(errorMessage);
     });
 
     return () => {
-      socket.off("game-room/password-failed");
       socket.off("game-room/error");
     };
   }, [socket]);
