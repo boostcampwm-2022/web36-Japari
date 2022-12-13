@@ -95,8 +95,18 @@ export class GameRoomGateway implements OnGatewayInit {
   @UsePipes(ValidationPipe)
   @SubscribeMessage("game-room/modify")
   async modify(@ConnectedSocket() socket: Socket, @MessageBody() data: RoomSettingDto) {
-    const { roomId } = await this.redis.getFrom(RedisTableName.SOCKET_ID_TO_USER_INFO, socket.id);
+    const { isPrivate, password } = data;
+
+    if (isPrivate && !(password.length >= 1 && password.length <= 20)) {
+      throw new SocketException("game-room/error", "비밀번호는 1자 이상 20자 이하여야만 합니다.");
+    }
+
+    const user = await this.redis.getFrom(RedisTableName.SOCKET_ID_TO_USER_INFO, socket.id);
+    if (!user) return;
+    const { roomId } = user;
+    if (!roomId) return;
     const room = await this.redis.getFrom(RedisTableName.GAME_ROOMS, roomId);
+    if (!room) return;
     const newRoom = { ...room, ...data };
 
     // 방 설정 변경
@@ -107,6 +117,8 @@ export class GameRoomGateway implements OnGatewayInit {
       roomId,
       ...newRoom,
     });
+
+    socket.emit("game-room/modify-success", { roomId });
   }
 
   @UsePipes(ValidationPipe)

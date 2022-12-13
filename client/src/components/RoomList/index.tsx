@@ -96,7 +96,9 @@ const RoomList = ({ rooms }: RoomListProps) => {
           <Select selectType="게임 필터" setValue={setGameType} />
         </div>
         <Button buttonType="방 만들기" handleClick={() => setCreateRoomModalOpen(true)} />
-        {createRoomModalOpen && <Modal ModalType="방 설정" closeModal={() => setCreateRoomModalOpen(false)} />}
+        {createRoomModalOpen && (
+          <Modal ModalType="방 설정" closeModal={() => setCreateRoomModalOpen(false)} roomSettingMode="CREATE" />
+        )}
       </div>
 
       <div css={style.roomListStyle}>

@@ -1,5 +1,5 @@
 /** @jsxImportSource @emotion/react */
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useRecoilValue } from "recoil";
 import { socketState } from "../../store/socket";
@@ -12,6 +12,7 @@ import * as style from "./styles";
 import { User } from "@dto";
 import { useCams } from "../../hooks/useCams";
 import { userState } from "../../store/user";
+import Modal from "../Modal";
 
 export interface WaitingRoomInfoProps {
   roomRecord: Room;
@@ -27,6 +28,12 @@ const WaitingRoomInfo = ({ roomRecord, participants }: WaitingRoomInfoProps) => 
   const user = useRecoilValue(userState);
   const navigate = useNavigate();
   const { videoStream, audioStream } = useCams();
+
+  const [modifyRoomModalOpen, setModifyRoomModalOpen] = useState<boolean>(false);
+
+  const handleRoomRecordClick = () => {
+    setModifyRoomModalOpen(true);
+  };
 
   const handleRootOutButton = () => {
     navigate("/lobby");
@@ -51,10 +58,28 @@ const WaitingRoomInfo = ({ roomRecord, participants }: WaitingRoomInfoProps) => 
     };
   }, [socket, navigate, roomRecord]);
 
+  useEffect(() => {
+    socket.on("game-room/password-failed", data => {
+      alert("비밀번호가 틀렸습니다.");
+    });
+
+    socket.on("game-room/error", errorMessage => {
+      alert(errorMessage);
+    });
+
+    return () => {
+      socket.off("game-room/password-failed");
+      socket.off("game-room/error");
+    };
+  }, [socket]);
+
   return (
     <div css={style.waitingRoomInfoStyle}>
       <div css={style.headerStyle}>
-        <RoomRecord {...roomRecord} />
+        <RoomRecord {...roomRecord} onClickRecord={handleRoomRecordClick} />
+        {modifyRoomModalOpen && (
+          <Modal ModalType="방 설정" closeModal={() => setModifyRoomModalOpen(false)} roomSettingMode="MODIFY" />
+        )}
       </div>
       <div css={style.mainWrapperStyle}>
         <div css={style.camListContainerStyle}>

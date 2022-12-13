@@ -8,10 +8,11 @@ import { useRecoilValue } from "recoil";
 import { socketState } from "../../../store/socket";
 
 interface RoomSettingProps {
+  mode: "CREATE" | "MODIFY";
   closeModal: () => void;
 }
 
-const RoomSetting = ({ closeModal }: RoomSettingProps) => {
+const RoomSetting = ({ mode, closeModal }: RoomSettingProps) => {
   const [gameId, setGameId] = useState<number>(-1);
   const [title, setTitle] = useState<string>("");
   const [isPrivate, setIsPrivate] = useState<boolean>(false);
@@ -24,14 +25,21 @@ const RoomSetting = ({ closeModal }: RoomSettingProps) => {
     // room 생성 혹은 설정 로직
     const data = { gameId, title, isPrivate, maximumPeople, password };
 
-    socket.emit("game-room/create", data);
+    if (mode === "CREATE") {
+      socket.emit("game-room/create", data);
+    } else {
+      socket.emit("game-room/modify", data);
+    }
   };
 
   useEffect(() => {
     socket.on("game-room/create-success", () => {
       closeModal();
     });
-  }, [socket]);
+    socket.on("game-room/modify-success", () => {
+      closeModal();
+    });
+  }, [socket, closeModal]);
 
   return (
     <>
