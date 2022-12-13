@@ -6,8 +6,6 @@ import { StreamInfo } from "../../hooks/useCams";
 import Audio from "../Audio";
 import { useRecoilValue } from "recoil";
 import { userState } from "../../store/user";
-import micOn from "../../assets/icons/mic-on.svg";
-import micOff from "../../assets/icons/mic-off.svg";
 
 export interface InGameCamListProps {
   participants: User[];
@@ -27,7 +25,6 @@ const InGameCamList = ({ participants, videoStream, audioStream }: InGameCamList
       {participants.map(participant => {
         const videoStreamInfo = videoStream.get(participant.email);
         const audioStreamInfo = audioStream.get(participant.email);
-        console.log(audioStreamInfo);
         return (
           <div key={participant.userId}>
             {videoStreamInfo ? (
@@ -42,9 +39,6 @@ const InGameCamList = ({ participants, videoStream, audioStream }: InGameCamList
             {audioStreamInfo && user?.userId !== audioStreamInfo.userInfo.userId && (
               <Audio mediaStream={audioStreamInfo.mediaStream ?? null} />
             )}
-            {/* audioStreaminfo에서 getAudioTracks에서 enabled 되있는지? */}
-            {/* {audioStreamInfo && audioStreamInfo.getAudioTracks} */}
-            {/* <img src={micOff} alt="mike" /> */}
           </div>
         );
       })}

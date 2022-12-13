@@ -337,6 +337,19 @@ export class MediaGateway implements OnGatewayInit, OnGatewayConnection, OnGatew
     }
   }
 
+  @SubscribeMessage("audio-status/modify")
+  handleAudioStatus(@ConnectedSocket() socket: Socket, @MessageBody() audioStatus: boolean) {
+    const { roomId } = this.peers[socket.id];
+
+    socket.emit("audio-status/modify", audioStatus);
+  }
+
+  @SubscribeMessage("video-status/modify")
+  handleVideoStatus(@ConnectedSocket() socket: Socket, @MessageBody() videoStatus: boolean) {
+    const { roomId } = this.peers[socket.id];
+    socket.emit("video-status/modify");
+  }
+
   handleConnection(@ConnectedSocket() socket: Socket) {}
 
   handleDisconnect(@ConnectedSocket() socket: Socket) {
