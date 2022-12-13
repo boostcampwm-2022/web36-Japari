@@ -215,10 +215,10 @@ export class MediaGateway implements OnGatewayInit, OnGatewayConnection, OnGatew
 
   informConsumers = async (roomId: string, socketId: string, producerId: string) => {
     const userInfo = JSON.parse(await this.redis.hget(RedisTableName.SOCKET_ID_TO_USER_INFO, socketId));
-    this.producers.forEach(producerData => {
-      if (producerData.socketId !== socketId && producerData.roomId === roomId) {
-        const producerSocket = this.peers[producerData.socketId].socket;
-        producerSocket.emit("media/new-producer", { producerId, userInfo });
+    this.rooms[roomId].peers.forEach(peerSocketId => {
+      if (peerSocketId !== socketId) {
+        const consumerSocket = this.peers[peerSocketId].socket;
+        consumerSocket.emit("media/new-producer", { producerId, userInfo });
       }
     });
   };
