@@ -1,5 +1,5 @@
 /** @jsxImportSource @emotion/react */
-import React, { useRef, useState, useEffect, useCallback } from "react";
+import { useRef, useState, useEffect, useCallback, useMemo } from "react";
 import * as style from "./styles";
 import timerImage from "../../../assets/icons/timer.png";
 import { useRecoilState, useRecoilValue } from "recoil";
@@ -87,7 +87,7 @@ export default function CatchMind({ participants }: CatchMindProps) {
   const [infoText, setInfoText] = useState<string>("");
   const [round, setRound] = useState<number>(1);
   const roundRef = useRef<number>(1);
-  const stateRef = useRef<number>(0);
+  const [gameState, setGameState] = useState<number>(0);
   const [drawerId, setDrawerId] = useState<number>(0);
 
   const timer = useRef<NodeJS.Timer | null>(null);
@@ -103,7 +103,6 @@ export default function CatchMind({ participants }: CatchMindProps) {
   }, []);
 
   const clearCanvas = useCallback(() => {
-    const ctx = getContextObject();
     if (!ctxRef.current) return;
     ctxRef.current.fillStyle = Color.WHITE;
     ctxRef.current.fillRect(0, 0, canvasRef.current!.width, canvasRef.current!.height);
@@ -136,14 +135,15 @@ export default function CatchMind({ participants }: CatchMindProps) {
       ctx.fillStyle = currentColorRef.current;
       ctx.beginPath();
     },
-    []
+    [getContextObject]
   );
 
-  const handleDebounce = useCallback(
-    debounce(imageSrc => {
-      socket.emit("catch-mind/image", { round, imageSrc });
-    }, 100),
-    [round]
+  const handleDebounce = useMemo(
+    () =>
+      debounce(imageSrc => {
+        socket.emit("catch-mind/image", { round, imageSrc });
+      }, 100),
+    [round, socket]
   );
 
   const stopDrawing = useCallback(() => {
@@ -165,26 +165,26 @@ export default function CatchMind({ participants }: CatchMindProps) {
       }
       ctx.moveTo(e.offsetX, e.offsetY);
     },
-    [isDrawing]
+    [isDrawing, getContextObject, handleDebounce]
   );
 
   // event handlers
   const handlePencilMode = useCallback(() => {
     if (drawerId !== user?.userId) return;
-    if (stateRef.current !== CatchMindState.DRAW) return;
+    if (gameState !== CatchMindState.DRAW) return;
     setMode("pencil");
-  }, [drawerId, user]);
+  }, [drawerId, user, gameState]);
 
   const handleEraserMode = useCallback(() => {
     if (drawerId !== user?.userId) return;
-    if (stateRef.current !== CatchMindState.DRAW) return;
+    if (gameState !== CatchMindState.DRAW) return;
     setMode("eraser");
-  }, [drawerId, user]);
+  }, [drawerId, user, gameState]);
 
   const handleLineWidth = useCallback(
     (line: "THIN" | "NORMAL" | "THICK") => {
       if (drawerId !== user?.userId) return;
-      if (stateRef.current !== CatchMindState.DRAW) return;
+      if (gameState !== CatchMindState.DRAW) return;
       setLine(line);
 
       const ctx = getContextObject();
@@ -202,32 +202,31 @@ export default function CatchMind({ participants }: CatchMindProps) {
       }
       ctx.closePath();
     },
-    [drawerId, user]
+    [drawerId, user, getContextObject, gameState]
   );
 
   const handleClear = useCallback(() => {
     if (drawerId !== user?.userId) return;
-    if (stateRef.current !== CatchMindState.DRAW) return;
+    if (gameState !== CatchMindState.DRAW) return;
     clearCanvas();
-  }, [drawerId, user]);
+  }, [drawerId, user, clearCanvas, gameState]);
 
   const handleSelectColor = useCallback(
     (color: string) => {
-      if (user?.userId !== drawerId || stateRef.current !== CatchMindState.DRAW) return;
+      if (user?.userId !== drawerId || gameState !== CatchMindState.DRAW) return;
       setMode("pencil");
       setCurrentColor(color);
     },
-    [drawerId]
+    [drawerId, user?.userId, gameState]
   );
 
   useEffect(() => {
     socket.emit("catch-mind/rendered", path);
-  }, [socket]);
+  }, [socket, path]);
 
   useEffect(() => {
     socket.on("catch-mind/round-start", data => {
-      console.log("round start:", data);
-      stateRef.current = CatchMindState.WAIT;
+      setGameState(CatchMindState.WAIT);
 
       if (data.answer) setInfoText(infoText);
       setRound(data.round);
@@ -247,11 +246,11 @@ export default function CatchMind({ participants }: CatchMindProps) {
     return () => {
       socket.off("catch-mind/round-start");
     };
-  }, [socket]);
+  }, [socket, clearCanvas, infoText, participants, writeCenter]);
 
   useEffect(() => {
     socket.on("catch-mind/draw-start", data => {
-      stateRef.current = CatchMindState.DRAW;
+      setGameState(CatchMindState.DRAW);
 
       clearCanvas();
       writeCenter(`Round ${data.round} 시작!`);
@@ -266,11 +265,11 @@ export default function CatchMind({ participants }: CatchMindProps) {
     return () => {
       socket.off("catch-mind/draw-start");
     };
-  }, [socket]);
+  }, [socket, clearCanvas, writeCenter]);
 
   useEffect(() => {
     socket.on("catch-mind/result", data => {
-      stateRef.current = CatchMindState.RESULT;
+      setGameState(CatchMindState.RESULT);
       setCurrentScore(data);
       clearCanvas();
       const ctx = getContextObject();
@@ -284,7 +283,7 @@ export default function CatchMind({ participants }: CatchMindProps) {
     return () => {
       socket.off("catch-mind/result");
     };
-  }, [socket]);
+  }, [socket, clearCanvas, writeCenter, getContextObject, setCurrentScore]);
 
   // 타이머
   useEffect(() => {
@@ -302,9 +301,10 @@ export default function CatchMind({ participants }: CatchMindProps) {
   }, []);
 
   useEffect(() => {
+    if (!canvasRef.current) return;
     const canvas = canvasRef.current;
-    if (!canvas) return;
-    if (stateRef.current !== CatchMindState.DRAW) return;
+
+    if (gameState !== CatchMindState.DRAW) return;
     if (drawerId !== user?.userId) return;
     canvas.addEventListener("mousedown", startDrawing);
     canvas.addEventListener("mousemove", onDrawing);
@@ -316,9 +316,10 @@ export default function CatchMind({ participants }: CatchMindProps) {
       canvas.removeEventListener("mouseup", stopDrawing);
       canvas.removeEventListener("mouseleave", stopDrawing);
     };
-  }, [startDrawing, onDrawing, stopDrawing, stateRef.current, drawerId]);
+  }, [startDrawing, onDrawing, stopDrawing, drawerId, user?.userId, gameState]);
 
   useEffect(() => {
+    setCurrentScore(null);
     if (!canvasRef.current) return;
     const canvas = canvasRef.current;
     canvas.width = 800;
@@ -329,14 +330,14 @@ export default function CatchMind({ participants }: CatchMindProps) {
     ctx.strokeStyle = "black";
     ctx.lineWidth = 2;
     ctxRef.current = ctx;
-  }, []);
+  }, [getContextObject, setCurrentScore]);
 
   useEffect(() => {
     socket.on("catch-mind/image", data => {
       const image = new Image();
       image.onload = () => {
         if (roundRef.current !== data.round) return;
-        if (stateRef.current !== CatchMindState.DRAW) return;
+        if (gameState !== CatchMindState.DRAW) return;
         const ctx = getContextObject();
         ctx.drawImage(image, 0, 0);
       };
@@ -345,21 +346,21 @@ export default function CatchMind({ participants }: CatchMindProps) {
     return () => {
       socket.off("catch-mind/image");
     };
-  }, [socket]);
+  }, [socket, getContextObject, gameState]);
 
   useEffect(() => {
     socket.on("catch-mind/end", () => {
       setCurrentScore(null);
       navigate(`/waiting/${path}`);
     });
-  }, []);
+  }, [navigate, path, setCurrentScore, socket]);
 
   useEffect(() => {
     const ctx = getContextObject();
     ctx.beginPath();
     ctx.strokeStyle = currentColor;
     ctx.fillStyle = currentColor;
-  }, [currentColor]);
+  }, [currentColor, getContextObject]);
 
   useEffect(() => {
     const ctx = getContextObject();
@@ -371,7 +372,7 @@ export default function CatchMind({ participants }: CatchMindProps) {
       ctx.beginPath();
       ctx.strokeStyle = Color.WHITE;
     }
-  }, [mode]);
+  }, [mode, getContextObject]);
 
   return (
     <div css={style.gameWrapperStyle}>
@@ -398,7 +399,7 @@ export default function CatchMind({ participants }: CatchMindProps) {
 
       <div css={style.paletteStyle}>
         {drawerId !== user?.userId && (
-          <div css={style.palleteLockStyle}>
+          <div css={style.paletteLockStyle}>
             <img src={paletteLockIcon} alt="palette-lock-icon" />
           </div>
         )}

@@ -19,23 +19,12 @@ import { SERVER_SOCKET_PORT } from "src/constants/config";
 import { CatchMindService } from "./catch-mind.service";
 import { randFromArray } from "util/random";
 import { v4 as uuid } from "uuid";
-
-export interface CatchMindRecord {
-  gameId: number;
-  playId: string;
-  answer: string;
-  round: number;
-  state: CatchMindState;
-  drawerIndex: number;
-  scores: Record<string, number>;
-  totalScores: Record<string, number>;
-  forStart: number[];
-}
+import { CatchMindGameRoom, CatchMindRecord } from "../../@types/catch-mind";
 
 @UseFilters(new SocketBadRequestFilter("catch-mind/error"))
 @UseFilters(SocketExceptionFilter)
 @WebSocketGateway(SERVER_SOCKET_PORT, { transports: ["websocket"], namespace: "/" })
-export class CatchMindGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
+export class CatchMindGateway implements OnGatewayInit {
   @WebSocketServer() public server: Server;
   private logger = new Logger("Catch Mind Gateway");
   readyPlayer: Map<string, string[]>;
@@ -119,7 +108,7 @@ export class CatchMindGateway implements OnGatewayInit, OnGatewayConnection, OnG
     this.readyPlayer.set(playData.playId, [...this.readyPlayer.get(playData.playId), socket.id]);
 
     if (this.readyPlayer.get(playData.playId).length === room.participants.length) {
-      this.catchMindService.notifyRoundStart(this.server, roomId, room.participants, playData);
+      this.catchMindService.notifyRoundStart(this.server, roomId);
     }
   }
 
@@ -130,14 +119,23 @@ export class CatchMindGateway implements OnGatewayInit, OnGatewayConnection, OnG
 
     const { roomId } = user;
 
-    const playData = await this.redis.getFrom(RedisTableName.PLAY_DATA, roomId);
+    const playData: CatchMindRecord = await this.redis.getFrom(RedisTableName.PLAY_DATA, roomId);
     if (!playData) return;
     // 게임이 끝나 로비로 돌아가는 경우는 무시
 
-    const room = await this.redis.getFrom(RedisTableName.GAME_ROOMS, roomId);
+    const room: CatchMindGameRoom = await this.redis.getFrom(RedisTableName.GAME_ROOMS, roomId);
+    if (!room) return;
+
+    // drawerId 백업
+    let drawerIndex = playData.drawerIndex;
+    if (playData.state === CatchMindState.RESULT) {
+      drawerIndex = (drawerIndex - 1 + room.participants.length) % room.participants.length;
+    }
+    const drawerId = room.participants[drawerIndex].userId;
 
     // 유저를 방에서 제거
-    const { email } = await this.redis.getFrom(RedisTableName.SOCKET_ID_TO_USER_INFO, socket.id);
+    const { email } = user;
+
     room.participants = room.participants.filter(user => user.email !== email);
     socket.leave(roomId);
     await this.redis.setTo(RedisTableName.GAME_ROOMS, roomId, room);
@@ -146,21 +144,34 @@ export class CatchMindGateway implements OnGatewayInit, OnGatewayConnection, OnG
     }
 
     // 유저를 PlayData에서 제거
-
     if (playData) {
       delete playData.scores[String(user.userId)];
       delete playData.totalScores[String(user.userId)];
 
-      if (Object.keys(playData.scores).length === 0) {
+      if (room.participants.length === 0) {
         await this.redis.hdel(RedisTableName.PLAY_DATA, roomId);
       } else {
         await this.redis.setTo(RedisTableName.PLAY_DATA, roomId, playData);
       }
     }
 
+    // 유저가 drawer일 경우 방의 라운드 변경
+    if (playData && drawerId === user.userId) {
+      if (playData.state === CatchMindState.RESULT) {
+        await this.redis.updateTo(RedisTableName.PLAY_DATA, roomId, { drawerIndex });
+      } else {
+        await this.redis.updateTo(RedisTableName.PLAY_DATA, roomId, {
+          state: CatchMindState.DRAW,
+          drawerIndex: playData.drawerIndex - 1,
+        });
+        this.catchMindService.notifyResultState(this.server, roomId, playData.playId, playData.round);
+      }
+    }
+
     // 유저를 로비로 보낸다
     socket.join("lobby");
     const userInfo = await this.redis.getFrom(RedisTableName.SOCKET_ID_TO_USER_INFO, socket.id);
+    if (!userInfo) return;
     userInfo.roomId = "lobby";
     await this.redis.setTo(RedisTableName.SOCKET_ID_TO_USER_INFO, socket.id, userInfo);
 
@@ -170,8 +181,4 @@ export class CatchMindGateway implements OnGatewayInit, OnGatewayConnection, OnG
       ...room,
     });
   }
-
-  async handleConnection(@ConnectedSocket() socket: Socket) {}
-
-  handleDisconnect(@ConnectedSocket() socket: Socket) {}
 }

@@ -18,14 +18,6 @@ Default.args = {
     gameId: 1,
     currentPeople: 6,
     maximumPeople: 8,
+    minimumPeople: 2,
   },
-  // camList: [
-  //   {
-  //     isVideoOn: false,
-  //     isAudioOn: false,
-  //     profile: "https://avatars.githubusercontent.com/u/102232291?v=4",
-  //     nickname: "아임더베스트",
-  //     scoreRank: "2500 (1위)",
-  //   },
-  // ],
 };

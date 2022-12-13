@@ -1,5 +1,5 @@
 /** @jsxImportSource @emotion/react */
-import React, { useEffect, useState, Fragment } from "react";
+import { useEffect, useState, Fragment } from "react";
 import { useNavigate } from "react-router-dom";
 import { useRecoilValue } from "recoil";
 import { socketState } from "../../store/socket";
@@ -16,6 +16,7 @@ export interface Room {
   gameId: number;
   currentPeople: number;
   maximumPeople: number;
+  minimumPeople: number;
   isPrivate: boolean;
 }
 
