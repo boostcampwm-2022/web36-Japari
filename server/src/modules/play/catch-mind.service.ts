@@ -21,7 +21,8 @@ export class CatchMindService {
     await this.redis.setTo(RedisTableName.PLAY_DATA, roomId, { ...record, state: CatchMindState.WAIT });
     const room: CatchMindGameRoom = await this.redis.getFrom(RedisTableName.GAME_ROOMS, roomId);
     if (!room) return;
-    const { drawerIndex, round, scores, totalScores, answer, playId } = record;
+    const { round, scores, totalScores, answer, playId } = record;
+    const drawerIndex = (record.drawerIndex + room.participants.length) % room.participants.length;
     const drawerId = room.participants[drawerIndex].userId;
 
     const newScores = {};
@@ -33,7 +34,11 @@ export class CatchMindService {
       newTotalScores[userId] = totalScores[userId];
     });
 
-    await this.redis.updateTo(RedisTableName.PLAY_DATA, roomId, { scores: newScores, totalScores: newTotalScores });
+    await this.redis.updateTo(RedisTableName.PLAY_DATA, roomId, {
+      drawerIndex,
+      scores: newScores,
+      totalScores: newTotalScores,
+    });
 
     const resp = {
       round,
