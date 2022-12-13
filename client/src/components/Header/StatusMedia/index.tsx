@@ -7,7 +7,6 @@ import * as style from "./styles";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { audioState, videoState, streamState } from "./../../../store/media";
 import { socketState } from "../../../store/socket";
-import { useEffect } from "react";
 
 const StatusMedia = () => {
   const stream = useRecoilValue(streamState);
@@ -21,7 +20,7 @@ const StatusMedia = () => {
         <div
           css={style.micCamButtonStyle}
           onClick={() => {
-            socket.emit("audio-status/modify", { audioStatus: !audio });
+            socket.emit("audio-status/modify", !audio);
             setAudio(audio => !audio);
             stream.getAudioTracks()[0].enabled = !stream.getAudioTracks()[0].enabled;
           }}
@@ -31,7 +30,7 @@ const StatusMedia = () => {
         <div
           css={style.micCamButtonStyle}
           onClick={() => {
-            socket.emit("video-status/modify", { videoStatus: !video });
+            socket.emit("video-status/modify", !video);
             setVideo(video => !video);
             stream.getVideoTracks()[0].enabled = !stream.getVideoTracks()[0].enabled;
           }}
