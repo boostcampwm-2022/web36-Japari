@@ -24,8 +24,8 @@ export class CatchMindService {
     const { drawerIndex, round, scores, totalScores, answer, playId } = record;
     const drawerId = room.participants[drawerIndex].userId;
 
-    let newScores = {};
-    let newTotalScores = {};
+    const newScores = {};
+    const newTotalScores = {};
 
     room.participants.forEach(participant => {
       const { userId } = participant;

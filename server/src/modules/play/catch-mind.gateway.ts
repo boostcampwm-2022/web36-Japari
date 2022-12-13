@@ -129,7 +129,7 @@ export class CatchMindGateway implements OnGatewayInit {
     // drawerId 백업
     let drawerIndex = playData.drawerIndex;
     if (playData.state === CatchMindState.RESULT) {
-      drawerIndex = (drawerIndex - 1) % room.participants.length;
+      drawerIndex = (drawerIndex - 1 + room.participants.length) % room.participants.length;
     }
     const drawerId = room.participants[drawerIndex].userId;
 
