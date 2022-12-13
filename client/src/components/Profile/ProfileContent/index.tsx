@@ -35,7 +35,7 @@ const ProfileContent = ({ user, editable, setNicknameChangeModalOpen }: ProfileP
         </div>
         <p css={style.ProfileEmailStyle}>{user.email}</p>
         <p css={style.ProfileScoreStyle}>
-          {user.score} 점 ( {user.rank} 위 )
+          {user.score} 점 <span>( {user.rank} 위 )</span>
         </p>
       </div>
     </div>

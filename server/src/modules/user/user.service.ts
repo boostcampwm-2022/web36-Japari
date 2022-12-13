@@ -20,8 +20,20 @@ export class UserService {
       where: { userId: id },
       select: getUserOption,
     });
+
     if (!userInfo) throw new NotFoundException();
-    return userInfo;
+
+    // 랭킹을 구한다.
+    const rank =
+      (await this.prisma.user.count({
+        where: {
+          score: {
+            gt: userInfo.score,
+          },
+        },
+      })) + 1;
+
+    return { ...userInfo, rank };
   }
 
   async findTopTenUser() {
