@@ -84,12 +84,6 @@ export class MediaGateway implements OnGatewayInit, OnGatewayConnection, OnGatew
     this.peers[socket.id] = {
       socket,
       roomId,
-      transports: [],
-      producers: [],
-      consumers: [],
-      peerDetails: {
-        name: "",
-      },
     };
 
     return { rtpCapabilities: newRouter.rtpCapabilities };
@@ -156,29 +150,14 @@ export class MediaGateway implements OnGatewayInit, OnGatewayConnection, OnGatew
 
   addTransport = (transport: Transport, roomId: string, consumer: boolean, socketId: string) => {
     this.transports = [...this.transports, { socketId, transport, roomId, consumer }];
-
-    this.peers[socketId] = {
-      ...this.peers[socketId],
-      transports: [...this.peers[socketId].transports, transport.id],
-    };
   };
 
   addProducer = (producer: Producer, roomId: string, socketId: string) => {
     this.producers = [...this.producers, { socketId, producer, roomId }];
-
-    this.peers[socketId] = {
-      ...this.peers[socketId],
-      producers: [...this.peers[socketId].producers, producer.id],
-    };
   };
 
   addConsumer = (consumer: Consumer, roomId: string, socketId: string) => {
     this.consumers = [...this.consumers, { socketId, consumer, roomId }];
-
-    this.peers[socketId] = {
-      ...this.peers[socketId],
-      consumers: [...this.peers[socketId].consumers, consumer.id],
-    };
   };
 
   @SubscribeMessage("media/getProducers")
@@ -325,9 +304,11 @@ export class MediaGateway implements OnGatewayInit, OnGatewayConnection, OnGatew
 
   @SubscribeMessage("media/disconnect")
   handleMediaDisconnect(@ConnectedSocket() socket: Socket) {
+    if (!this.peers[socket.id]) return;
+
     const removeItems = (items: any[], socketId: string, type: string) => {
       items.forEach(item => {
-        if (item.socketId === socket.id) {
+        if (item.socketId === socketId) {
           item[type].close();
         }
       });
@@ -347,6 +328,10 @@ export class MediaGateway implements OnGatewayInit, OnGatewayConnection, OnGatew
         router: this.rooms[roomId].router,
         peers: this.rooms[roomId].peers.filter(socketId => socketId !== socket.id),
       };
+
+      if (this.rooms[roomId].peers.length === 0) {
+        delete this.rooms[roomId];
+      }
     }
   }
 
