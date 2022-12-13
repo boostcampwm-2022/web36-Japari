@@ -61,6 +61,7 @@ export const useCams = () => {
       videoGoogleStartBitrate: 1000,
     },
   };
+  let localUserMedia: boolean = true;
   let audioParams: ProducerOptions;
   let videoParams: ProducerOptions = params;
   let producerTransport: Transport;
@@ -79,6 +80,8 @@ export const useCams = () => {
       })
       .then(streamSuccess)
       .catch(error => {
+        localUserMedia = false;
+        joinRoom();
         console.log(error.message);
       });
   };
@@ -120,6 +123,10 @@ export const useCams = () => {
   };
 
   const createSendTransport = async () => {
+    if (!localUserMedia) {
+      getProducers();
+      return;
+    }
     socket.emit("media/createWebRtcTransport", { consumer: false }, (transportOptions: TransportOptions) => {
       producerTransport = device.createSendTransport(transportOptions);
       handleCreateProducerTransport();
