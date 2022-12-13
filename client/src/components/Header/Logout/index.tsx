@@ -9,7 +9,7 @@ import { userState } from "../../../store/user";
 const RoomRecord = () => {
   const navigate = useNavigate();
   const socket = useRecoilValue(socketState);
-  const [user, setUser] = useRecoilState(userState);
+  const [, setUser] = useRecoilState(userState);
 
   const handleLogout = async () => {
     await logout();

@@ -5,7 +5,7 @@ import { Consumer } from "mediasoup-client/lib/Consumer";
 import { ProducerOptions } from "mediasoup-client/lib/Producer";
 import { MediaKind, RtpCapabilities, RtpParameters } from "mediasoup-client/lib/RtpParameters";
 import { Transport, TransportOptions } from "mediasoup-client/lib/Transport";
-import { Fragment, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { useRecoilValue, useRecoilState } from "recoil";
 import { socketState } from "../store/socket";
@@ -26,7 +26,7 @@ export type StreamInfo = {
 };
 
 export const useCams = () => {
-  const [localStream, setLocalStream] = useRecoilState(streamState);
+  const [, setLocalStream] = useRecoilState(streamState);
   const audio = useRecoilValue(audioState);
   const video = useRecoilValue(videoState);
   const socket = useRecoilValue(socketState);

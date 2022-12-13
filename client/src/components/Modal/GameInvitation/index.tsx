@@ -2,7 +2,6 @@
 
 import { User } from "@dto";
 import Button from "../../Button";
-import ProfileContent from "../../Profile/ProfileContent";
 import * as style from "./styles";
 
 interface GameInvitationProps {

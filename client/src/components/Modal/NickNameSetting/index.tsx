@@ -6,7 +6,6 @@ import { useState } from "react";
 import { updateNickname } from "../../../api/user";
 import { useRecoilState } from "recoil";
 import { userState } from "../../../store/user";
-import { useTheme } from "@emotion/react";
 import { User } from "@dto";
 
 interface NickNameSettingProps {

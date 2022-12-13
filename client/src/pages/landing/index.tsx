@@ -4,8 +4,6 @@ import * as style from "./styles";
 import { Page } from "../../components/Page";
 import LandingImage from "../../assets/images/landing-image.png";
 import JaPartyWord from "../../assets/logo/Ja-Party-word.png";
-import NaverLogo from "../../assets/logo/naver_logo.png";
-import KakaoLogo from "../../assets/logo/kakao_logo.png";
 import GoogleLogo from "../../assets/logo/google_logo.png";
 import GithubLogo from "../../assets/logo/github_logo.png";
 import { isLogin } from "../../api/auth";
