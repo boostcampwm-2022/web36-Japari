@@ -6,6 +6,7 @@ import { useRecoilValue } from "recoil";
 import { socketState } from "../../store/socket";
 import * as style from "./styles";
 import Spinner from "../Loader/Spinner";
+import { getTopUsers } from "../../api/user";
 
 export type User = {
   userId: number;
@@ -19,7 +20,7 @@ export type User = {
 export interface UserListProps {
   users: User[];
   friends: User[];
-  rank: User[];
+  topUsers: User[];
 }
 
 const UserList = () => {
@@ -29,7 +30,7 @@ const UserList = () => {
   const [userMap, setUserMap] = useState<UserListProps>({
     users: [],
     friends: [],
-    rank: [],
+    topUsers: [],
   });
 
   useEffect(() => {
@@ -44,6 +45,16 @@ const UserList = () => {
     };
   }, [socket]);
 
+  useEffect(() => {
+    if (selected === 2) {
+      getTopUsers().then(topUsers => {
+        setUserMap(current => {
+          return { ...current, topUsers };
+        });
+      });
+    }
+  }, [selected]);
+
   return (
     <div css={style.ListContainerStyle}>
       <UserListTab selected={selected} setSelected={setSelected} />
@@ -55,7 +66,7 @@ const UserList = () => {
           <>
             {selected === 0 && <UserTable users={userMap.users} selected={selected} />}
             {selected === 1 && <UserTable users={userMap.friends} selected={selected} />}
-            {selected === 2 && <UserTable users={userMap.rank} selected={selected} />}
+            {selected === 2 && <UserTable users={userMap.topUsers} selected={selected} />}
           </>
         )}
       </div>
