@@ -26,18 +26,26 @@ export const firstRowStyle = css`
 
 export const landingContentStyle = css`
   position: relative;
+  height: 35rem;
+`;
+
+export const landingContentBackgroundStyle = css`
+  position: absolute;
+  height: 35rem;
+  width: max(100vw, 80rem);
+  background: linear-gradient(to right, #97cce8, #87c2e2);
 `;
 
 export const landingImageStyle = css`
-  width: 100%;
+  height: 100%;
   opacity: 0.5;
 `;
 
 export const waitingExampleStyle = css`
   position: absolute;
   width: 50%;
-  top: 5rem;
-  left: 5rem;
+  top: 3rem;
+  left: 3rem;
   border-radius: 1rem;
   box-shadow: 0 0.2rem 1rem rgba(0, 0, 0, 0.4);
 `;
@@ -45,8 +53,8 @@ export const waitingExampleStyle = css`
 export const playingExampleStyle = css`
   position: absolute;
   width: 50%;
-  top: 10rem;
-  right: 5rem;
+  top: 6rem;
+  right: 3rem;
   border-radius: 1rem;
   box-shadow: 0 0.2rem 1rem rgba(0, 0, 0, 0.4);
 `;

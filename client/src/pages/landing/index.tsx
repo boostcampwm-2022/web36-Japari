@@ -6,8 +6,6 @@ import LandingBackgroundImage from "../../assets/images/landing-background-image
 import PlayingExample from "../../assets/images/playing-example.png";
 import WaitingExample from "../../assets/images/waiting-example.png";
 import WhitePaint from "../../assets/images/white-paint.png";
-import NaverLogo from "../../assets/logo/naver_logo.png";
-import KakaoLogo from "../../assets/logo/kakao_logo.png";
 import GoogleLogo from "../../assets/logo/google_logo.png";
 import GithubLogo from "../../assets/logo/github_logo.png";
 import { isLogin } from "../../api/auth";
@@ -32,6 +30,7 @@ const LandingPage: React.FC = () => {
   return (
     <Page>
       <div css={style.landingPageBodyStyle}>
+        <div css={style.landingContentBackgroundStyle} />
         <div css={style.landingContentStyle}>
           <img css={style.landingImageStyle} src={LandingBackgroundImage} alt="LandingImage" />
           <img css={style.waitingExampleStyle} src={WaitingExample} alt="WaitingExample" />
@@ -47,8 +46,6 @@ const LandingPage: React.FC = () => {
         <div css={style.singInWrapperStyle}>
           <p>Sign in with</p>
           <div css={style.logoContainerStyle}>
-            {/* <img css={style.logoStyle} src={NaverLogo} alt="NaverLogo" /> */}
-            {/* <img css={style.logoStyle} src={KakaoLogo} alt="KakaoLogo" /> */}
             <img css={style.logoStyle} src={GoogleLogo} alt="GoogleLogo" onClick={handleGoogleLogin} />
             <img css={style.logoStyle} src={GithubLogo} alt="GithubLogo" onClick={handleGithubLogin} />
           </div>
