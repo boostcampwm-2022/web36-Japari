@@ -30,7 +30,6 @@ export const Header = ({ headerType }: HeaderProps) => {
             buttonType="방 나가기"
             handleClick={() => {
               navigate("/lobby");
-              socket.emit("play-room/exit");
             }}
           />
         )}
