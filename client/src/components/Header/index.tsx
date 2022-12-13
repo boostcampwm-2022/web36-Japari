@@ -5,8 +5,6 @@ import StatusMedia from "./StatusMedia";
 import Button from "../Button";
 
 import * as style from "./styles";
-import { useRecoilValue } from "recoil";
-import { socketState } from "../../store/socket";
 import { useNavigate } from "react-router-dom";
 
 export interface HeaderProps {
@@ -15,7 +13,6 @@ export interface HeaderProps {
 
 export const Header = ({ headerType }: HeaderProps) => {
   const navigate = useNavigate();
-  const socket = useRecoilValue(socketState);
 
   return (
     <header css={style.headerStyle}>

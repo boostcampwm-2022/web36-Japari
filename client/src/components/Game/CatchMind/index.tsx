@@ -1,5 +1,5 @@
 /** @jsxImportSource @emotion/react */
-import React, { useRef, useState, useEffect, useCallback, useMemo } from "react";
+import { useRef, useState, useEffect, useCallback, useMemo } from "react";
 import * as style from "./styles";
 import timerImage from "../../../assets/icons/timer.png";
 import { useRecoilState, useRecoilValue } from "recoil";
@@ -87,7 +87,7 @@ export default function CatchMind({ participants }: CatchMindProps) {
   const [infoText, setInfoText] = useState<string>("");
   const [round, setRound] = useState<number>(1);
   const roundRef = useRef<number>(1);
-  const stateRef = useRef<number>(0);
+  const [gameState, setGameState] = useState<number>(0);
   const [drawerId, setDrawerId] = useState<number>(0);
 
   const timer = useRef<NodeJS.Timer | null>(null);
@@ -143,7 +143,7 @@ export default function CatchMind({ participants }: CatchMindProps) {
       debounce(imageSrc => {
         socket.emit("catch-mind/image", { round, imageSrc });
       }, 100),
-    [socket, round]
+    [round, socket]
   );
 
   const stopDrawing = useCallback(() => {
@@ -171,20 +171,20 @@ export default function CatchMind({ participants }: CatchMindProps) {
   // event handlers
   const handlePencilMode = useCallback(() => {
     if (drawerId !== user?.userId) return;
-    if (stateRef.current !== CatchMindState.DRAW) return;
+    if (gameState !== CatchMindState.DRAW) return;
     setMode("pencil");
-  }, [drawerId, user]);
+  }, [drawerId, user, gameState]);
 
   const handleEraserMode = useCallback(() => {
     if (drawerId !== user?.userId) return;
-    if (stateRef.current !== CatchMindState.DRAW) return;
+    if (gameState !== CatchMindState.DRAW) return;
     setMode("eraser");
-  }, [drawerId, user]);
+  }, [drawerId, user, gameState]);
 
   const handleLineWidth = useCallback(
     (line: "THIN" | "NORMAL" | "THICK") => {
       if (drawerId !== user?.userId) return;
-      if (stateRef.current !== CatchMindState.DRAW) return;
+      if (gameState !== CatchMindState.DRAW) return;
       setLine(line);
 
       const ctx = getContextObject();
@@ -202,22 +202,22 @@ export default function CatchMind({ participants }: CatchMindProps) {
       }
       ctx.closePath();
     },
-    [drawerId, user, getContextObject]
+    [drawerId, user, getContextObject, gameState]
   );
 
   const handleClear = useCallback(() => {
     if (drawerId !== user?.userId) return;
-    if (stateRef.current !== CatchMindState.DRAW) return;
+    if (gameState !== CatchMindState.DRAW) return;
     clearCanvas();
-  }, [drawerId, user, clearCanvas]);
+  }, [drawerId, user, clearCanvas, gameState]);
 
   const handleSelectColor = useCallback(
     (color: string) => {
-      if (user?.userId !== drawerId || stateRef.current !== CatchMindState.DRAW) return;
+      if (user?.userId !== drawerId || gameState !== CatchMindState.DRAW) return;
       setMode("pencil");
       setCurrentColor(color);
     },
-    [drawerId, user]
+    [drawerId, user?.userId, gameState]
   );
 
   useEffect(() => {
@@ -227,7 +227,7 @@ export default function CatchMind({ participants }: CatchMindProps) {
   useEffect(() => {
     socket.on("catch-mind/round-start", data => {
       console.log("round start:", data);
-      stateRef.current = CatchMindState.WAIT;
+      setGameState(CatchMindState.WAIT);
 
       if (data.answer) setInfoText(infoText);
       setRound(data.round);
@@ -251,7 +251,8 @@ export default function CatchMind({ participants }: CatchMindProps) {
 
   useEffect(() => {
     socket.on("catch-mind/draw-start", data => {
-      stateRef.current = CatchMindState.DRAW;
+      console.log("draw-start :", data);
+      setGameState(CatchMindState.DRAW);
 
       clearCanvas();
       writeCenter(`Round ${data.round} 시작!`);
@@ -270,7 +271,7 @@ export default function CatchMind({ participants }: CatchMindProps) {
 
   useEffect(() => {
     socket.on("catch-mind/result", data => {
-      stateRef.current = CatchMindState.RESULT;
+      setGameState(CatchMindState.RESULT);
       setCurrentScore(data);
       clearCanvas();
       const ctx = getContextObject();
@@ -284,7 +285,7 @@ export default function CatchMind({ participants }: CatchMindProps) {
     return () => {
       socket.off("catch-mind/result");
     };
-  }, [socket, clearCanvas, getContextObject, writeCenter, setCurrentScore]);
+  }, [socket, clearCanvas, writeCenter, getContextObject, setCurrentScore]);
 
   // 타이머
   useEffect(() => {
@@ -302,9 +303,10 @@ export default function CatchMind({ participants }: CatchMindProps) {
   }, []);
 
   useEffect(() => {
+    if (!canvasRef.current) return;
     const canvas = canvasRef.current;
-    if (!canvas) return;
-    if (stateRef.current !== CatchMindState.DRAW) return;
+
+    if (gameState !== CatchMindState.DRAW) return;
     if (drawerId !== user?.userId) return;
     canvas.addEventListener("mousedown", startDrawing);
     canvas.addEventListener("mousemove", onDrawing);
@@ -316,7 +318,7 @@ export default function CatchMind({ participants }: CatchMindProps) {
       canvas.removeEventListener("mouseup", stopDrawing);
       canvas.removeEventListener("mouseleave", stopDrawing);
     };
-  }, [startDrawing, onDrawing, stopDrawing, drawerId, user]);
+  }, [startDrawing, onDrawing, stopDrawing, drawerId, user?.userId, gameState]);
 
   useEffect(() => {
     setCurrentScore(null);
@@ -337,7 +339,7 @@ export default function CatchMind({ participants }: CatchMindProps) {
       const image = new Image();
       image.onload = () => {
         if (roundRef.current !== data.round) return;
-        if (stateRef.current !== CatchMindState.DRAW) return;
+        if (gameState !== CatchMindState.DRAW) return;
         const ctx = getContextObject();
         ctx.drawImage(image, 0, 0);
       };
@@ -346,7 +348,7 @@ export default function CatchMind({ participants }: CatchMindProps) {
     return () => {
       socket.off("catch-mind/image");
     };
-  }, [socket, getContextObject]);
+  }, [socket, getContextObject, gameState]);
 
   useEffect(() => {
     socket.on("catch-mind/end", () => {
