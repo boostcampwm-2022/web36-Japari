@@ -57,7 +57,7 @@ const WaitingRoomInfo = ({ roomRecord, participants }: WaitingRoomInfoProps) => 
           {participants.map(participant => {
             const videoStreamInfo = videoStream.get(participant.email);
             const audioStreamInfo = audioStream.get(participant.email);
-
+            console.log(audioStreamInfo);
             return (
               <div key={participant.userId}>
                 {videoStreamInfo ? (
