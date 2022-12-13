@@ -14,10 +14,11 @@ export interface ModalProps {
   gameId?: number;
   roomName?: string;
   roomId?: string;
+  roomSettingMode?: "CREATE" | "MODIFY";
   closeModal: () => void;
 }
 
-const Modal = ({ ModalType, user, gameId, roomName, closeModal, roomId }: ModalProps) => {
+const Modal = ({ ModalType, user, gameId, roomName, closeModal, roomId, roomSettingMode }: ModalProps) => {
   let modalTitle = "";
   let content = null;
 
@@ -28,7 +29,7 @@ const Modal = ({ ModalType, user, gameId, roomName, closeModal, roomId }: ModalP
       break;
     case "방 설정":
       modalTitle = "방 설정";
-      content = <RoomSetting closeModal={closeModal} />;
+      content = <RoomSetting closeModal={closeModal} mode={roomSettingMode!} />;
       break;
     case "비밀번호 입력":
       modalTitle = "비밀번호 입력";

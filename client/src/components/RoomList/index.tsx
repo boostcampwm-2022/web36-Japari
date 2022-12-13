@@ -62,12 +62,15 @@ const RoomList = ({ rooms }: RoomListProps) => {
 
   useEffect(() => {
     socket.on("game-room/create-success", data => {
+      setCreateRoomModalOpen(false);
       navigate(`/waiting/${data.roomId}`);
     });
     socket.on("game-room/password-success", data => {
+      setPasswordModalOpen(false);
       navigate(`/waiting/${data.roomId}`);
     });
-    socket.on("game-room/password-failed", data => {
+    socket.on("game-room/password-failed", () => {
+      setPasswordModalOpen(false);
       alert("비밀번호가 틀렸습니다.");
     });
 
@@ -96,7 +99,9 @@ const RoomList = ({ rooms }: RoomListProps) => {
           <Select selectType="게임 필터" setValue={setGameType} />
         </div>
         <Button buttonType="방 만들기" handleClick={() => setCreateRoomModalOpen(true)} />
-        {createRoomModalOpen && <Modal ModalType="방 설정" closeModal={() => setCreateRoomModalOpen(false)} />}
+        {createRoomModalOpen && (
+          <Modal ModalType="방 설정" closeModal={() => setCreateRoomModalOpen(false)} roomSettingMode="CREATE" />
+        )}
       </div>
 
       <div css={style.roomListStyle}>
