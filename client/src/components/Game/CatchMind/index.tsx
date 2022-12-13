@@ -226,7 +226,6 @@ export default function CatchMind({ participants }: CatchMindProps) {
 
   useEffect(() => {
     socket.on("catch-mind/round-start", data => {
-      console.log("round start:", data);
       setGameState(CatchMindState.WAIT);
 
       if (data.answer) setInfoText(infoText);
@@ -251,7 +250,6 @@ export default function CatchMind({ participants }: CatchMindProps) {
 
   useEffect(() => {
     socket.on("catch-mind/draw-start", data => {
-      console.log("draw-start :", data);
       setGameState(CatchMindState.DRAW);
 
       clearCanvas();
