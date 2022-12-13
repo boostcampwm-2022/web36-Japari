@@ -224,9 +224,7 @@ export class MediaGateway implements OnGatewayInit, OnGatewayConnection, OnGatew
   };
 
   getTransport = (socketId: string) => {
-    const [producerTransport] = this.transports.filter(
-      transport => transport.socketId === socketId && !transport.consumer
-    );
+    const producerTransport = this.transports.find(transport => transport.socketId === socketId && !transport.consumer);
     return producerTransport.transport;
   };
 
@@ -238,8 +236,9 @@ export class MediaGateway implements OnGatewayInit, OnGatewayConnection, OnGatew
   ) {
     const consumerTransport = this.transports.find(
       transportData => transportData.consumer && transportData.transport.id == serverConsumerTransportId
-    ).transport;
-    await consumerTransport.connect({ dtlsParameters });
+    );
+    if (!consumerTransport) return;
+    await consumerTransport.transport.connect({ dtlsParameters });
   }
 
   @SubscribeMessage("media/consume")
@@ -255,9 +254,10 @@ export class MediaGateway implements OnGatewayInit, OnGatewayConnection, OnGatew
     const { roomId } = this.peers[socket.id];
     const router = this.rooms[roomId].router;
 
-    let consumerTransport = this.transports.find(
+    const consumerTransport = this.transports.find(
       transportData => transportData.consumer && transportData.transport.id == serverConsumerTransportId
-    ).transport;
+    );
+    if (!consumerTransport) return;
 
     if (
       router.canConsume({
@@ -265,7 +265,7 @@ export class MediaGateway implements OnGatewayInit, OnGatewayConnection, OnGatew
         rtpCapabilities,
       })
     ) {
-      const consumer = await consumerTransport.consume({
+      const consumer = await consumerTransport.transport.consume({
         producerId: remoteProducerId,
         rtpCapabilities,
         paused: true,
@@ -273,7 +273,7 @@ export class MediaGateway implements OnGatewayInit, OnGatewayConnection, OnGatew
 
       consumer.on("producerclose", () => {
         socket.emit("media/producer-closed", remoteProducerId);
-        consumerTransport.close([]);
+        consumerTransport.transport.close([]);
         this.transports = this.transports.filter(transportData => transportData.transport.id !== consumerTransport.id);
         consumer.close();
         this.consumers = this.consumers.filter(consumerData => consumerData.consumer.id !== consumer.id);
@@ -299,6 +299,8 @@ export class MediaGateway implements OnGatewayInit, OnGatewayConnection, OnGatew
     @MessageBody() { serverConsumerId }: { serverConsumerId: string }
   ) {
     const { consumer } = this.consumers.find(consumerData => consumerData.consumer.id === serverConsumerId);
+    if (!consumer) return;
+
     await consumer.resume();
   }
 
