@@ -16,7 +16,7 @@ import Modal from "../Modal";
 
 import micOn from "../../assets/icons/mic-on.svg";
 import micOff from "../../assets/icons/mic-off.svg";
-import çamOn from "../../assets/icons/cam-on.svg";
+import camOn from "../../assets/icons/cam-on.svg";
 import camOff from "../../assets/icons/cam-off.svg";
 
 export interface WaitingRoomInfoProps {
