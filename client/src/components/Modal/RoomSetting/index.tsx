@@ -3,7 +3,7 @@ import Input from "../../Input";
 import Button from "../../Button";
 import Select from "../../Select";
 import * as style from "./styles";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useRecoilValue } from "recoil";
 import { socketState } from "../../../store/socket";
 

@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { useRecoilState } from "recoil";
 import { getLoggedInUser } from "../api/user";
 import { userState } from "../store/user";

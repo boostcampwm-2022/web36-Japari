@@ -12,6 +12,7 @@ import { socketState } from "../../store/socket";
 import { useLocation, useNavigate } from "react-router-dom";
 import useSocketConnect from "../../hooks/useSocketConnect";
 import useSetUser from "../../hooks/useSetUser";
+import { soundState } from "../../store/sound";
 
 export type GameRoom = {
   title: string;
@@ -28,6 +29,7 @@ const WaitingPage: React.FC = () => {
   const socket = useRecoilValue(socketState);
   const user = useRecoilValue(userState);
   const [room, setRoom] = useState<GameRoom | null>(null);
+  const [sound, soundId] = useRecoilValue(soundState);
 
   const location = useLocation();
   const roomId = location.pathname.split("/").slice(-1)[0];
@@ -54,6 +56,14 @@ const WaitingPage: React.FC = () => {
       socket.emit("wait-room/exit");
     };
   }, [socket, navigate, roomId]);
+
+  useEffect(() => {
+    sound.volume(0.05, soundId);
+
+    return () => {
+      sound.volume(0.1, soundId);
+    };
+  }, [sound, soundId]);
 
   return (
     <Page>

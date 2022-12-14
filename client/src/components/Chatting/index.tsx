@@ -1,5 +1,5 @@
 /** @jsxImportSource @emotion/react */
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import ChatLog from "./ChatLog";
 import ChatInput from "./ChatInput";
 import * as style from "./styles";
@@ -23,7 +23,7 @@ const Chatting = () => {
     setLogs((current: Chat[]) => [...current, newLog]);
   };
 
-  const checkLocation = () => {
+  const checkLocation = useCallback(() => {
     const currentPage = location.pathname.split("/").slice(1)[0];
     switch (currentPage) {
       case "lobby":
@@ -34,11 +34,11 @@ const Chatting = () => {
         setChannel("chat/room");
         return;
     }
-  };
+  }, [location.pathname]);
 
   useEffect(() => {
     checkLocation();
-  }, []);
+  }, [checkLocation]);
 
   useEffect(() => {
     if (channel === "") return;
