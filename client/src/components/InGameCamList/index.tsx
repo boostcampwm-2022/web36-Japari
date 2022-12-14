@@ -25,7 +25,6 @@ const InGameCamList = ({ participants, videoStream, audioStream }: InGameCamList
       {participants.map(participant => {
         const videoStreamInfo = videoStream.get(participant.email);
         const audioStreamInfo = audioStream.get(participant.email);
-
         return (
           <div key={participant.userId}>
             {videoStreamInfo ? (

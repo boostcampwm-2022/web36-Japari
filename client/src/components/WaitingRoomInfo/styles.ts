@@ -47,3 +47,19 @@ export const footerStyle = css`
   justify-content: end;
   gap: 2rem;
 `;
+
+export const camBoxStyle = css`
+  position: relative;
+  z-index: 0;
+`;
+
+export const micStyle = css`
+  width: 1rem;
+  z-index: 1;
+  position: absolute;
+  left: 75%;
+  top: 55%;
+  border: 0.1em white solid;
+  border-radius: 25rem;
+  background-color: white;
+`;
