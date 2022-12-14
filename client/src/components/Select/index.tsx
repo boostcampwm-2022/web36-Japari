@@ -32,7 +32,9 @@ const Select = ({ selectType, width, setValue }: SelectProps) => {
           >
             <option value={0}>모든 게임</option>
             <option value={1}>캐치 마인드</option>
-            <option value={2}>배틀십</option>
+            <option value={2} disabled>
+              배틀십
+            </option>
           </select>
         </div>
       );
@@ -52,7 +54,9 @@ const Select = ({ selectType, width, setValue }: SelectProps) => {
               게임을 선택해 주세요.
             </option>
             <option value={1}>캐치 마인드</option>
-            <option value={2}>배틀십</option>
+            <option value={2} disabled>
+              배틀십
+            </option>
           </select>
         </div>
       );
