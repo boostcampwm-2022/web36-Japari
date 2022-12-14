@@ -40,18 +40,22 @@ const WaitingRoomInfo = ({ roomRecord, participants }: WaitingRoomInfoProps) => 
 
   const initializeMediaStatus = useCallback(
     (participant: User, videoStreamInfo: StreamInfo | undefined, audioStreamInfo: StreamInfo | undefined) => {
-      if (!videoStreamInfo || !audioStreamInfo) return;
-      setRemoteVideoOnOff(current => {
-        const newMap = new Map(current);
-        newMap.set(participant.userId, videoStreamInfo.mediaStream.getVideoTracks()[0].enabled);
-        return newMap;
-      });
-
-      setRemoteAudioOnOff(current => {
-        const newMap = new Map(current);
-        remoteAudioOnOff.set(participant.userId, audioStreamInfo.mediaStream.getAudioTracks()[0].enabled);
-        return newMap;
-      });
+      if (videoStreamInfo) {
+        setRemoteVideoOnOff(current => {
+          const newMap = new Map(current);
+          newMap.set(participant.userId, videoStreamInfo.mediaStream.getVideoTracks()[0].enabled);
+          return newMap;
+        });
+      }
+      if (audioStreamInfo) {
+        setRemoteAudioOnOff(current => {
+          const newMap = new Map(current);
+          newMap.set(participant.userId, audioStreamInfo.mediaStream.getAudioTracks()[0].enabled);
+          return newMap;
+        });
+      }
+      console.log(videoStreamInfo);
+      console.log(audioStreamInfo);
     },
     []
   );
@@ -115,6 +119,10 @@ const WaitingRoomInfo = ({ roomRecord, participants }: WaitingRoomInfoProps) => 
     };
   }, [socket]);
 
+  useEffect(() => {
+    console.log(remoteAudioOnOff);
+  }, [remoteAudioOnOff]);
+
   return (
     <div css={style.waitingRoomInfoStyle}>
       <div css={style.headerStyle}>
@@ -134,7 +142,7 @@ const WaitingRoomInfo = ({ roomRecord, participants }: WaitingRoomInfoProps) => 
                 {videoStreamInfo ? (
                   <Cam
                     mediaStream={videoStreamInfo.mediaStream ?? null}
-                    isVideoOn={true}
+                    isVideoOn={remoteVideoOnOff.get(participant.userId)}
                     userInfo={videoStreamInfo.userInfo}
                   />
                 ) : (
