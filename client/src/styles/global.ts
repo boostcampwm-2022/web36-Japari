@@ -171,7 +171,7 @@ export const globalStyle = css`
 
   * {
     font-family: "LINESeedKR";
-    font-size: 16px;
+    font-size: max(8px, min(1vw, 100vh / 62));
   }
 
   body {

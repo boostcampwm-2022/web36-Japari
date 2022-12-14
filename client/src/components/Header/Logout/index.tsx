@@ -20,7 +20,7 @@ const RoomRecord = () => {
 
   return (
     <div css={style.logoutContainerStyle} onClick={handleLogout}>
-      <img src={logoutIcon} alt="logoutIcon" />
+      <img css={style.logoutIconStyle} src={logoutIcon} alt="logoutIcon" />
       <span css={style.logoutTextStyle}>로그아웃</span>
     </div>
   );

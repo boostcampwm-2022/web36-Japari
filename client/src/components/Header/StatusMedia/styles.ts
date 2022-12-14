@@ -19,3 +19,7 @@ export const micCamButtonStyle = css`
     filter: invert(50%);
   }
 `;
+
+export const micIconStyle = css`
+  width: 3rem;
+`;

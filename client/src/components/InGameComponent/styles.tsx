@@ -18,7 +18,7 @@ export const GameAndChatContainerStyle = css`
 export const GameContainerStyle = (theme: Theme) => css`
   background-color: ${theme.colors.secondary};
   height: 40rem;
-  width: 60rem;
+  width: 72.5rem;
   border-radius: 0.75rem;
   text-align: center;
   padding: 2rem;

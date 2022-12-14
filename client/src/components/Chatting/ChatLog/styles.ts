@@ -17,4 +17,5 @@ export const ChatLogContainerStyle = css`
 export const ChatLogStyle = css`
   display: flex;
   gap: 0.25rem;
+  word-break: break-all;
 `;
