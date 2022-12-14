@@ -1,5 +1,5 @@
 /** @jsxImportSource @emotion/react */
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useRecoilValue } from "recoil";
 import { socketState } from "../../store/socket";
@@ -38,24 +38,23 @@ const WaitingRoomInfo = ({ roomRecord, participants }: WaitingRoomInfoProps) => 
 
   const [modifyRoomModalOpen, setModifyRoomModalOpen] = useState<boolean>(false);
 
-  const initializeMediaStatus = (
-    participant: User,
-    videoStreamInfo: StreamInfo | undefined,
-    audioStreamInfo: StreamInfo | undefined
-  ) => {
-    if (!videoStreamInfo || !audioStreamInfo) return;
-    setRemoteVideoOnOff(current => {
-      const newMap = new Map(current);
-      newMap.set(participant.userId, videoStreamInfo.mediaStream.getVideoTracks()[0].enabled);
-      return newMap;
-    });
+  const initializeMediaStatus = useCallback(
+    (participant: User, videoStreamInfo: StreamInfo | undefined, audioStreamInfo: StreamInfo | undefined) => {
+      if (!videoStreamInfo || !audioStreamInfo) return;
+      setRemoteVideoOnOff(current => {
+        const newMap = new Map(current);
+        newMap.set(participant.userId, videoStreamInfo.mediaStream.getVideoTracks()[0].enabled);
+        return newMap;
+      });
 
-    setRemoteAudioOnOff(current => {
-      const newMap = new Map(current);
-      remoteAudioOnOff.set(participant.userId, audioStreamInfo.mediaStream.getAudioTracks()[0].enabled);
-      return newMap;
-    });
-  };
+      setRemoteAudioOnOff(current => {
+        const newMap = new Map(current);
+        remoteAudioOnOff.set(participant.userId, audioStreamInfo.mediaStream.getAudioTracks()[0].enabled);
+        return newMap;
+      });
+    },
+    []
+  );
 
   const handleRoomRecordClick = () => {
     setModifyRoomModalOpen(true);
@@ -89,7 +88,7 @@ const WaitingRoomInfo = ({ roomRecord, participants }: WaitingRoomInfoProps) => 
       const audioStreamInfo = audioStream.get(participant.email);
       initializeMediaStatus(participant, videoStreamInfo, audioStreamInfo);
     });
-  }, []);
+  }, [videoStream, audioStream, initializeMediaStatus, participants]);
 
   useEffect(() => {
     socket.on("game-room/error", errorMessage => {
