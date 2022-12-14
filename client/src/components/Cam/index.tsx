@@ -9,7 +9,7 @@ import { useLocation } from "react-router-dom";
 
 export interface CamProps {
   mediaStream: MediaStream | null;
-  isVideoOn: boolean;
+  isVideoOn: boolean | undefined;
   userInfo: User;
 }
 

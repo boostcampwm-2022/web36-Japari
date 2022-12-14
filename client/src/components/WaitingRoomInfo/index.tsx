@@ -44,7 +44,6 @@ const WaitingRoomInfo = ({ roomRecord, participants }: WaitingRoomInfoProps) => 
     audioStreamInfo: StreamInfo | undefined
   ) => {
     if (!videoStreamInfo || !audioStreamInfo) return;
-    console.log("이니셜라이즈");
     setRemoteVideoOnOff(current => {
       const newMap = new Map(current);
       newMap.set(participant.userId, videoStreamInfo.mediaStream.getVideoTracks()[0].enabled);
@@ -54,7 +53,6 @@ const WaitingRoomInfo = ({ roomRecord, participants }: WaitingRoomInfoProps) => 
     setRemoteAudioOnOff(current => {
       const newMap = new Map(current);
       remoteAudioOnOff.set(participant.userId, audioStreamInfo.mediaStream.getAudioTracks()[0].enabled);
-      // remoteAudioOnOff.get(participant.userId);
       return newMap;
     });
   };
@@ -98,8 +96,6 @@ const WaitingRoomInfo = ({ roomRecord, participants }: WaitingRoomInfoProps) => 
       alert(errorMessage);
     });
     socket.on("audio-status/modify", ({ userInfo, audioStatus }) => {
-      console.log("오디오 유즈이펙트");
-      console.log(userInfo, audioStatus);
       setRemoteAudioOnOff(current => {
         const newMap = new Map(current);
         newMap.set(userInfo.userId, audioStatus);
@@ -107,7 +103,6 @@ const WaitingRoomInfo = ({ roomRecord, participants }: WaitingRoomInfoProps) => 
       });
     });
     socket.on("video-status/modify", ({ userInfo, videoStatus }) => {
-      console.log("비디오 유즈이펙트");
       setRemoteVideoOnOff(current => {
         const newMap = new Map(current);
         newMap.set(userInfo.userId, videoStatus);
@@ -134,10 +129,9 @@ const WaitingRoomInfo = ({ roomRecord, participants }: WaitingRoomInfoProps) => 
           {participants.map(participant => {
             const videoStreamInfo = videoStream.get(participant.email);
             const audioStreamInfo = audioStream.get(participant.email);
-            console.log(remoteAudioOnOff.get(participant.userId));
 
             return (
-              <div key={participant.userId}>
+              <div css={style.camBoxStyle} key={participant.userId}>
                 {videoStreamInfo ? (
                   <Cam
                     mediaStream={videoStreamInfo.mediaStream ?? null}
@@ -152,9 +146,9 @@ const WaitingRoomInfo = ({ roomRecord, participants }: WaitingRoomInfoProps) => 
                 )}
                 {participant.userId !== user?.userId &&
                   (remoteAudioOnOff.get(participant.userId) ? (
-                    <img src={micOn} alt="mic-on" />
+                    <img css={style.micStyle} src={micOn} alt="mic-on" />
                   ) : (
-                    <img src={micOff} alt="mic-off" />
+                    <img css={style.micStyle} src={micOff} alt="mic-off" />
                   ))}
               </div>
             );
