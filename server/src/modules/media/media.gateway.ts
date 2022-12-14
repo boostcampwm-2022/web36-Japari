@@ -337,6 +337,32 @@ export class MediaGateway implements OnGatewayInit, OnGatewayConnection, OnGatew
     }
   }
 
+  @SubscribeMessage("audio-status/modify")
+  async handleAudioStatus(@ConnectedSocket() socket: Socket, @MessageBody() audioStatus: boolean) {
+    const { roomId } = this.peers[socket.id];
+    const userInfo = JSON.parse(await this.redis.hget(RedisTableName.SOCKET_ID_TO_USER_INFO, socket.id));
+
+    this.rooms[roomId].peers.forEach((peerSocketId: string) => {
+      if (peerSocketId !== socket.id) {
+        const peerSocket = this.peers[peerSocketId].socket;
+        peerSocket.emit("audio-status/modify", { userInfo, audioStatus });
+      }
+    });
+  }
+
+  @SubscribeMessage("video-status/modify")
+  async handleVideoStatus(@ConnectedSocket() socket: Socket, @MessageBody() videoStatus: boolean) {
+    const { roomId } = this.peers[socket.id];
+    const userInfo = JSON.parse(await this.redis.hget(RedisTableName.SOCKET_ID_TO_USER_INFO, socket.id));
+
+    this.rooms[roomId].peers.forEach((peerSocketId: string) => {
+      if (peerSocketId !== socket.id) {
+        const peerSocket = this.peers[peerSocketId].socket;
+        peerSocket.emit("video-status/modify", { userInfo, videoStatus });
+      }
+    });
+  }
+
   handleConnection(@ConnectedSocket() socket: Socket) {}
 
   handleDisconnect(@ConnectedSocket() socket: Socket) {
