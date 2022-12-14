@@ -1,5 +1,5 @@
 /** @jsxImportSource @emotion/react */
-import Cam, { CamProps } from "../Cam";
+import Cam from "../Cam";
 import * as style from "./styles";
 import { User } from "@dto";
 import { StreamInfo } from "../../hooks/useCams";

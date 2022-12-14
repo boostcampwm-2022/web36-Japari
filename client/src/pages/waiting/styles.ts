@@ -1,4 +1,4 @@
-import { css, Theme } from "@emotion/react";
+import { css } from "@emotion/react";
 
 export const WaitingContentContainerStyle = css`
   display: flex;

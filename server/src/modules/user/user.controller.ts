@@ -26,9 +26,9 @@ export class UserController {
     return this.userService.findUser(req.user.userId);
   }
 
-  @Get("/list")
-  async getUserList() {
-    return this.userService.findAllUser();
+  @Get("/top")
+  async getTopUsers() {
+    return this.userService.findTopTenUser();
   }
 
   @UsePipes(ValidationPipe)

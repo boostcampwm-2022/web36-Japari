@@ -5,7 +5,7 @@ import { Consumer } from "mediasoup-client/lib/Consumer";
 import { ProducerOptions } from "mediasoup-client/lib/Producer";
 import { MediaKind, RtpCapabilities, RtpParameters } from "mediasoup-client/lib/RtpParameters";
 import { Transport, TransportOptions } from "mediasoup-client/lib/Transport";
-import { Fragment, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { useRecoilValue, useRecoilState } from "recoil";
 import { socketState } from "../store/socket";
@@ -26,7 +26,7 @@ export type StreamInfo = {
 };
 
 export const useCams = () => {
-  const [localStream, setLocalStream] = useRecoilState(streamState);
+  const [, setLocalStream] = useRecoilState(streamState);
   const audio = useRecoilValue(audioState);
   const video = useRecoilValue(videoState);
   const socket = useRecoilValue(socketState);
@@ -61,6 +61,7 @@ export const useCams = () => {
       videoGoogleStartBitrate: 1000,
     },
   };
+  let localUserMedia: boolean = true;
   let audioParams: ProducerOptions;
   let videoParams: ProducerOptions = params;
   let producerTransport: Transport;
@@ -79,6 +80,8 @@ export const useCams = () => {
       })
       .then(streamSuccess)
       .catch(error => {
+        localUserMedia = false;
+        joinRoom();
         console.log(error.message);
       });
   };
@@ -120,6 +123,10 @@ export const useCams = () => {
   };
 
   const createSendTransport = async () => {
+    if (!localUserMedia) {
+      getProducers();
+      return;
+    }
     socket.emit("media/createWebRtcTransport", { consumer: false }, (transportOptions: TransportOptions) => {
       producerTransport = device.createSendTransport(transportOptions);
       handleCreateProducerTransport();

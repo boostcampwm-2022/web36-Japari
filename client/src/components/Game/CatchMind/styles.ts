@@ -1,13 +1,35 @@
 import { css } from "@emotion/react";
+import palleteCoverTexture from "../../../assets/images/oak-texture-background.webp";
 
 export const gameWrapperStyle = css`
   display: flex;
   gap: 1rem;
 `;
 
+export const paletteLockStyle = css`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  border-radius: 5px;
+  position: absolute;
+  top: -0.1rem;
+  right: -0.1rem;
+  z-index: 1;
+
+  border: 1.5px solid burlywood;
+  background-image: url(${palleteCoverTexture});
+
+  > img {
+    width: 3rem;
+    height: 3rem;
+  }
+`;
+
 export const paletteStyle = css`
   position: relative;
-  bottom: 6px;
+  bottom: 0px;
 
   display: flex;
   flex-direction: column;
@@ -15,7 +37,6 @@ export const paletteStyle = css`
   align-items: center;
 
   width: 15rem;
-  /* height: 40rem; */
   background-color: burlywood;
   border: 1px solid black;
   border-radius: 5px;
@@ -145,8 +166,8 @@ export const timerStyle = css`
   gap: 1rem;
 `;
 
-export const answerStyle = css`
-  color: tomato;
+export const answerStyle = (isAnswer: boolean) => css`
+  color: ${isAnswer ? "tomato" : "darkslateblue"};
   font-weight: bold;
 `;
 

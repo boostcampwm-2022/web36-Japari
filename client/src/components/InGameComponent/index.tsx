@@ -24,7 +24,7 @@ const InGameComponent = ({ room }: InGameComponentProps) => {
       <div css={style.GameAndChatContainerStyle}>
         <div css={style.GameContainerStyle}>
           {/* <Game gameId={location.state.gameId} /> */}
-          <Game gameId={1} />
+          <Game gameId={1} participants={room.participants} />
         </div>
         <Chatting />
       </div>

@@ -1,5 +1,4 @@
 /** @jsxImportSource @emotion/react */
-import { Oval } from "react-loader-spinner";
 import Spinner from "./Spinner";
 import * as style from "./styles";
 

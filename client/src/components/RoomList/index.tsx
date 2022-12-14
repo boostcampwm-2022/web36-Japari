@@ -1,5 +1,5 @@
 /** @jsxImportSource @emotion/react */
-import React, { useEffect, useState, Fragment } from "react";
+import { useEffect, useState, Fragment } from "react";
 import { useNavigate } from "react-router-dom";
 import { useRecoilValue } from "recoil";
 import { socketState } from "../../store/socket";
@@ -16,6 +16,7 @@ export interface Room {
   gameId: number;
   currentPeople: number;
   maximumPeople: number;
+  minimumPeople: number;
   isPrivate: boolean;
 }
 
@@ -31,9 +32,11 @@ const RoomList = ({ rooms }: RoomListProps) => {
   const [filteredRooms, setFilteredRooms] = useState<Room[]>([]);
   const [createRoomModalOpen, setCreateRoomModalOpen] = useState<boolean>(false);
   const [passwordModalOpen, setPasswordModalOpen] = useState<boolean>(false);
+  const [selectedRoomId, setSelectedRoomId] = useState<string>("");
 
   const onClickRecord = (roomId: string, isPrivate: boolean) => {
     if (isPrivate) {
+      setSelectedRoomId(roomId);
       setPasswordModalOpen(true);
       return;
     }
@@ -59,12 +62,15 @@ const RoomList = ({ rooms }: RoomListProps) => {
 
   useEffect(() => {
     socket.on("game-room/create-success", data => {
+      setCreateRoomModalOpen(false);
       navigate(`/waiting/${data.roomId}`);
     });
     socket.on("game-room/password-success", data => {
+      setPasswordModalOpen(false);
       navigate(`/waiting/${data.roomId}`);
     });
-    socket.on("game-room/password-failed", data => {
+    socket.on("game-room/password-failed", () => {
+      setPasswordModalOpen(false);
       alert("비밀번호가 틀렸습니다.");
     });
 
@@ -93,19 +99,21 @@ const RoomList = ({ rooms }: RoomListProps) => {
           <Select selectType="게임 필터" setValue={setGameType} />
         </div>
         <Button buttonType="방 만들기" handleClick={() => setCreateRoomModalOpen(true)} />
-        {createRoomModalOpen && <Modal ModalType="방 설정" closeModal={() => setCreateRoomModalOpen(false)} />}
+        {createRoomModalOpen && (
+          <Modal ModalType="방 설정" closeModal={() => setCreateRoomModalOpen(false)} roomSettingMode="CREATE" />
+        )}
       </div>
 
       <div css={style.roomListStyle}>
         {filteredRooms.map(room => (
           <Fragment key={room.roomId}>
             <RoomRecord {...room} onClickRecord={() => onClickRecord(room.roomId, room.isPrivate)} />
-            {passwordModalOpen && (
-              <Modal ModalType="비밀번호 입력" roomId={room.roomId} closeModal={() => setPasswordModalOpen(false)} />
-            )}
           </Fragment>
         ))}
       </div>
+      {passwordModalOpen && (
+        <Modal ModalType="비밀번호 입력" roomId={selectedRoomId} closeModal={() => setPasswordModalOpen(false)} />
+      )}
     </div>
   );
 };

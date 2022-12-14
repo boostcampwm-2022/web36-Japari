@@ -11,6 +11,7 @@ import { Server, Socket } from "socket.io";
 import { SERVER_SOCKET_PORT } from "./constants/config";
 import { RedisTableName } from "./constants/enum";
 import { GameRoomGateway } from "./modules/game-room/game-room.gateway";
+import { CatchMindGateway } from "./modules/play/catch-mind.gateway";
 import { PrismaService } from "./modules/prisma/prisma.service";
 import { RedisService } from "./modules/redis/redis.service";
 
@@ -19,7 +20,12 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
   @WebSocketServer() public server: Server;
   private logger = new Logger("App Gateway");
 
-  constructor(private prisma: PrismaService, private redis: RedisService, private gameRoomGateway: GameRoomGateway) {}
+  constructor(
+    private prisma: PrismaService,
+    private redis: RedisService,
+    private gameRoomGateway: GameRoomGateway,
+    private catchMindGateway: CatchMindGateway
+  ) {}
 
   afterInit(server: Server) {
     this.logger.verbose("app gateway initiated");
@@ -60,11 +66,15 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
   }
 
   async handleDisconnect(@ConnectedSocket() socket: Socket) {
-    this.logger.warn(`socket ${socket.id} disconnected`);
-
     // Redis 테이블 갱신
 
-    // 1. online-users
+    // 1. play-data
+    await this.catchMindGateway.exit(socket);
+
+    // 2. game-rooms
+    await this.gameRoomGateway.exit(socket);
+
+    // 3. online-users
     // 같은 소켓 id를 value.socketId에 포함하는 레코드를 지운다.
     const allUsers = await this.redis.hgetall(RedisTableName.ONLINE_USERS);
     const userIdToRemove = Object.entries(allUsers)
@@ -76,63 +86,19 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 
     await this.redis.hdel(RedisTableName.ONLINE_USERS, String(userIdToRemove));
 
-    // 2. socket-id-to-user-info
+    // 4. socket-id-to-user-info
     // value.userId가 userIdToRemove인 레코드를 전부 지운다.
-    // 3. game-rooms
-    // key가 roomId인 레코드 room에 대하여
-    // room.patricipants를 순회하면서 userId가 userIdToRemove인 레코드를 전부 지운다.
-    // 4. play-data
-    // key가 roomId인 레코드 playData에 대하여
-    // playData.scores[userIdToRemove], playData.totalScores[userIdToRemove]를 삭제한다.
     const allSocketUsers = await this.redis.hgetall(RedisTableName.SOCKET_ID_TO_USER_INFO);
-    const relatedSocketIdAndRoomIdList = Object.entries(allSocketUsers)
+    const relatedSocketIdList = Object.entries(allSocketUsers)
       .map(([key, value]) => {
         return [key, JSON.parse(value)];
       })
       .filter(([, userInfo]) => userInfo.userId === userIdToRemove)
-      .map(([socketId, userInfo]) => [socketId, userInfo.roomId]);
+      .map(([socketId]) => socketId);
 
-    const usedRoomId = new Map();
-
-    for (const [socketId, roomId] of relatedSocketIdAndRoomIdList) {
+    for (const socketId of relatedSocketIdList) {
       // socket-id-to-user-info
       await this.redis.hdel(RedisTableName.SOCKET_ID_TO_USER_INFO, socketId);
-
-      // roomId 중복 체크
-      if (usedRoomId.has(roomId)) {
-        continue;
-      }
-      usedRoomId.set(roomId, true);
-
-      // game-rooms
-      const room = await this.redis.getFrom(RedisTableName.GAME_ROOMS, roomId);
-
-      if (room) {
-        room.participants = room.participants.filter(user => user.userId !== userIdToRemove);
-        this.server.to(roomId).emit("game-room/info", {
-          ...room,
-          participants: room.participants,
-        });
-        if (room.participants.length === 0) {
-          await this.redis.hdel(RedisTableName.GAME_ROOMS, roomId);
-        } else {
-          await this.redis.setTo(RedisTableName.GAME_ROOMS, roomId, room);
-        }
-      }
-
-      // play-data
-      const playData = await this.redis.getFrom(RedisTableName.PLAY_DATA, roomId);
-
-      if (playData) {
-        delete playData.scores[String(userIdToRemove)];
-        delete playData.totalScores[String(userIdToRemove)];
-
-        if (Object.keys(playData.scores).length === 0) {
-          await this.redis.hdel(RedisTableName.PLAY_DATA, roomId);
-        } else {
-          await this.redis.setTo(RedisTableName.PLAY_DATA, roomId, playData);
-        }
-      }
     }
   }
 }

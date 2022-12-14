@@ -20,12 +20,35 @@ export class UserService {
       where: { userId: id },
       select: getUserOption,
     });
+
     if (!userInfo) throw new NotFoundException();
-    return userInfo;
+
+    // 랭킹을 구한다.
+    const rank =
+      (await this.prisma.user.count({
+        where: {
+          score: {
+            gt: userInfo.score,
+          },
+        },
+      })) + 1;
+
+    return { ...userInfo, rank };
   }
 
-  async findAllUser() {
-    return this.prisma.user.findMany({ select: getUserOption });
+  async findTopTenUser() {
+    const promises = [];
+    const topUsers = await this.prisma.user.findMany({ select: getUserOption, orderBy: { score: "desc" }, take: 10 });
+    topUsers.forEach(user => {
+      promises.push(this.redis.getFrom(RedisTableName.ONLINE_USERS, String(user.userId)));
+    });
+    const onlineTopUsers = await Promise.all(promises);
+    return topUsers.map((topUser, index) => {
+      if (onlineTopUsers[index]) {
+        return { ...topUser, connected: true };
+      }
+      return { ...topUser, connected: false };
+    });
   }
 
   async updateUserNickname(userId: number, nickname: string) {

@@ -1,17 +1,18 @@
 /** @jsxImportSource @emotion/react */
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useRecoilValue } from "recoil";
 import { socketState } from "../../store/socket";
 import Button from "../Button";
 import Audio from "../Audio";
-import Cam, { CamProps } from "../Cam";
+import Cam from "../Cam";
 import { Room } from "../RoomList";
 import RoomRecord from "../RoomList/RoomRecord";
 import * as style from "./styles";
 import { User } from "@dto";
 import { useCams } from "../../hooks/useCams";
 import { userState } from "../../store/user";
+import Modal from "../Modal";
 
 export interface WaitingRoomInfoProps {
   roomRecord: Room;
@@ -25,9 +26,14 @@ export interface ProfileProps {
 const WaitingRoomInfo = ({ roomRecord, participants }: WaitingRoomInfoProps) => {
   const socket = useRecoilValue(socketState);
   const user = useRecoilValue(userState);
-  // [camList, setCamList] = useState<Cam[]>([]);
   const navigate = useNavigate();
   const { videoStream, audioStream } = useCams();
+
+  const [modifyRoomModalOpen, setModifyRoomModalOpen] = useState<boolean>(false);
+
+  const handleRoomRecordClick = () => {
+    setModifyRoomModalOpen(true);
+  };
 
   const handleRootOutButton = () => {
     navigate("/lobby");
@@ -35,6 +41,10 @@ const WaitingRoomInfo = ({ roomRecord, participants }: WaitingRoomInfoProps) => 
   };
 
   const handleGameStartButton = () => {
+    if (roomRecord.minimumPeople > participants.length) {
+      alert(`최소 인원 ${roomRecord.minimumPeople}명이 모여야 게임을 시작할 수 있습니다.`);
+      return;
+    }
     socket.emit("catch-mind/start");
   };
 
@@ -45,12 +55,25 @@ const WaitingRoomInfo = ({ roomRecord, participants }: WaitingRoomInfoProps) => 
     return () => {
       socket.off("play/start");
     };
+  }, [socket, navigate, roomRecord]);
+
+  useEffect(() => {
+    socket.on("game-room/error", errorMessage => {
+      alert(errorMessage);
+    });
+
+    return () => {
+      socket.off("game-room/error");
+    };
   }, [socket]);
 
   return (
     <div css={style.waitingRoomInfoStyle}>
       <div css={style.headerStyle}>
-        <RoomRecord {...roomRecord} />
+        <RoomRecord {...roomRecord} onClickRecord={handleRoomRecordClick} />
+        {modifyRoomModalOpen && (
+          <Modal ModalType="방 설정" closeModal={() => setModifyRoomModalOpen(false)} roomSettingMode="MODIFY" />
+        )}
       </div>
       <div css={style.mainWrapperStyle}>
         <div css={style.camListContainerStyle}>
