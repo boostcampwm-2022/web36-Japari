@@ -12,7 +12,6 @@ export const largeButtonStyle = css`
   width: 8rem;
   height: 2.5rem;
 
-  padding-top: 0.2rem; // 글자를 가운데로 정렬하는 용도
   font-weight: bold;
 `;
 
@@ -30,7 +29,6 @@ export const smallButtonStyle = css`
   width: 3.5rem;
   height: 1.5rem;
 
-  padding-top: 0.2rem; // 글자를 가운데로 정렬하는 용도
   font-weight: bold;
 `;
 
