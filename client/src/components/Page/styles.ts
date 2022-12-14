@@ -4,5 +4,5 @@ export const PageContainer = (theme: Theme) => css`
   background-color: ${theme.colors.primary};
   min-height: 100vh;
   display: inline-block;
-  min-width: 100%;
+  min-width: max(100%, 80rem);
 `;
