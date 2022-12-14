@@ -47,10 +47,12 @@ const UserList = () => {
 
   useEffect(() => {
     if (selected === 2) {
+      setLoading(true);
       getTopUsers().then(topUsers => {
         setUserMap(current => {
           return { ...current, topUsers };
         });
+        setLoading(false);
       });
     }
   }, [selected]);
