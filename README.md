@@ -2,6 +2,8 @@
 
 # 프로젝트 소개
 
+배포 URL: <a href="https://자파리.온라인.한국">자파리.온라인.한국</a>
+
 ![image](https://user-images.githubusercontent.com/86656921/205483722-9b8ecd8e-9823-4abc-a622-9b4d870c4413.png)
 
        * 자파리(Japari)는 ‘소꿉놀이’, ‘장난’, ‘장난하다’ 등의 의미를 갖고 있는 제주도 말입니다.
