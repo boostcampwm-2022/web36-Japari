@@ -80,7 +80,7 @@ const InGameCamList = ({ participants, videoStream, audioStream, socket }: InGam
         const videoStreamInfo = videoStream.get(participant.email);
         const audioStreamInfo = audioStream.get(participant.email);
         return (
-          <div key={participant.userId}>
+          <div css={style.camBoxStyle} key={participant.userId}>
             {videoStreamInfo ? (
               <Cam
                 mediaStream={videoStreamInfo.mediaStream ?? null}

@@ -32,7 +32,7 @@ const WaitingRoomInfo = ({ roomRecord, participants }: WaitingRoomInfoProps) => 
   const user = useRecoilValue(userState);
   const navigate = useNavigate();
   const { videoStream, audioStream } = useCams();
-  const [, setRemoteVideoOnOff] = useState<Map<number, boolean>>(new Map());
+  const [remoteVideoOnOff, setRemoteVideoOnOff] = useState<Map<number, boolean>>(new Map());
   const [remoteAudioOnOff, setRemoteAudioOnOff] = useState<Map<number, boolean>>(new Map());
   const [modifyRoomModalOpen, setModifyRoomModalOpen] = useState<boolean>(false);
   const [audio] = useRecoilState(audioState);

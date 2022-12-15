@@ -16,12 +16,17 @@ export const camWrapperStyle = (theme: Theme) => css`
 `;
 
 export const micStyle = css`
-  width: 1rem;
+  width: 1.5rem;
   z-index: 1;
   position: absolute;
-  left: 75%;
+  left: 80%;
   top: 55%;
   border: 0.1em white solid;
   border-radius: 25rem;
   background-color: white;
+`;
+
+export const camBoxStyle = css`
+  position: relative;
+  z-index: 0;
 `;
