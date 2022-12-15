@@ -5,6 +5,12 @@ export const TabContainerStyle = css`
   flex-direction: row;
   align-items: flex-end;
   margin-left: 0.75rem;
+
+  > li {
+    &:hover {
+      cursor: pointer;
+    }
+  }
 `;
 
 export const TabStyle = css`

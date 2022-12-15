@@ -65,4 +65,10 @@ export const ProfileScoreStyle = css`
   font-size: 0.8rem;
   font-weight: bold;
   margin-top: 1.25rem;
+
+  > span {
+    font-size: 0.8rem;
+    font-weight: bold;
+    color: mediumseagreen;
+  }
 `;

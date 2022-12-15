@@ -26,7 +26,7 @@ export type StreamInfo = {
 };
 
 export const useCams = () => {
-  const [localStream, setLocalStream] = useRecoilState(streamState);
+  const [, setLocalStream] = useRecoilState(streamState);
   const audio = useRecoilValue(audioState);
   const video = useRecoilValue(videoState);
   const socket = useRecoilValue(socketState);

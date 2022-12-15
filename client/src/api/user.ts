@@ -9,6 +9,15 @@ export const getLoggedInUser = async () => {
   }
 };
 
+export const getTopUsers = async () => {
+  try {
+    const res = await axios.get("/user/top");
+    return res.data;
+  } catch {
+    return null;
+  }
+};
+
 export const updateNickname = async (nickname: string) => {
   try {
     const res = await axios.patch("/user/nickname", { nickname });

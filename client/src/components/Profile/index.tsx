@@ -1,7 +1,6 @@
 /** @jsxImportSource @emotion/react */
 import * as style from "./styles";
 import ProfileContent from "./ProfileContent";
-import { Oval } from "react-loader-spinner";
 import { User } from "@dto";
 import Spinner from "../Loader/Spinner";
 
