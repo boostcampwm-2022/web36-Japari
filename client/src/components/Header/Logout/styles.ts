@@ -15,3 +15,7 @@ export const logoutContainerStyle = css`
     filter: invert(50%);
   }
 `;
+
+export const logoutIconStyle = css`
+  height: 1.5rem;
+`;
