@@ -1,5 +1,5 @@
 import { css } from "@emotion/react";
-import palleteCoverTexture from "../../../assets/images/oak-texture-background.webp";
+import paletteCoverTexture from "../../../assets/images/oak-texture-background.webp";
 
 export const gameWrapperStyle = css`
   display: flex;
@@ -19,7 +19,7 @@ export const paletteLockStyle = css`
   z-index: 1;
 
   border: 0.4rem solid burlywood;
-  background-image: url(${palleteCoverTexture});
+  background-image: url(${paletteCoverTexture});
 
   > img {
     width: 3rem;
