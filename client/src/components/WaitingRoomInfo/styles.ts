@@ -54,7 +54,7 @@ export const camBoxStyle = css`
 `;
 
 export const micStyle = css`
-  width: 1rem;
+  width: 1.5rem;
   z-index: 1;
   position: absolute;
   left: 75%;

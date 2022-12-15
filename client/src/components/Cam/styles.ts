@@ -5,6 +5,7 @@ export const camContainerStyle = css`
   flex-direction: column;
   align-items: center;
   gap: 0.5rem;
+  width: 100%;
 
   > span {
     font-size: 1.1rem;
@@ -32,7 +33,7 @@ export const camWrapperStyle = css`
   border: 0.1rem solid green;
   overflow: hidden;
 
-  width: 10rem;
+  width: 12rem;
   aspect-ratio: 4/3;
 
   > video {
