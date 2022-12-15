@@ -3,7 +3,8 @@ import palleteCoverTexture from "../../../assets/images/oak-texture-background.w
 
 export const gameWrapperStyle = css`
   display: flex;
-  gap: 1rem;
+  gap: 2rem;
+  width: 100%;
 `;
 
 export const paletteLockStyle = css`
@@ -12,13 +13,12 @@ export const paletteLockStyle = css`
   justify-content: center;
   width: 100%;
   height: 100%;
-  border-radius: 5px;
+  border-radius: 0.3rem;
   position: absolute;
   top: -0.1rem;
-  right: -0.1rem;
   z-index: 1;
 
-  border: 1.5px solid burlywood;
+  border: 0.4rem solid burlywood;
   background-image: url(${palleteCoverTexture});
 
   > img {
@@ -29,17 +29,17 @@ export const paletteLockStyle = css`
 
 export const paletteStyle = css`
   position: relative;
-  bottom: 0px;
+  bottom: 0;
 
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
   align-items: center;
 
-  width: 15rem;
+  width: 5rem;
   background-color: burlywood;
-  border: 1px solid black;
-  border-radius: 5px;
+  border: 0.1rem solid black;
+  border-radius: 0.3rem;
 
   box-sizing: content-box;
   padding: 0.5rem;
@@ -52,8 +52,8 @@ export const toolStyle = css`
 `;
 
 export const buttonStyle = (line: string, thisLine: string) => css`
-  border-radius: 5px;
-  ${line === thisLine ? "border: 3px solid green;" : ""}
+  border-radius: 0.3rem;
+  ${line === thisLine ? "border: 0.2rem solid green;" : ""}
 
   box-sizing: border-box;
   width: 4rem;
@@ -68,8 +68,8 @@ export const buttonStyle = (line: string, thisLine: string) => css`
 
 export const clearStyle = css`
   width: 4rem;
-  border-radius: 5px;
-  padding: 3px 0;
+  border-radius: 0.3rem;
+  padding: 0.2rem 0;
   cursor: pointer;
   background-color: plum;
   box-shadow: 0 0.25rem 0.25rem rgba(0, 0, 0, 0.2);
@@ -81,8 +81,8 @@ export const toggleStyle = (mode: string, thisMode: string) => css`
   width: 4rem;
   height: 4rem;
   box-sizing: border-box;
-  ${mode === thisMode ? "border: 3px solid green;" : ""}
-  border-radius: 5px;
+  ${mode === thisMode ? "border: 0.2rem solid green;" : ""}
+  border-radius: 0.3rem;
   cursor: pointer;
   background-color: plum;
   > img {
@@ -101,7 +101,7 @@ export const lineWidthStyle = css``;
 export const selectedColorStyle = (color: string) => css`
   width: 4rem;
   height: 4rem;
-  border-radius: 5px;
+  border-radius: 0.3rem;
 
   background-color: ${color};
   cursor: pointer;
@@ -120,7 +120,7 @@ export const colorGridStyle = css`
 export const colorStyle = (color: string) => css`
   width: 2rem;
   height: 2rem;
-  border-radius: 5px;
+  border-radius: 0.3rem;
 
   background-color: ${color};
   cursor: pointer;
@@ -131,10 +131,12 @@ export const gameViewStyle = css`
   flex-direction: column;
   gap: 1rem;
   padding: 0;
+  /* flex-grow: 1; */
+  width: calc(100% - 8rem);
 `;
 
 export const canvasStyle = css`
-  border: 1px solid black;
+  border: 0.1rem solid black;
   background-color: white;
   width: 100%;
   height: 32rem;

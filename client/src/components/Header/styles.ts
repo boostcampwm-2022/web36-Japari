@@ -18,7 +18,7 @@ export const audioControllerStyle = css`
   justify-content: flex-start;
   width: 15rem;
   height: 3rem;
-  border: 1px solid green;
+  border: 0.1rem solid green;
   margin-left: 2rem;
   box-sizing: border-box;
   overflow: hidden;
@@ -26,7 +26,7 @@ export const audioControllerStyle = css`
   background-color: rgba(0, 0, 0, 0.7);
 
   > p {
-    font-size: large;
+    font-size: 1.1rem;
     color: lightgreen;
     animation: marquee 5s linear infinite;
 

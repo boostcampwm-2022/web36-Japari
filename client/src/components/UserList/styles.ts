@@ -3,7 +3,7 @@ import { css, Theme } from "@emotion/react";
 export const ListContainerStyle = css`
   display: flex;
   flex-direction: column;
-  width: 20rem;
+  width: 22.5rem;
   height: 40rem;
 `;
 
