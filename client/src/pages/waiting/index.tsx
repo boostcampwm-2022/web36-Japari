@@ -41,7 +41,7 @@ const WaitingPage: React.FC = () => {
     socket.on("game-room/info", (room: GameRoom) => {
       setRoom(room);
     });
-    socket.on("game-room/join-failed", data => {
+    socket.on("game-room/join-failed", () => {
       navigate("/lobby");
     });
     socket.on("fully connected", () => {

@@ -12,6 +12,6 @@ const soundId = sound.play();
 
 export const soundState = atom<{ sound: Howl; soundId: number; soundMuted: boolean }>({
   key: "bgmState",
-  default: { sound, soundId, soundMuted: true },
+  default: { sound, soundId, soundMuted: false },
   dangerouslyAllowMutability: true,
 });
