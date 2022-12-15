@@ -10,8 +10,8 @@ const sound = new Howl({
 
 const soundId = sound.play();
 
-export const soundState = atom<[Howl, number, boolean]>({
+export const soundState = atom<{ sound: Howl; soundId: number; soundMuted: boolean }>({
   key: "bgmState",
-  default: [sound, soundId, false],
+  default: { sound, soundId, soundMuted: true },
   dangerouslyAllowMutability: true,
 });

@@ -19,7 +19,7 @@ export interface HeaderProps {
 export const Header = ({ headerType }: HeaderProps) => {
   const navigate = useNavigate();
 
-  const [sound, soundId, isBgmMuted] = useRecoilValue(soundState);
+  const { sound, soundId, soundMuted } = useRecoilValue(soundState);
   const setSoundState = useSetRecoilState(soundState);
 
   const handleClickBgm = () => {
@@ -27,12 +27,12 @@ export const Header = ({ headerType }: HeaderProps) => {
   };
 
   useEffect(() => {
-    if (!isBgmMuted) {
-      sound.play(soundId);
-    } else {
-      sound.pause(soundId);
-    }
-  }, [sound, isBgmMuted, soundId]);
+    if (!soundMuted) sound.play(soundId);
+    else sound.pause(soundId);
+    return () => {
+      sound.stop();
+    };
+  }, [soundMuted, sound, soundId]);
 
   return (
     <header css={style.headerStyle}>
@@ -41,8 +41,8 @@ export const Header = ({ headerType }: HeaderProps) => {
         <div css={style.audioControllerStyle}>
           <p onClick={handleClickBgm}>Chat (Menu) - Rest!</p>
         </div>
-        <div css={style.bgmButtonStyle} onClick={() => setSoundState([sound, soundId, !isBgmMuted])}>
-          <img src={isBgmMuted ? bgmPlayIcon : bgmPauseIcon} alt="bgm-control-button" />
+        <div css={style.bgmButtonStyle} onClick={() => setSoundState(prev => ({ ...prev, soundMuted: !soundMuted }))}>
+          <img src={soundMuted ? bgmPlayIcon : bgmPauseIcon} alt="bgm-control-button" />
         </div>
       </div>
       <div css={style.headerRightStyle}>

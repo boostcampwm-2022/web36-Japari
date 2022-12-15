@@ -29,7 +29,7 @@ const WaitingPage: React.FC = () => {
   const socket = useRecoilValue(socketState);
   const [user, setUser] = useRecoilState(userState);
   const [room, setRoom] = useState<GameRoom | null>(null);
-  const [sound, soundId] = useRecoilValue(soundState);
+  const { sound, soundId } = useRecoilValue(soundState);
 
   const location = useLocation();
   const roomId = location.pathname.split("/").slice(-1)[0];
