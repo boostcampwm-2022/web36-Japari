@@ -33,7 +33,6 @@ const WaitingPage: React.FC = () => {
 
   const location = useLocation();
   const roomId = location.pathname.split("/").slice(-1)[0];
-
   useSocketConnect();
   useSetUser();
 

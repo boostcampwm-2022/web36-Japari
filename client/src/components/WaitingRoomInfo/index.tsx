@@ -1,7 +1,7 @@
 /** @jsxImportSource @emotion/react */
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useRecoilValue } from "recoil";
+import { useRecoilValue, useRecoilState } from "recoil";
 import { socketState } from "../../store/socket";
 import Button from "../Button";
 import Audio from "../Audio";
@@ -13,6 +13,7 @@ import { User } from "@dto";
 import { useCams, StreamInfo } from "../../hooks/useCams";
 import { userState } from "../../store/user";
 import Modal from "../Modal";
+import { audioState } from "../../store/media";
 
 import micOn from "../../assets/icons/mic-on.svg";
 import micOff from "../../assets/icons/mic-off.svg";
@@ -31,29 +32,20 @@ const WaitingRoomInfo = ({ roomRecord, participants }: WaitingRoomInfoProps) => 
   const user = useRecoilValue(userState);
   const navigate = useNavigate();
   const { videoStream, audioStream } = useCams();
-  const [, setRemoteVideoOnOff] = useState<Map<number, boolean>>(new Map());
+  const [remoteVideoOnOff, setRemoteVideoOnOff] = useState<Map<number, boolean>>(new Map());
   const [remoteAudioOnOff, setRemoteAudioOnOff] = useState<Map<number, boolean>>(new Map());
-
   const [modifyRoomModalOpen, setModifyRoomModalOpen] = useState<boolean>(false);
+  const [audio] = useRecoilState(audioState);
 
-  const initializeMediaStatus = (
-    participant: User,
-    videoStreamInfo: StreamInfo | undefined,
-    audioStreamInfo: StreamInfo | undefined
-  ) => {
-    if (!videoStreamInfo || !audioStreamInfo) return;
-    setRemoteVideoOnOff(current => {
-      const newMap = new Map(current);
-      newMap.set(participant.userId, videoStreamInfo.mediaStream.getVideoTracks()[0].enabled);
-      return newMap;
-    });
-
-    setRemoteAudioOnOff(current => {
-      const newMap = new Map(current);
-      remoteAudioOnOff.set(participant.userId, audioStreamInfo.mediaStream.getAudioTracks()[0].enabled);
-      return newMap;
-    });
-  };
+  const initializeMediaStatus = useCallback((participant: User, videoStreamInfo: StreamInfo | undefined) => {
+    if (videoStreamInfo) {
+      setRemoteVideoOnOff(current => {
+        const newMap = new Map(current);
+        newMap.set(participant.userId, videoStreamInfo.mediaStream.getVideoTracks()[0].enabled);
+        return newMap;
+      });
+    }
+  }, []);
 
   const handleRoomRecordClick = () => {
     setModifyRoomModalOpen(true);
@@ -84,10 +76,9 @@ const WaitingRoomInfo = ({ roomRecord, participants }: WaitingRoomInfoProps) => 
   useEffect(() => {
     participants.forEach(participant => {
       const videoStreamInfo = videoStream.get(participant.email);
-      const audioStreamInfo = audioStream.get(participant.email);
-      initializeMediaStatus(participant, videoStreamInfo, audioStreamInfo);
+      initializeMediaStatus(participant, videoStreamInfo);
     });
-  }, []);
+  }, [videoStream, initializeMediaStatus, participants]);
 
   useEffect(() => {
     socket.on("game-room/error", errorMessage => {
@@ -117,6 +108,12 @@ const WaitingRoomInfo = ({ roomRecord, participants }: WaitingRoomInfoProps) => 
     };
   }, [socket]);
 
+  useEffect(() => {
+    if (audioStream.size > 0 && videoStream.size > 0) {
+      socket.emit("audio-status/modify", audio);
+    }
+  }, [audio, socket, audioStream, videoStream]);
+
   return (
     <div css={style.waitingRoomInfoStyle}>
       <div css={style.headerStyle}>
@@ -136,7 +133,7 @@ const WaitingRoomInfo = ({ roomRecord, participants }: WaitingRoomInfoProps) => 
                 {videoStreamInfo ? (
                   <Cam
                     mediaStream={videoStreamInfo.mediaStream ?? null}
-                    isVideoOn={true}
+                    isVideoOn={remoteVideoOnOff.get(participant.userId)}
                     userInfo={videoStreamInfo.userInfo}
                   />
                 ) : (
