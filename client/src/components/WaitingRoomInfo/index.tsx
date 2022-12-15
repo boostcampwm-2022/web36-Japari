@@ -37,25 +37,15 @@ const WaitingRoomInfo = ({ roomRecord, participants }: WaitingRoomInfoProps) => 
   const [modifyRoomModalOpen, setModifyRoomModalOpen] = useState<boolean>(false);
   const [audio] = useRecoilState(audioState);
 
-  const initializeMediaStatus = useCallback(
-    (participant: User, videoStreamInfo: StreamInfo | undefined, audioStreamInfo: StreamInfo | undefined) => {
-      if (videoStreamInfo) {
-        setRemoteVideoOnOff(current => {
-          const newMap = new Map(current);
-          newMap.set(participant.userId, videoStreamInfo.mediaStream.getVideoTracks()[0].enabled);
-          return newMap;
-        });
-      }
-      if (audioStreamInfo) {
-        setRemoteAudioOnOff(current => {
-          const newMap = new Map(current);
-          newMap.set(participant.userId, audioStreamInfo.mediaStream.getAudioTracks()[0].enabled);
-          return newMap;
-        });
-      }
-    },
-    []
-  );
+  const initializeMediaStatus = useCallback((participant: User, videoStreamInfo: StreamInfo | undefined) => {
+    if (videoStreamInfo) {
+      setRemoteVideoOnOff(current => {
+        const newMap = new Map(current);
+        newMap.set(participant.userId, videoStreamInfo.mediaStream.getVideoTracks()[0].enabled);
+        return newMap;
+      });
+    }
+  }, []);
 
   const handleRoomRecordClick = () => {
     setModifyRoomModalOpen(true);
@@ -86,10 +76,9 @@ const WaitingRoomInfo = ({ roomRecord, participants }: WaitingRoomInfoProps) => 
   useEffect(() => {
     participants.forEach(participant => {
       const videoStreamInfo = videoStream.get(participant.email);
-      const audioStreamInfo = audioStream.get(participant.email);
-      initializeMediaStatus(participant, videoStreamInfo, audioStreamInfo);
+      initializeMediaStatus(participant, videoStreamInfo);
     });
-  }, [videoStream, audioStream, initializeMediaStatus, participants]);
+  }, [videoStream, initializeMediaStatus, participants]);
 
   useEffect(() => {
     socket.on("game-room/error", errorMessage => {
