@@ -95,6 +95,9 @@ const WaitingRoomInfo = ({ roomRecord, participants }: WaitingRoomInfoProps) => 
     socket.on("game-room/error", errorMessage => {
       alert(errorMessage);
     });
+    socket.on("game-room/info", data => {
+      setModifyRoomModalOpen(false);
+    });
     socket.on("audio-status/modify", ({ userInfo, audioStatus }) => {
       setRemoteAudioOnOff(current => {
         const newMap = new Map(current);
