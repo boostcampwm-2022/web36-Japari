@@ -40,7 +40,7 @@ const PlayingPage: React.FC = () => {
     };
   }, [user, socket, navigate, roomId]);
 
-  return <Page>{room && <InGameComponent room={room} socket={socket} />}</Page>;
+  return <Page>{room && <InGameComponent room={room} />}</Page>;
 };
 
 export default PlayingPage;

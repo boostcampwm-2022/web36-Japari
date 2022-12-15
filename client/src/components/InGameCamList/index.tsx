@@ -7,25 +7,25 @@ import Audio from "../Audio";
 import { useRecoilValue, useRecoilState } from "recoil";
 import { userState } from "../../store/user";
 import { useEffect, useCallback, useState } from "react";
-import { Socket } from "socket.io-client";
 import { audioState } from "../../store/media";
 
 import micOn from "../../assets/icons/mic-on.svg";
 import micOff from "../../assets/icons/mic-off.svg";
+import { socketState } from "../../store/socket";
 
 export interface InGameCamListProps {
   participants: User[];
   videoStream: Map<string, StreamInfo>;
   audioStream: Map<string, StreamInfo>;
-  socket: Socket;
 }
 
 export interface ProfileProps {
   profile: string;
 }
 
-const InGameCamList = ({ participants, videoStream, audioStream, socket }: InGameCamListProps) => {
+const InGameCamList = ({ participants, videoStream, audioStream }: InGameCamListProps) => {
   const user = useRecoilValue(userState);
+  const socket = useRecoilValue(socketState);
   const [remoteVideoOnOff, setRemoteVideoOnOff] = useState<Map<number, boolean>>(new Map());
   const [remoteAudioOnOff, setRemoteAudioOnOff] = useState<Map<number, boolean>>(new Map());
   const [audio] = useRecoilState(audioState);

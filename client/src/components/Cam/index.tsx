@@ -38,11 +38,6 @@ const Cam = ({ mediaStream, isVideoOn, userInfo }: CamProps) => {
   return (
     <div css={style.camContainerStyle}>
       <div css={style.camWrapperStyle}>
-        {/* {isVideoOn ? (
-          <video ref={videoRef} autoPlay playsInline muted={user?.userId === userInfo.userId}></video>
-        ) : (
-          <Profile profile={userInfo.profileImage} />
-        )} */}
         <video ref={videoRef} autoPlay playsInline muted={user?.userId === userInfo.userId}></video>
         {!isVideoOn && <Profile profile={userInfo.profileImage} />}
       </div>
