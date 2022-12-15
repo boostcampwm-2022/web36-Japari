@@ -24,7 +24,7 @@ export const mainWrapperStyle = (theme: Theme) => css`
   justify-content: space-between;
   width: inherit;
   flex-grow: 1;
-  gap: 2rem;
+  gap: 1rem;
   padding: 3rem;
   box-sizing: border-box;
   border-radius: 0.6rem;
@@ -38,8 +38,8 @@ export const camListContainerStyle = css`
 
   grid-template-columns: 1fr 1fr 1fr 1fr;
   grid-template-rows: 1fr 1fr;
-  column-gap: 3rem;
-  row-gap: 3rem;
+  column-gap: 2rem;
+  row-gap: 2rem;
 `;
 
 export const footerStyle = css`
