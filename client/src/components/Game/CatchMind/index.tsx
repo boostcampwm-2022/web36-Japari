@@ -186,6 +186,10 @@ export default function CatchMind({ participants }: CatchMindProps) {
 
       ctx.drawImage(canvasBack, 0, 0, canvas.width, canvas.height);
     }
+
+    handleCtxColor();
+    handleCtxLineWidth();
+    handleCtxMode();
   };
 
   // event handlers
@@ -206,24 +210,45 @@ export default function CatchMind({ participants }: CatchMindProps) {
       if (drawerId !== user?.userId) return;
       if (gameState !== CatchMindState.DRAW) return;
       setLine(line);
-
-      const ctx = getContextObject();
-      ctx.beginPath();
-      switch (line) {
-        case "THIN":
-          ctx.lineWidth = THIN;
-          break;
-        case "NORMAL":
-          ctx.lineWidth = NORMAL;
-          break;
-        case "THICK":
-          ctx.lineWidth = THICK;
-          break;
-      }
-      ctx.closePath();
     },
-    [drawerId, user, getContextObject, gameState]
+    [drawerId, user, gameState]
   );
+
+  const handleCtxMode = () => {
+    const ctx = getContextObject();
+    if (mode === "pencil") {
+      ctx.beginPath();
+      ctx.strokeStyle = currentColorRef.current;
+    }
+    if (mode === "eraser") {
+      ctx.beginPath();
+      ctx.strokeStyle = Color.WHITE;
+    }
+  };
+
+  const handleCtxLineWidth = () => {
+    const ctx = getContextObject();
+    ctx.beginPath();
+    switch (line) {
+      case "THIN":
+        ctx.lineWidth = THIN;
+        break;
+      case "NORMAL":
+        ctx.lineWidth = NORMAL;
+        break;
+      case "THICK":
+        ctx.lineWidth = THICK;
+        break;
+    }
+    ctx.closePath();
+  };
+
+  const handleCtxColor = () => {
+    const ctx = getContextObject();
+    ctx.beginPath();
+    ctx.strokeStyle = currentColor;
+    ctx.fillStyle = currentColor;
+  };
 
   const handleClear = useCallback(() => {
     if (drawerId !== user?.userId) return;
@@ -236,6 +261,7 @@ export default function CatchMind({ participants }: CatchMindProps) {
       if (user?.userId !== drawerId || gameState !== CatchMindState.DRAW) return;
       setMode("pencil");
       setCurrentColor(color);
+      handleCtxColor();
     },
     [drawerId, user?.userId, gameState]
   );
@@ -378,23 +404,16 @@ export default function CatchMind({ participants }: CatchMindProps) {
   }, [navigate, path, setCurrentScore, socket]);
 
   useEffect(() => {
-    const ctx = getContextObject();
-    ctx.beginPath();
-    ctx.strokeStyle = currentColor;
-    ctx.fillStyle = currentColor;
-  }, [currentColor, getContextObject]);
+    handleCtxMode();
+  }, [mode]);
 
   useEffect(() => {
-    const ctx = getContextObject();
-    if (mode === "pencil") {
-      ctx.beginPath();
-      ctx.strokeStyle = currentColorRef.current;
-    }
-    if (mode === "eraser") {
-      ctx.beginPath();
-      ctx.strokeStyle = Color.WHITE;
-    }
-  }, [mode, getContextObject]);
+    handleCtxLineWidth();
+  }, [line]);
+
+  useEffect(() => {
+    handleCtxColor();
+  }, [currentColor]);
 
   useEffect(() => {
     resizeCanvas();
@@ -403,7 +422,7 @@ export default function CatchMind({ participants }: CatchMindProps) {
     return () => {
       window.removeEventListener("resize", resizeCanvas);
     };
-  }, [canvasRef, resizeCanvas]);
+  }, [canvasRef]);
 
   return (
     <div css={style.gameWrapperStyle}>
