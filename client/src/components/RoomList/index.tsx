@@ -116,7 +116,9 @@ const RoomList = ({ rooms }: RoomListProps) => {
           게임 방이 없습니다!
           <br /> 방을 만들어 다른 유저들과 게임을 즐겨보세요!
         </p>
-      ) : null}
+      ) : (
+        <></>
+      )}
       {passwordModalOpen && (
         <Modal ModalType="비밀번호 입력" roomId={selectedRoomId} closeModal={() => setPasswordModalOpen(false)} />
       )}
