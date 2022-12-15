@@ -367,9 +367,12 @@ export default function CatchMind({ participants }: CatchMindProps) {
   }, [socket, getContextObject, gameState]);
 
   useEffect(() => {
-    socket.on("catch-mind/end", () => {
+    socket.on("catch-mind/end", data => {
       setCurrentScore(null);
       navigate(`/waiting/${path}`);
+      if (data === "minimum_exception") {
+        alert("최소 인원이 충족되지 않아 게임이 종료되었습니다.");
+      }
     });
 
     return () => {
