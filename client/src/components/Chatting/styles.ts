@@ -2,7 +2,7 @@ import { css, Theme } from "@emotion/react";
 
 export const ChattingContainerStyle = (theme: Theme) => css`
   background-color: ${theme.colors.secondary};
-  width: 60rem;
+  width: 72.5rem;
   height: 12.5rem;
   border-radius: 0.75rem;
   padding: 0.75rem;

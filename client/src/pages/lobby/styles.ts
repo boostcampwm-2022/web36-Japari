@@ -5,7 +5,7 @@ export const LobbyContentContainerStyle = css`
   flex-direction: column;
   align-items: center;
   gap: 2rem;
-  padding: 1rem 1rem 2rem 1rem;
+  padding: 1rem 1.5rem 2rem 1.5rem;
 `;
 
 export const RowContentContainerStyle = css`

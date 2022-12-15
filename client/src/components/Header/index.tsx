@@ -3,8 +3,8 @@ import Logo from "../Logo";
 import Logout from "./Logout";
 import StatusMedia from "./StatusMedia";
 import Button from "../Button";
-import bgmPauseIcon from "../../assets/icons/bgm-pause-icon.png";
-import bgmPlayIcon from "../../assets/icons/bgm-play-icon.png";
+import bgmPauseIcon from "../../assets/icons/bgm-pause-icon.webp";
+import bgmPlayIcon from "../../assets/icons/bgm-play-icon.webp";
 
 import * as style from "./styles";
 import { useNavigate } from "react-router-dom";

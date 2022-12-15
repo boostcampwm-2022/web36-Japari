@@ -6,7 +6,7 @@ import Profile from "../../components/Profile";
 import UserList from "../../components/UserList";
 import Chatting from "../../components/Chatting";
 import WaitingRoomInfo from "../../components/WaitingRoomInfo";
-import { useRecoilValue } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 import { userState } from "../../store/user";
 import { socketState } from "../../store/socket";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -27,19 +27,18 @@ export type GameRoom = {
 const WaitingPage: React.FC = () => {
   const navigate = useNavigate();
   const socket = useRecoilValue(socketState);
-  const user = useRecoilValue(userState);
+  const [user, setUser] = useRecoilState(userState);
   const [room, setRoom] = useState<GameRoom | null>(null);
   const [sound, soundId] = useRecoilValue(soundState);
 
   const location = useLocation();
   const roomId = location.pathname.split("/").slice(-1)[0];
-
   useSocketConnect();
   useSetUser();
 
   useEffect(() => {
-    socket.on("game-room/info", data => {
-      setRoom(data);
+    socket.on("game-room/info", (room: GameRoom) => {
+      setRoom(room);
     });
     socket.on("game-room/join-failed", data => {
       navigate("/lobby");
@@ -47,6 +46,7 @@ const WaitingPage: React.FC = () => {
     socket.on("fully connected", () => {
       socket.emit("game-room/join", { roomId });
     });
+
     socket.emit("game-room/join", { roomId });
 
     return () => {
@@ -56,6 +56,15 @@ const WaitingPage: React.FC = () => {
       socket.emit("wait-room/exit");
     };
   }, [socket, navigate, roomId]);
+
+  useEffect(() => {
+    socket.on("game-room/info", (room: GameRoom) => {
+      if (user) {
+        const newUser = room.participants.filter(participant => participant.userId === user.userId)[0];
+        setUser({ ...user, score: newUser.score });
+      }
+    });
+  }, [socket, user, setUser]);
 
   useEffect(() => {
     sound.volume(0.05, soundId);

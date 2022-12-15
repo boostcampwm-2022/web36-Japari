@@ -5,9 +5,10 @@ export const camContainerStyle = css`
   flex-direction: column;
   align-items: center;
   gap: 0.5rem;
+  width: 100%;
 
   > span {
-    font-size: 18px;
+    font-size: 1.1rem;
     font-weight: bold;
   }
 `;
@@ -18,7 +19,7 @@ export const camNickNameStyle = css`
 
 export const camScoreStyle = css`
   color: green;
-  font-size: 16px;
+  font-size: 1rem;
 `;
 
 export const camWrapperStyle = css`
@@ -28,11 +29,11 @@ export const camWrapperStyle = css`
 
   position: relative;
   background-color: black;
-  border-radius: 10px;
-  border: 1px solid green;
+  border-radius: 0.6rem;
+  border: 0.1rem solid green;
   overflow: hidden;
 
-  width: 10rem;
+  width: 12rem;
   aspect-ratio: 4/3;
 
   > video {

@@ -3,7 +3,7 @@ import { css, Theme } from "@emotion/react";
 export const waitingRoomInfoStyle = css`
   display: flex;
   flex-direction: column;
-  width: 60rem;
+  width: 72.5rem;
   height: 40rem;
 `;
 
@@ -14,7 +14,7 @@ export const headerStyle = css`
   height: 3rem;
 
   > div {
-    border-radius: 5px 5px 0 0;
+    border-radius: 0.3rem 0.3rem 0 0;
   }
 `;
 
@@ -27,7 +27,7 @@ export const mainWrapperStyle = (theme: Theme) => css`
   gap: 2rem;
   padding: 3rem;
   box-sizing: border-box;
-  border-radius: 10px;
+  border-radius: 0.6rem;
   box-shadow: 0 0.25rem 0.25rem rgba(0, 0, 0, 0.2);
   background-color: ${theme.colors.secondary};
 `;
@@ -54,7 +54,7 @@ export const camBoxStyle = css`
 `;
 
 export const micStyle = css`
-  width: 1rem;
+  width: 1.5rem;
   z-index: 1;
   position: absolute;
   left: 75%;

@@ -1,7 +1,7 @@
 /** @jsxImportSource @emotion/react */
 import * as style from "./styles";
 import { User } from "@dto";
-import { useCams } from "../../hooks/useCams";
+import { useCams, StreamInfo } from "../../hooks/useCams";
 import InGameCamList from "../InGameCamList";
 import Chatting from "../Chatting";
 import Game from "../Game";
