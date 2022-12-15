@@ -1,6 +1,6 @@
 /** @jsxImportSource @emotion/react */
 import * as style from "./styles";
-import DefaultUserImage from "../../../assets/images/default-user-image.png";
+import DefaultUserImage from "../../../assets/images/default-user-image.webp";
 import EditIcon from "../../../assets/icons/edit-icon.svg";
 import { User } from "@dto";
 import { Dispatch, SetStateAction } from "react";

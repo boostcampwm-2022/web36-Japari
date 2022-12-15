@@ -1,5 +1,5 @@
 -- AlterTable
-ALTER TABLE `user` MODIFY `profile_image` VARCHAR(191) NOT NULL DEFAULT '/profile/default.png';
+ALTER TABLE `user` MODIFY `profile_image` VARCHAR(191) NOT NULL DEFAULT '/profile/default.webp';
 
 -- CreateTable
 CREATE TABLE `refresh_token_black_list` (

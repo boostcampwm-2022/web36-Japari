@@ -1,5 +1,5 @@
 /** @jsxImportSource @emotion/react */
-import DefaultUserImage from "../../../../assets/images/default-user-image.png";
+import DefaultUserImage from "../../../../assets/images/default-user-image.webp";
 import { User } from "../..";
 import * as style from "./styles";
 import { css } from "@emotion/react";
