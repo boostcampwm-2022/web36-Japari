@@ -181,8 +181,8 @@ export class CatchMindGateway implements OnGatewayInit {
 
     // 만약 user.participants.length가 minimumPeople보다 작다면 게임을 종료한다.
     if (room.participants.length < room.minimumPeople) {
-      this.server.to(roomId).emit("catch-mind/end", "minimum_exception");
       await this.redis.hdel(RedisTableName.PLAY_DATA, roomId);
+      this.server.to(roomId).emit("catch-mind/end", "minimum_exception");
     }
   }
 }
