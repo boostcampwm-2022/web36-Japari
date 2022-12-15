@@ -401,9 +401,9 @@ export default function CatchMind({ participants }: CatchMindProps) {
     window.addEventListener("resize", resizeCanvas);
 
     return () => {
-      window.removeEventListener("reisez", resizeCanvas);
+      window.removeEventListener("resize", resizeCanvas);
     };
-  }, [canvasRef]);
+  }, [canvasRef, resizeCanvas]);
 
   return (
     <div css={style.gameWrapperStyle}>
