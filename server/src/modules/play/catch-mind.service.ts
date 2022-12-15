@@ -1,10 +1,10 @@
-import { Injectable, Logger } from "@nestjs/common";
+import { Injectable } from "@nestjs/common";
 import { Server, Socket } from "socket.io";
 import { CatchMindState, RedisTableName } from "src/constants/enum";
 import { randFromArray } from "util/random";
 import { PrismaService } from "../prisma/prisma.service";
 import { RedisService } from "../redis/redis.service";
-import { Participant, CatchMindGameRoom, CatchMindRecord } from "../../@types/catch-mind";
+import { CatchMindGameRoom, CatchMindRecord } from "../../@types/catch-mind";
 
 const WAIT_TIME = 5;
 const DRAW_TIME = 120;
@@ -12,7 +12,6 @@ const RESULT_TIME = 10;
 
 @Injectable()
 export class CatchMindService {
-  private logger = new Logger("Catch Mind Service");
   constructor(private redis: RedisService, private prisma: PrismaService) {}
 
   async notifyRoundStart(server: Server, roomId: string) {
