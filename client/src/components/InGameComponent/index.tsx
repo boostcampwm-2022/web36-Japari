@@ -1,17 +1,20 @@
 /** @jsxImportSource @emotion/react */
+import { useState, useCallback, useEffect } from "react";
 import * as style from "./styles";
 import { User } from "@dto";
-import { useCams } from "../../hooks/useCams";
+import { useCams, StreamInfo } from "../../hooks/useCams";
 import InGameCamList from "../InGameCamList";
 import Chatting from "../Chatting";
 import Game from "../Game";
 import { GameRoom } from "../../pages/waiting";
+import { Socket } from "socket.io-client";
 
 export interface InGameComponentProps {
   room: GameRoom;
+  socket: Socket;
 }
 
-const InGameComponent = ({ room }: InGameComponentProps) => {
+const InGameComponent = ({ room, socket }: InGameComponentProps) => {
   const { videoStream, audioStream } = useCams();
 
   return (
@@ -20,6 +23,7 @@ const InGameComponent = ({ room }: InGameComponentProps) => {
         participants={room.participants.filter((userInfo: User, idx: number) => idx % 2 === 0)}
         videoStream={videoStream}
         audioStream={audioStream}
+        socket={socket}
       />
       <div css={style.GameAndChatContainerStyle}>
         <div css={style.GameContainerStyle}>
@@ -32,6 +36,7 @@ const InGameComponent = ({ room }: InGameComponentProps) => {
         participants={room.participants.filter((userInfo: User, idx: number) => idx % 2 === 1)}
         videoStream={videoStream}
         audioStream={audioStream}
+        socket={socket}
       />
     </div>
   );

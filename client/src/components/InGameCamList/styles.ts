@@ -14,3 +14,14 @@ export const camWrapperStyle = (theme: Theme) => css`
   box-shadow: 0 0.25rem 0.25rem rgba(0, 0, 0, 0.2);
   background-color: ${theme.colors.secondary};
 `;
+
+export const micStyle = css`
+  width: 1rem;
+  z-index: 1;
+  position: absolute;
+  left: 75%;
+  top: 55%;
+  border: 0.1em white solid;
+  border-radius: 25rem;
+  background-color: white;
+`;
