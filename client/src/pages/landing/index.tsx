@@ -2,12 +2,12 @@
 import React, { useEffect } from "react";
 import * as style from "./styles";
 import { Page } from "../../components/Page";
-import LandingBackgroundImage from "../../assets/images/landing-background-image.png";
-import PlayingExample from "../../assets/images/playing-example.png";
-import WaitingExample from "../../assets/images/waiting-example.png";
-import WhitePaint from "../../assets/images/white-paint.png";
-import GoogleLogo from "../../assets/logo/google_logo.png";
-import GithubLogo from "../../assets/logo/github_logo.png";
+import LandingBackgroundImage from "../../assets/images/landing-background-image.webp";
+import PlayingExample from "../../assets/images/playing-example.webp";
+import WaitingExample from "../../assets/images/waiting-example.webp";
+import WhitePaint from "../../assets/images/white-paint.webp";
+import GoogleLogo from "../../assets/logo/google_logo.webp";
+import GithubLogo from "../../assets/logo/github_logo.webp";
 import { isLogin } from "../../api/auth";
 import { useNavigate } from "react-router-dom";
 

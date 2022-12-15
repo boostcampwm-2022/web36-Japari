@@ -15,7 +15,7 @@ model User {
   email String
   nickname  String? 
   score Int @default(0)
-  profileImage String  @default("/profile/default.png") @map("profile_image")
+  profileImage String  @default("/profile/default.webp") @map("profile_image")
   jwtRefreshToken String? @map("jwt_refresh_token")
 
   // https://github.com/prisma/prisma/discussions/13214

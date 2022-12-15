@@ -1,16 +1,16 @@
 /** @jsxImportSource @emotion/react */
 import { useRef, useState, useEffect, useCallback, useMemo } from "react";
 import * as style from "./styles";
-import timerImage from "../../../assets/icons/timer.png";
+import timerImage from "../../../assets/icons/timer.webp";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { userState } from "../../../store/user";
 import { socketState } from "../../../store/socket";
 import { currentScoreState } from "../../../store/catchmind";
 import { debounce } from "lodash";
 
-import pencilIcon from "../../../assets/icons/catch-mind-pencil.png";
-import eraserIcon from "../../../assets/icons/catch-mind-eraser.png";
-import paletteLockIcon from "../../../assets/icons/palette-lock.png";
+import pencilIcon from "../../../assets/icons/catch-mind-pencil.webp";
+import eraserIcon from "../../../assets/icons/catch-mind-eraser.webp";
+import paletteLockIcon from "../../../assets/icons/palette-lock.webp";
 import { useNavigate, useLocation } from "react-router-dom";
 import { User } from "@dto";
 
