@@ -33,9 +33,7 @@ const ChatLog = ({ logs }: ChatLogProps) => {
         return (
           <div css={style.ChatLogStyle} key={idx}>
             <p>&#91;{log.sendTime}&#93;</p>
-            <p>
-              {log.sender} : {log.message}
-            </p>
+            <p>{log.sender + ": " + log.message}</p>
           </div>
         );
       })}

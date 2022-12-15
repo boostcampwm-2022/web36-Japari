@@ -13,10 +13,10 @@ export const roomRecordStyle = css`
   padding: 0.75rem 0rem;
 
   background: #5992ff;
-  border-radius: 5px;
+  border-radius: 0.3rem;
 
   > span {
-    font-size: 18px;
+    font-size: 1.1rem;
     font-weight: bold;
     color: white;
 
@@ -49,5 +49,5 @@ export const roomRecordPeopleStyle = css`
 export const divisionLineStyle = css`
   background-color: white;
   width: 0.2rem;
-  border-radius: 5px;
+  border-radius: 0.3rem;
 `;
