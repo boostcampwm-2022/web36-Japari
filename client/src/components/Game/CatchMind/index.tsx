@@ -172,9 +172,19 @@ export default function CatchMind({ participants }: CatchMindProps) {
     if (!canvasRef.current) return;
     const canvas = canvasRef.current;
 
+    const ctx = getContextObject();
+
+    const canvasBack = document.createElement("canvas");
+    canvasBack.width = canvas.width;
+    canvasBack.height = canvas.height;
+    const ctxBack = canvasBack.getContext("2d");
+    ctxBack?.drawImage(canvas, 0, 0);
+
     if (canvas.parentElement) {
       canvas.width = canvas.parentElement.clientWidth;
       canvas.height = canvas.parentElement.clientHeight;
+
+      ctx.drawImage(canvasBack, 0, 0, canvas.width, canvas.height);
     }
   };
 
@@ -345,7 +355,9 @@ export default function CatchMind({ participants }: CatchMindProps) {
         if (roundRef.current !== data.round) return;
         if (gameState !== CatchMindState.DRAW) return;
         const ctx = getContextObject();
-        ctx.drawImage(image, 0, 0);
+
+        const canvas = canvasRef.current;
+        ctx.drawImage(image, 0, 0, canvas!.width, canvas!.height);
       };
       image.src = data.imageSrc;
     });
