@@ -34,8 +34,8 @@ enum Color {
 }
 
 const WAIT_TIME = 5;
-const DRAW_TIME = 120; // 120
-const RESULT_TIME = 10; //15
+const DRAW_TIME = 120;
+const RESULT_TIME = 10;
 
 enum CatchMindState {
   WAIT,
@@ -371,6 +371,10 @@ export default function CatchMind({ participants }: CatchMindProps) {
       setCurrentScore(null);
       navigate(`/waiting/${path}`);
     });
+
+    return () => {
+      socket.off("catch-mind/end");
+    };
   }, [navigate, path, setCurrentScore, socket]);
 
   useEffect(() => {
