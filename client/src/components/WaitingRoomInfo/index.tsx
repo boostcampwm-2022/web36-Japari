@@ -1,7 +1,7 @@
 /** @jsxImportSource @emotion/react */
 import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useRecoilValue } from "recoil";
+import { useRecoilValue, useRecoilState } from "recoil";
 import { socketState } from "../../store/socket";
 import Button from "../Button";
 import Audio from "../Audio";
@@ -13,11 +13,10 @@ import { User } from "@dto";
 import { useCams, StreamInfo } from "../../hooks/useCams";
 import { userState } from "../../store/user";
 import Modal from "../Modal";
+import { audioState } from "../../store/media";
 
 import micOn from "../../assets/icons/mic-on.svg";
 import micOff from "../../assets/icons/mic-off.svg";
-import çamOn from "../../assets/icons/cam-on.svg";
-import camOff from "../../assets/icons/cam-off.svg";
 
 export interface WaitingRoomInfoProps {
   roomRecord: Room;
@@ -35,8 +34,8 @@ const WaitingRoomInfo = ({ roomRecord, participants }: WaitingRoomInfoProps) => 
   const { videoStream, audioStream } = useCams();
   const [remoteVideoOnOff, setRemoteVideoOnOff] = useState<Map<number, boolean>>(new Map());
   const [remoteAudioOnOff, setRemoteAudioOnOff] = useState<Map<number, boolean>>(new Map());
-
   const [modifyRoomModalOpen, setModifyRoomModalOpen] = useState<boolean>(false);
+  const [audio] = useRecoilState(audioState);
 
   const initializeMediaStatus = useCallback(
     (participant: User, videoStreamInfo: StreamInfo | undefined, audioStreamInfo: StreamInfo | undefined) => {
@@ -116,6 +115,12 @@ const WaitingRoomInfo = ({ roomRecord, participants }: WaitingRoomInfoProps) => 
       socket.off("video-status/modify");
     };
   }, [socket]);
+
+  useEffect(() => {
+    if (audioStream.size > 0 && videoStream.size > 0) {
+      socket.emit("audio-status/modify", audio);
+    }
+  }, [audio, socket, audioStream, videoStream]);
 
   return (
     <div css={style.waitingRoomInfoStyle}>
