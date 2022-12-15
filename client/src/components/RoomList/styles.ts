@@ -5,7 +5,7 @@ export const containerStyle = css`
   display: inline-flex;
   flex-direction: column;
   height: 40rem;
-  width: 60rem;
+  width: 72.5rem;
 `;
 
 export const headerStyle = css`
@@ -38,9 +38,23 @@ export const roomListStyle = (theme: Theme) => css`
   flex-grow: 1;
   box-sizing: border-box;
   padding: 1.5rem;
-  border-radius: 10px;
+  border-radius: 0.6rem;
   overflow-y: overlay;
 
   box-shadow: 0 0.25rem 0.25rem rgba(0, 0, 0, 0.2);
   background-color: ${theme.colors.secondary};
+`;
+
+export const notificationStyle = css`
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+
+  width: 100%;
+  text-align: center;
+  line-height: 4rem;
+
+  color: blueviolet;
+  font-size: 2rem;
 `;

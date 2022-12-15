@@ -14,7 +14,7 @@ import paletteLockIcon from "../../../assets/icons/palette-lock.png";
 import { useNavigate, useLocation } from "react-router-dom";
 import { User } from "@dto";
 
-const DEFAULT_FONT = "50px LINESeedKR bold";
+const DEFAULT_FONT = "3rem LINESeedKR bold";
 
 enum Color {
   WHITE = "white",
@@ -34,8 +34,8 @@ enum Color {
 }
 
 const WAIT_TIME = 5;
-const DRAW_TIME = 120; // 120
-const RESULT_TIME = 10; //15
+const DRAW_TIME = 120;
+const RESULT_TIME = 10;
 
 enum CatchMindState {
   WAIT,
@@ -119,7 +119,7 @@ export default function CatchMind({ participants }: CatchMindProps) {
       ctx.fillStyle = option?.color ?? "black";
       if (option?.size) {
         ctx.font = option.size + " LINESeedKR";
-      }
+      } else ctx.font = "4rem LINESeedKR";
 
       const metrics = ctx.measureText(text);
       const width = metrics.width;
@@ -167,6 +167,26 @@ export default function CatchMind({ participants }: CatchMindProps) {
     },
     [isDrawing, getContextObject, handleDebounce]
   );
+
+  const resizeCanvas = () => {
+    if (!canvasRef.current) return;
+    const canvas = canvasRef.current;
+
+    const ctx = getContextObject();
+
+    const canvasBack = document.createElement("canvas");
+    canvasBack.width = canvas.width;
+    canvasBack.height = canvas.height;
+    const ctxBack = canvasBack.getContext("2d");
+    ctxBack?.drawImage(canvas, 0, 0);
+
+    if (canvas.parentElement) {
+      canvas.width = canvas.parentElement.clientWidth;
+      canvas.height = canvas.parentElement.clientHeight;
+
+      ctx.drawImage(canvasBack, 0, 0, canvas.width, canvas.height);
+    }
+  };
 
   // event handlers
   const handlePencilMode = useCallback(() => {
@@ -274,7 +294,7 @@ export default function CatchMind({ participants }: CatchMindProps) {
       clearCanvas();
       const ctx = getContextObject();
       writeCenter(`정답 공개`, { color: "black", dx: 0, dy: -90 });
-      writeCenter(`${data.answer}`, { color: "red", size: "75px", dx: 0, dy: 30 });
+      writeCenter(`${data.answer}`, { color: "red", size: "4.5rem", dx: 0, dy: 30 });
       ctx.fillStyle = currentColorRef.current;
 
       setTime(RESULT_TIME);
@@ -320,10 +340,6 @@ export default function CatchMind({ participants }: CatchMindProps) {
 
   useEffect(() => {
     setCurrentScore(null);
-    if (!canvasRef.current) return;
-    const canvas = canvasRef.current;
-    canvas.width = 800;
-    canvas.height = 510;
 
     const ctx = getContextObject();
     ctx.font = DEFAULT_FONT;
@@ -339,7 +355,9 @@ export default function CatchMind({ participants }: CatchMindProps) {
         if (roundRef.current !== data.round) return;
         if (gameState !== CatchMindState.DRAW) return;
         const ctx = getContextObject();
-        ctx.drawImage(image, 0, 0);
+
+        const canvas = canvasRef.current;
+        ctx.drawImage(image, 0, 0, canvas!.width, canvas!.height);
       };
       image.src = data.imageSrc;
     });
@@ -356,6 +374,10 @@ export default function CatchMind({ participants }: CatchMindProps) {
         alert("최소 인원이 충족되지 않아 게임이 종료되었습니다.");
       }
     });
+
+    return () => {
+      socket.off("catch-mind/end");
+    };
   }, [navigate, path, setCurrentScore, socket]);
 
   useEffect(() => {
@@ -376,6 +398,15 @@ export default function CatchMind({ participants }: CatchMindProps) {
       ctx.strokeStyle = Color.WHITE;
     }
   }, [mode, getContextObject]);
+
+  useEffect(() => {
+    resizeCanvas();
+    window.addEventListener("resize", resizeCanvas);
+
+    return () => {
+      window.removeEventListener("reisez", resizeCanvas);
+    };
+  }, [canvasRef]);
 
   return (
     <div css={style.gameWrapperStyle}>

@@ -25,7 +25,11 @@ const StatusMedia = () => {
             stream.getAudioTracks()[0].enabled = !stream.getAudioTracks()[0].enabled;
           }}
         >
-          {audio ? <img src={micOn} alt="micOn" /> : <img src={micOff} alt="micOff" />}
+          {audio ? (
+            <img css={style.micIconStyle} src={micOn} alt="micOn" />
+          ) : (
+            <img css={style.micIconStyle} src={micOff} alt="micOff" />
+          )}
         </div>
         <div
           css={style.micCamButtonStyle}
@@ -35,7 +39,11 @@ const StatusMedia = () => {
             stream.getVideoTracks()[0].enabled = !stream.getVideoTracks()[0].enabled;
           }}
         >
-          {video ? <img src={camOn} alt="camOn" /> : <img src={camOff} alt="camOff" />}
+          {video ? (
+            <img css={style.micIconStyle} src={camOn} alt="camOn" />
+          ) : (
+            <img css={style.micIconStyle} src={camOff} alt="camOff" />
+          )}
         </div>
       </div>
     )

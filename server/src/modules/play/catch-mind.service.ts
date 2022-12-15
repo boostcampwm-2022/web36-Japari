@@ -7,8 +7,8 @@ import { RedisService } from "../redis/redis.service";
 import { Participant, CatchMindGameRoom, CatchMindRecord } from "../../@types/catch-mind";
 
 const WAIT_TIME = 5;
-const DRAW_TIME = 120; //120
-const RESULT_TIME = 10; //15
+const DRAW_TIME = 120;
+const RESULT_TIME = 10;
 
 @Injectable()
 export class CatchMindService {
@@ -117,14 +117,29 @@ export class CatchMindService {
 
     // 마지막 라운드가 될 경우 게임을 종료한다.
     if (round === 5) {
-      Object.entries(totalScores).forEach(async ([userIdString, addScore]) => {
+      const room: CatchMindGameRoom | null = await this.redis.getFrom(RedisTableName.GAME_ROOMS, roomId);
+      if (!room) return;
+
+      for (const [userIdString, addScore] of Object.entries(totalScores)) {
         // 1. 유저 점수에 totalScores 반영
         const userId = Number(userIdString);
-        const { score } = await this.prisma.user.findFirst({ where: { userId } });
-        await this.prisma.user.update({ where: { userId }, data: { score: score + (addScore as number) } });
+        const user = await this.redis.getFrom(RedisTableName.ONLINE_USERS, userIdString);
+        if (!user) continue;
+        const { score, socketId } = user;
+        const newScore = score + (addScore as number);
+        await this.prisma.user.update({ where: { userId }, data: { score: newScore } });
+        await this.redis.updateTo(RedisTableName.ONLINE_USERS, userIdString, { score: newScore });
+        await this.redis.updateTo(RedisTableName.SOCKET_ID_TO_USER_INFO, socketId, { score: newScore });
+      }
+
+      room.participants = room.participants.map(participant => {
+        participant.score += totalScores[participant.userId];
+        return participant;
       });
+      await this.redis.setTo(RedisTableName.GAME_ROOMS, roomId, room);
+
       // 2. 게임 종료
-      // 15초 뒤 round start
+      // 10초 뒤 end
       setTimeout(async () => {
         await this.redis.hdel(RedisTableName.PLAY_DATA, roomId);
         server.to(roomId).emit("catch-mind/end");

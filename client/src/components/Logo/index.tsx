@@ -1,5 +1,5 @@
 /** @jsxImportSource @emotion/react */
-import { logoStyle } from "./styles";
+import { logoIconStyle, logoStyle, logoWordStyle } from "./styles";
 import JapariLogoGame from "../../assets/logo/japari-logo-image.svg";
 import JapariLogoWord from "../../assets/logo/japari-logo-word.svg";
 
@@ -26,8 +26,8 @@ const Logo = ({ logoType }: LogoProps) => {
 
   return (
     <div css={logoStyle}>
-      <img src={JapariLogoGame} alt="JapariLogoGame" />
-      <img src={JapariLogoWord} alt="JapariLogoWord" />
+      <img css={logoIconStyle} src={JapariLogoGame} alt="JapariLogoGame" />
+      <img css={logoWordStyle} src={JapariLogoWord} alt="JapariLogoWord" />
     </div>
   );
 };
