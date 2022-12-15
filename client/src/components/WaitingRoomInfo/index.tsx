@@ -54,8 +54,6 @@ const WaitingRoomInfo = ({ roomRecord, participants }: WaitingRoomInfoProps) => 
           return newMap;
         });
       }
-      console.log(videoStreamInfo);
-      console.log(audioStreamInfo);
     },
     []
   );
@@ -118,10 +116,6 @@ const WaitingRoomInfo = ({ roomRecord, participants }: WaitingRoomInfoProps) => 
       socket.off("video-status/modify");
     };
   }, [socket]);
-
-  useEffect(() => {
-    console.log(remoteAudioOnOff);
-  }, [remoteAudioOnOff]);
 
   return (
     <div css={style.waitingRoomInfoStyle}>
