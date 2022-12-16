@@ -31,23 +31,37 @@
 
 # 기능 소개
 
+## 랜딩 페이지
+
+![Untitled](https://user-images.githubusercontent.com/87958906/208001203-00571034-27ff-4c77-911e-b345ef0be2ba.png)
+
+- 사용자들은 하단의 구글 또는 깃헙 로그인 버튼을 통해 소셜 로그인을 진행할 수 있습니다.
+- 화면을 클릭하면 자동으로 배경음악이 실행됩니다.
+
 ## 로비
 
-![image](https://user-images.githubusercontent.com/86656921/205483914-a662cf80-ce5e-49f2-a841-de0275394097.png)
+![Untitled1](https://user-images.githubusercontent.com/87958906/208001213-3a1223dc-d6ec-4876-a9c7-e60666afc87e.png)
+![Untitled2](https://user-images.githubusercontent.com/87958906/208001217-6cf162e4-4127-481d-8d98-e0e3d47dd895.png)
+
 - 사용자들은 왼쪽의 유저 목록에서 현재 접속중인 유저의 목록을 확인할 수 있습니다.
 - 사용자들은 방 만들기 버튼을 눌러 방을 만들거나 목록에 있는 방 레코드를 눌러 방에 입장할 수 있습니다.
 - 하단의 채팅창을 이용해 로비에 있는 사용자들과 채팅을 할 수 있습니다.
 
 ## 대기실
 
-![image](https://user-images.githubusercontent.com/86656921/205483924-b32c285b-5afd-4ae0-be4e-d53f124d568d.png)
+![Untitled3](https://user-images.githubusercontent.com/87958906/208001231-7f53b9ef-9d0a-4eb6-92bf-65ba7f51ee39.png)
+
 - 방에 입장하면 방에 있는 다른 사용자들과 화상 / 음성 대화가 가능합니다.
-- 상단에 있는 마이크, 카메라 버튼을 눌러 자신의 마이크와 카메라를 온오프 할 수 있습니다.
+- 상단 우측에 있는 마이크, 카메라 버튼을 눌러 자신의 마이크와 카메라를 온오프 할 수 있습니다.
 - 참여자 누구나 게임 시작을 눌러 게임을 시작할 수 있습니다.
 
 ## 인게임
 
-![image](https://user-images.githubusercontent.com/86656921/205483928-25896783-96ff-4055-89df-36c71613593a.png)
+![Untitled4](https://user-images.githubusercontent.com/87958906/208001244-7f947d06-bd3d-438a-80f9-9b589ea22961.png)
+![Untitled5](https://user-images.githubusercontent.com/87958906/208001253-e9911f1b-c108-42db-966b-fee85d45eb8d.png)
+![Untitled6](https://user-images.githubusercontent.com/87958906/208001260-b382eb9f-5c2a-4745-b47a-5bb168f889d1.png)
+![Untitled7](https://user-images.githubusercontent.com/87958906/208001280-ca904244-2039-40ed-897a-9fab261072f7.png)
+
 - 게임을 시작하면 화면 중앙에 있는 게임 화면을 통해 게임을 할 수 있습니다.
 - 하단의 채팅창을 이용해 같이 게임을 진행중인 사용자들과 채팅을 할 수 있습니다.
 - 방 나가기 버튼을 눌러 게임 도중에 방을 나갈 수 있습니다.
