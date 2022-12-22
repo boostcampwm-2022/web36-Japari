@@ -88,3 +88,12 @@
 - 제시어는 캔버스 상단에 계속 위치합니다.
 - 팔레트에서 펜, 지우개, 펜 굵기, 색깔을 고를 수 있습니다.
 - 시간이 모두 지나거나 방 인원들이 모두 정답을 맞추면 시간이 종료됩니다.
+
+# 기술적 경험
+
+- <a href="https://github.com/boostcampwm-2022/web36-Japari/wiki/Responsive-Web">Responsive Web</a>
+- <a href="https://github.com/boostcampwm-2022/web36-Japari/wiki/%EC%BB%A4%EC%8A%A4%ED%85%80%20%EC%9D%B8%EC%A6%9D%20%EB%A1%9C%EC%A7%81">커스텀 인증 로직</a>
+- <a href="https://github.com/boostcampwm-2022/web36-Japari/wiki/WebRTC-(SFU)">WebRTC - (SFU)</a>
+- <a href="https://github.com/boostcampwm-2022/web36-Japari/wiki/%EC%BA%94%EB%B2%84%EC%8A%A4%20%EC%9D%B4%EB%AF%B8%EC%A7%80%20%EC%A0%84%EC%86%A1%20%EC%B5%9C%EC%A0%81%ED%99%94">캔버스 이미지 전송 최적화</a>
+- <a href="https://github.com/boostcampwm-2022/web36-Japari/wiki/%EC%8B%9C%EA%B0%81%ED%99%94%EB%A5%BC%20%EC%9D%B4%EC%9A%A9%ED%95%9C%20%EB%B2%84%EA%B7%B8%20%ED%95%B4%EA%B2%B0">시각화를 이용한 버그 해결</a>
+- <a href="https://github.com/boostcampwm-2022/web36-Japari/wiki/%EC%9E%90%EB%8F%99%EB%B0%B0%ED%8F%AC%20%EB%B0%8F%20%EB%A1%9C%EC%BB%AC%20%ED%99%98%EA%B2%BD%20%EC%B0%A8%EC%9D%B4%EB%A1%9C%20%EB%B0%9C%EC%83%9D%ED%95%9C%20%EB%AC%B8%EC%A0%9C">자동배포 및 로컬 환경 차이로 발생한 문제</a>
