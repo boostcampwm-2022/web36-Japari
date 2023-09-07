@@ -20,7 +20,7 @@
 |**J003 강수홍**|**J065 김형준**|**J146 이승재**|**J203 최성호**|
 |---|---|---|---|
 |<img src="https://user-images.githubusercontent.com/86656921/205483807-8d946c15-c385-4e13-b45a-a89c62eee576.png" width="200" height="200"/>|<img src="https://user-images.githubusercontent.com/86656921/205483833-c6740164-cd6d-4a79-b291-530d30340cd2.png" width="200" height="200"/>|<img src="https://user-images.githubusercontent.com/86656921/205483841-b9bdb32d-bf75-4e3d-8c4b-36e43083b363.png" width="200" height="200"/>|<img src="https://user-images.githubusercontent.com/86656921/205483852-66d14892-aa70-4b17-b4bb-88af56efa232.png" width="200" height="200"/>|
-|[**GitHub**](https://github.com/tnghd5761)|[**GitHub**](https://github.com/kimhyeongjun95)|[**GitHub**](https://github.com/seungjae94)|[**GitHub**](https://github.com/c99-coder)|
+|[**GitHub**](https://github.com/tnghd5761)|[**GitHub**](https://github.com/kimhyeongjun95)|[**GitHub**](https://github.com/seungjae94)|[**GitHub**](https://github.com/c99-dev)|
 |`회기의 마술사`|`울산 분위기 메이커`|`김포 개발왕`|`신촌 배포왕`|
 
 # 기술 스택
