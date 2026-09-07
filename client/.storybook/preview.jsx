@@ -1,5 +1,5 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import { INITIAL_VIEWPORTS } from "@storybook/addon-viewport";
+import { INITIAL_VIEWPORTS } from "storybook/viewport";
 import { Global, ThemeProvider } from "@emotion/react";
 import { globalStyle } from "../src/styles/global";
 import theme from "../src/styles/theme";
@@ -14,7 +14,7 @@ export const parameters = {
     },
   },
   viewport: {
-    viewports: INITIAL_VIEWPORTS,
+    options: INITIAL_VIEWPORTS,
   },
 };
 

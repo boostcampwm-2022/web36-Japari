@@ -1,4 +1,4 @@
-import { Story, Meta } from "@storybook/react";
+import { StoryFn, Meta } from "@storybook/react-vite";
 import Logout from ".";
 
 export default {
@@ -6,7 +6,7 @@ export default {
   component: Logout,
 } as Meta;
 
-const Template: Story = () => <Logout />;
+const Template: StoryFn = () => <Logout />;
 
 export const Default = Template.bind({});
 Default.storyName = "로그아웃";

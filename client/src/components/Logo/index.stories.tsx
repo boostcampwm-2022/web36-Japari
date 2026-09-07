@@ -1,4 +1,4 @@
-import { Meta, Story } from "@storybook/react";
+import { Meta, StoryFn } from "@storybook/react-vite";
 import Logo, { LogoProps } from "./index";
 
 export default {
@@ -6,7 +6,7 @@ export default {
   component: Logo,
 } as Meta;
 
-const Template: Story<LogoProps> = args => <Logo {...args} />;
+const Template: StoryFn<LogoProps> = args => <Logo {...args} />;
 
 export const Default = Template.bind({});
 Default.storyName = "로고";

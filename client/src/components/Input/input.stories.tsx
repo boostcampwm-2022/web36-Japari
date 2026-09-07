@@ -1,4 +1,4 @@
-import { Meta, Story } from "@storybook/react";
+import { Meta, StoryFn } from "@storybook/react-vite";
 import Input, { InputProps } from "./index";
 
 export default {
@@ -6,7 +6,7 @@ export default {
   component: Input,
 } as Meta;
 
-const Template: Story<InputProps> = args => <Input {...args} />;
+const Template: StoryFn<InputProps> = args => <Input {...args} />;
 
 export const Default = Template.bind({});
 Default.storyName = "인풋";

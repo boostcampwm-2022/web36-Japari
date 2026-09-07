@@ -1,4 +1,4 @@
-import { Story, Meta } from "@storybook/react";
+import { StoryFn, Meta } from "@storybook/react-vite";
 import WaitingRoomInfo, { WaitingRoomInfoProps } from ".";
 
 export default {
@@ -6,7 +6,7 @@ export default {
   component: WaitingRoomInfo,
 } as Meta;
 
-const Template: Story<WaitingRoomInfoProps> = args => <WaitingRoomInfo {...args} />;
+const Template: StoryFn<WaitingRoomInfoProps> = args => <WaitingRoomInfo {...args} />;
 
 export const Default = Template.bind({});
 Default.storyName = "대기실 정보";

@@ -1,4 +1,4 @@
-import { Story, Meta } from "@storybook/react";
+import { StoryFn, Meta } from "@storybook/react-vite";
 import Chatting from ".";
 
 export default {
@@ -6,7 +6,7 @@ export default {
   component: Chatting,
 } as Meta;
 
-const Template: Story = () => <Chatting />;
+const Template: StoryFn = () => <Chatting />;
 
 export const Default = Template.bind({});
 Default.storyName = "채팅";

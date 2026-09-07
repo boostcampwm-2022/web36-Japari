@@ -2,53 +2,29 @@
   "name": "client",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.12.0"
+  },
   "dependencies": {
-    "@emotion/css": "^11.10.5",
-    "@emotion/react": "^11.10.5",
-    "@emotion/styled": "^11.10.5",
-    "@testing-library/jest-dom": "^5.16.5",
-    "@testing-library/react": "^13.4.0",
-    "@testing-library/user-event": "^13.5.0",
-    "@types/jest": "^27.5.2",
-    "@types/lodash": "^4.14.191",
-    "@types/node": "^16.18.3",
-    "@types/react": "^18.0.25",
-    "@types/react-dom": "^18.0.9",
-    "axios": "^1.2.0",
-    "howler": "^2.2.3",
-    "mediasoup-client": "^3.6.63",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "react-loader-spinner": "^5.3.4",
-    "react-scripts": "5.0.1",
-    "recoil": "^0.7.6",
-    "socket.io-client": "^4.5.4",
-    "typescript": "^4.8.4",
-    "web-vitals": "^2.1.4"
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
+    "axios": "^1.20.0",
+    "howler": "^2.2.4",
+    "lodash": "^4.17.23",
+    "mediasoup-client": "^3.23.1",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-loader-spinner": "^5.4.5",
+    "react-router-dom": "^7.18.0",
+    "recoil": "^0.7.7",
+    "socket.io-client": "^4.8.3"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject",
-    "storybook": "start-storybook -p 6006 -s public",
-    "build-storybook": "build-storybook -s public"
-  },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ],
-    "overrides": [
-      {
-        "files": [
-          "**/*.stories.*"
-        ],
-        "rules": {
-          "import/no-anonymous-default-export": "off"
-        }
-      }
-    ]
+    "start": "vite",
+    "build": "tsc --noEmit && vite build",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
   },
   "browserslist": {
     "production": [
@@ -63,23 +39,16 @@
     ]
   },
   "devDependencies": {
-    "@storybook/addon-a11y": "^6.5.13",
-    "@storybook/addon-actions": "^6.5.13",
-    "@storybook/addon-essentials": "^6.5.13",
-    "@storybook/addon-interactions": "^6.5.13",
-    "@storybook/addon-links": "^6.5.13",
-    "@storybook/builder-webpack5": "^6.5.13",
-    "@storybook/manager-webpack5": "^6.5.13",
-    "@storybook/node-logger": "^6.5.13",
-    "@storybook/preset-create-react-app": "^4.1.2",
-    "@storybook/react": "^6.5.13",
-    "@storybook/testing-library": "^0.0.13",
-    "@types/axios": "^0.14.0",
-    "@types/howler": "^2.2.7",
-    "babel-plugin-named-exports-order": "^0.0.2",
-    "http-proxy-middleware": "^2.0.6",
-    "prop-types": "^15.8.1",
-    "react-router-dom": "^6.4.3",
-    "webpack": "^5.75.0"
+    "@storybook/addon-a11y": "10.6.0",
+    "@storybook/react-vite": "10.6.0",
+    "@types/howler": "^2.2.12",
+    "@types/lodash": "^4.17.25",
+    "@types/node": "^22.20.1",
+    "@types/react": "^18.3.31",
+    "@types/react-dom": "^18.3.7",
+    "@vitejs/plugin-react": "6.1.1",
+    "storybook": "10.6.0",
+    "typescript": "^5.9.3",
+    "vite": "8.2.2"
   }
 }

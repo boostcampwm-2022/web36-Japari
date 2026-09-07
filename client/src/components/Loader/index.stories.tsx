@@ -1,4 +1,4 @@
-import { Meta, Story } from "@storybook/react";
+import { Meta, StoryFn } from "@storybook/react-vite";
 import Loader from ".";
 
 export default {
@@ -6,7 +6,7 @@ export default {
   component: Loader,
 } as Meta;
 
-const Template: Story = () => <Loader />;
+const Template: StoryFn = () => <Loader />;
 
 export const Default = Template.bind({});
 Default.storyName = "화면 로더";

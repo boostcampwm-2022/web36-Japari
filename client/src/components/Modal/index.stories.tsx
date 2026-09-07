@@ -1,4 +1,4 @@
-import { Meta, Story } from "@storybook/react";
+import { Meta, StoryFn } from "@storybook/react-vite";
 import Modal, { ModalProps } from "./index";
 
 export default {
@@ -6,7 +6,7 @@ export default {
   component: Modal,
 } as Meta;
 
-const Template: Story<ModalProps> = args => <Modal {...args} />;
+const Template: StoryFn<ModalProps> = args => <Modal {...args} />;
 
 export const NickNameSetting = Template.bind({});
 NickNameSetting.storyName = "닉네임 설정";

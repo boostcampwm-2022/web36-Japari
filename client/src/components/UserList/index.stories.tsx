@@ -1,4 +1,4 @@
-import { Meta, Story } from "@storybook/react";
+import { Meta, StoryFn } from "@storybook/react-vite";
 import UserList from "./index";
 
 export default {
@@ -6,7 +6,7 @@ export default {
   component: UserList,
 } as Meta;
 
-const Template: Story = () => <UserList></UserList>;
+const Template: StoryFn = () => <UserList></UserList>;
 
 export const Default = Template.bind({});
 Default.storyName = "유저 목록 사이드바";

@@ -90,7 +90,7 @@ export default function CatchMind({ participants }: CatchMindProps) {
   const [gameState, setGameState] = useState<number>(0);
   const [drawerId, setDrawerId] = useState<number>(0);
 
-  const timer = useRef<NodeJS.Timer | null>(null);
+  const timer = useRef<ReturnType<typeof setInterval> | null>(null);
   if (timeRef) {
     timeRef.current = time;
   }

@@ -13,11 +13,11 @@ import { useNavigate } from "react-router-dom";
 
 const LandingPage: React.FC = () => {
   const handleGoogleLogin = () => {
-    window.location.href = process.env.REACT_APP_OAUTH_GOOGLE_AUTH_SERVER!;
+    window.location.href = import.meta.env.VITE_OAUTH_GOOGLE_AUTH_SERVER;
   };
 
   const handleGithubLogin = () => {
-    window.location.href = process.env.REACT_APP_OAUTH_GITHUB_AUTH_SERVER!;
+    window.location.href = import.meta.env.VITE_OAUTH_GITHUB_AUTH_SERVER;
   };
   const navigate = useNavigate();
 

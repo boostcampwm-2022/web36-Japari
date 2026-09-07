@@ -10,14 +10,13 @@
     "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": true,
     "module": "esnext",
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
     "jsxImportSource": "@emotion/react",
-    "types": ["@emotion/react/types/css-prop"]
+    "types": ["node", "vite/client", "@emotion/react/types/css-prop"]
   },
-  "include": ["src"],
-  "typeRoots": ["@types"]
+  "include": ["src", ".storybook", "vite.config.ts"]
 }

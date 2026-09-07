@@ -1,4 +1,4 @@
-import { Meta, Story } from "@storybook/react";
+import { Meta, StoryFn } from "@storybook/react-vite";
 import CheckBox from "./index";
 
 export default {
@@ -6,7 +6,7 @@ export default {
   component: CheckBox,
 } as Meta;
 
-const Template: Story = (args: any) => <CheckBox {...args} />;
+const Template: StoryFn = (args: any) => <CheckBox {...args} />;
 
 export const Default = Template.bind({});
 Default.storyName = "체크박스";

@@ -1,4 +1,4 @@
-import { Meta, Story } from "@storybook/react";
+import { Meta, StoryFn } from "@storybook/react-vite";
 import Select, { SelectProps } from "./index";
 
 export default {
@@ -6,7 +6,7 @@ export default {
   component: Select,
 } as Meta;
 
-const Template: Story<SelectProps> = args => <Select {...args} />;
+const Template: StoryFn<SelectProps> = args => <Select {...args} />;
 
 export const Default = Template.bind({});
 Default.storyName = "셀렉트";

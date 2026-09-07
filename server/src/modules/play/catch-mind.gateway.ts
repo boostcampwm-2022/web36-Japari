@@ -16,7 +16,7 @@ import { SERVER_SOCKET_PORT } from "src/constants/config";
 
 import { CatchMindService } from "./catch-mind.service";
 import { randFromArray } from "util/random";
-import { v4 as uuid } from "uuid";
+import { randomUUID } from "node:crypto";
 import { CatchMindGameRoom, CatchMindRecord } from "../../@types/catch-mind";
 
 @UseFilters(new SocketBadRequestFilter("catch-mind/error"))
@@ -56,7 +56,7 @@ export class CatchMindGateway implements OnGatewayInit {
 
     const newRecord: CatchMindRecord = {
       gameId: 1,
-      playId: uuid(),
+      playId: randomUUID(),
       round: 1,
       answer,
       state: CatchMindState.WAIT,

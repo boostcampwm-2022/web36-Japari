@@ -22,16 +22,16 @@ import {
   Producer,
   Router,
   RtpCapabilities,
-  RtpCodecCapability,
+  RouterRtpCodecCapability,
   RtpParameters,
   Transport,
   WebRtcTransport,
   WebRtcTransportOptions,
-} from "mediasoup/node/lib/types";
+} from "mediasoup/types";
 import { RedisService } from "../redis/redis.service";
 import { RedisTableName } from "src/constants/enum";
 
-const mediaCodecs: RtpCodecCapability[] = [
+const mediaCodecs: RouterRtpCodecCapability[] = [
   {
     kind: "video",
     mimeType: "video/VP8",

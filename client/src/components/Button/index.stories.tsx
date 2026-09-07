@@ -1,5 +1,5 @@
 import React from "react";
-import { Meta, Story } from "@storybook/react";
+import { Meta, StoryFn } from "@storybook/react-vite";
 import Button, { ButtonProps } from "./index";
 
 export default {
@@ -7,7 +7,7 @@ export default {
   component: Button,
 } as Meta;
 
-const Template: Story<ButtonProps> = args => <Button {...args}></Button>;
+const Template: StoryFn<ButtonProps> = args => <Button {...args}></Button>;
 
 export const Default = Template.bind({});
 Default.storyName = "버튼";

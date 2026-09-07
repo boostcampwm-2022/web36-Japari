@@ -1,4 +1,4 @@
-import { Story, Meta } from "@storybook/react";
+import { StoryFn, Meta } from "@storybook/react-vite";
 import Cam, { CamProps } from ".";
 
 export default {
@@ -6,7 +6,7 @@ export default {
   component: Cam,
 } as Meta;
 
-const Template: Story<CamProps> = args => <Cam {...args} />;
+const Template: StoryFn<CamProps> = args => <Cam {...args} />;
 
 export const Default = Template.bind({});
 Default.storyName = "캠";

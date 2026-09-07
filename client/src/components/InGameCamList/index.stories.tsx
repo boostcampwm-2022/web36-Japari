@@ -1,4 +1,4 @@
-import { Story, Meta } from "@storybook/react";
+import { StoryFn, Meta } from "@storybook/react-vite";
 import InGameCamList, { InGameCamListProps } from ".";
 
 export default {
@@ -6,7 +6,7 @@ export default {
   component: InGameCamList,
 } as Meta;
 
-const Template: Story<InGameCamListProps> = args => <InGameCamList {...args} />;
+const Template: StoryFn<InGameCamListProps> = args => <InGameCamList {...args} />;
 
 export const Default = Template.bind({});
 Default.storyName = "인게임 캠 목록";

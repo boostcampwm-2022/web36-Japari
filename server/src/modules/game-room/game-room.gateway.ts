@@ -13,7 +13,7 @@ import { Server, Socket } from "socket.io";
 import { RedisTableName } from "src/constants/enum";
 import { redisRecordToObject } from "util/convert";
 import { PrismaService } from "../prisma/prisma.service";
-import { v4 as uuid } from "uuid";
+import { randomUUID } from "node:crypto";
 import { RoomSettingDto } from "./dto/room-setting.dto";
 import { RoomCredentialDto } from "./dto/room-credential.dto";
 import { SocketExceptionFilter } from "src/exception-filters/websocket.filter";
@@ -75,7 +75,7 @@ export class GameRoomGateway implements OnGatewayInit {
     }
 
     // 입력으로 들어오지 않은 방 정보 추가
-    const roomId = uuid();
+    const roomId = randomUUID();
     const { minimumPeople } = await this.prisma.game.findUnique({ where: { gameId } });
 
     // 새로운 방을 redis에 저장

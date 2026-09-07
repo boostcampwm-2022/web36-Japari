@@ -1,4 +1,4 @@
-import { Story, ComponentMeta } from "@storybook/react";
+import { StoryFn, Meta } from "@storybook/react-vite";
 import { Header, HeaderProps } from "./index";
 
 export default {
@@ -10,9 +10,9 @@ export default {
       values: [{ name: "pink", value: "#FDE1E3" }],
     },
   },
-} as ComponentMeta<typeof Header>;
+} as Meta<typeof Header>;
 
-const Template: Story<HeaderProps> = args => <Header {...args} />;
+const Template: StoryFn<HeaderProps> = args => <Header {...args} />;
 
 export const Default = Template.bind({});
 Default.storyName = "헤더";

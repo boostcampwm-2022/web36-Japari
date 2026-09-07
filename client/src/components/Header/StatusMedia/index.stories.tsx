@@ -1,5 +1,5 @@
 // make Storybook for Mic and Cam toggle icon
-import { Meta, Story } from "@storybook/react";
+import { Meta, StoryFn } from "@storybook/react-vite";
 import StatusMedia from ".";
 
 export default {
@@ -7,7 +7,7 @@ export default {
   component: StatusMedia,
 } as Meta;
 
-const Template: Story = args => <StatusMedia {...args} />;
+const Template: StoryFn = args => <StatusMedia {...args} />;
 export const Default = Template.bind({});
 Default.storyName = "마이크,카메라";
 Default.args = {

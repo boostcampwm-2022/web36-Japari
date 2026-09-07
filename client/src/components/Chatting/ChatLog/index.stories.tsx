@@ -1,4 +1,4 @@
-import { Story, Meta } from "@storybook/react";
+import { StoryFn, Meta } from "@storybook/react-vite";
 import ChatLog, { ChatLogProps } from ".";
 
 export default {
@@ -6,7 +6,7 @@ export default {
   component: ChatLog,
 } as Meta;
 
-const Template: Story<ChatLogProps> = args => <ChatLog {...args} />;
+const Template: StoryFn<ChatLogProps> = args => <ChatLog {...args} />;
 
 export const Default = Template.bind({});
 Default.storyName = "채팅 로그";

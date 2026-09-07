@@ -1,4 +1,4 @@
-import { Story, Meta } from "@storybook/react";
+import { StoryFn, Meta } from "@storybook/react-vite";
 import RoomList, { RoomListProps } from ".";
 
 export default {
@@ -6,7 +6,7 @@ export default {
   component: RoomList,
 } as Meta;
 
-const Template: Story<RoomListProps> = args => <RoomList {...args} />;
+const Template: StoryFn<RoomListProps> = args => <RoomList {...args} />;
 
 export const Default = Template.bind({});
 Default.storyName = "방 목록";

@@ -6,9 +6,9 @@ on:
 
 env:
   CI: false
-  REACT_APP_OAUTH_GITHUB_AUTH_SERVER: ${{ secrets.REACT_APP_OAUTH_GITHUB_AUTH_SERVER }}
-  REACT_APP_OAUTH_GOOGLE_AUTH_SERVER: ${{ secrets.REACT_APP_OAUTH_GOOGLE_AUTH_SERVER }}
-  REACT_APP_SOCKET_SERVER_URL: ${{ secrets.REACT_APP_SOCKET_SERVER_URL }}
+  VITE_OAUTH_GITHUB_AUTH_SERVER: ${{ secrets.REACT_APP_OAUTH_GITHUB_AUTH_SERVER }}
+  VITE_OAUTH_GOOGLE_AUTH_SERVER: ${{ secrets.REACT_APP_OAUTH_GOOGLE_AUTH_SERVER }}
+  VITE_SOCKET_SERVER_URL: ${{ secrets.REACT_APP_SOCKET_SERVER_URL }}
   SERVER_PORT: ${{ secrets.SERVER_PORT }}
   SERVER_SOCKET_PORT: ${{ secrets.SERVER_SOCKET_PORT }}
   DATABASE_URL: ${{ secrets.DATABASE_URL }}
@@ -36,18 +36,27 @@ jobs:
 
     steps:
       - name: 체크아웃
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+
+      - name: Node.js 설정
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: |
+            client/package-lock.json
+            server/package-lock.json
 
       - name: client 모듈 설치
         working-directory: ./client
-        run: npm install
+        run: npm ci
 
       - name: client 환경변수 파일 생성
         working-directory: ./client
         run: |
-          echo REACT_APP_OAUTH_GITHUB_AUTH_SERVER=$REACT_APP_OAUTH_GITHUB_AUTH_SERVER > .env
-          echo REACT_APP_OAUTH_GITHUB_AUTH_SERVER=$REACT_APP_OAUTH_GOOGLE_AUTH_SERVER >> .env
-          echo REACT_APP_SOCKET_SERVER_URL=$REACT_APP_SOCKET_SERVER_URL >> .env
+          echo VITE_OAUTH_GITHUB_AUTH_SERVER=$VITE_OAUTH_GITHUB_AUTH_SERVER > .env
+          echo VITE_OAUTH_GOOGLE_AUTH_SERVER=$VITE_OAUTH_GOOGLE_AUTH_SERVER >> .env
+          echo VITE_SOCKET_SERVER_URL=$VITE_SOCKET_SERVER_URL >> .env
 
       - name: client 빌드
         working-directory: ./client
@@ -58,7 +67,7 @@ jobs:
 
       - name: server 모듈 설치
         working-directory: ./server
-        run: npm install
+        run: npm ci
 
       - name: server 환경변수 파일 생성
         working-directory: ./server

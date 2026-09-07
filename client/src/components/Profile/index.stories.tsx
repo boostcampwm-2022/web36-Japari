@@ -1,4 +1,4 @@
-import { Meta, Story } from "@storybook/react";
+import { Meta, StoryFn } from "@storybook/react-vite";
 import Profile, { ProfileProps } from "./index";
 
 export default {
@@ -6,7 +6,7 @@ export default {
   component: Profile,
 } as Meta;
 
-const Template: Story<ProfileProps> = args => <Profile {...args}></Profile>;
+const Template: StoryFn<ProfileProps> = args => <Profile {...args}></Profile>;
 
 export const Default = Template.bind({});
 Default.storyName = "프로필 (짧은 이메일)";

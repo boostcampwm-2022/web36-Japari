@@ -1,10 +1,15 @@
 /** @jsxImportSource @emotion/react */
 import { User } from "@dto";
 import { Device } from "mediasoup-client";
-import { Consumer } from "mediasoup-client/lib/Consumer";
-import { ProducerOptions } from "mediasoup-client/lib/Producer";
-import { MediaKind, RtpCapabilities, RtpParameters } from "mediasoup-client/lib/RtpParameters";
-import { Transport, TransportOptions } from "mediasoup-client/lib/Transport";
+import type {
+  Consumer,
+  MediaKind,
+  ProducerOptions,
+  RtpCapabilities,
+  RtpParameters,
+  Transport,
+  TransportOptions,
+} from "mediasoup-client/types";
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { useRecoilValue, useRecoilState } from "recoil";
